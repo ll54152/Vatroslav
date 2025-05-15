@@ -1,115 +1,104 @@
-import * as React from "react"
-import { Link } from 'react-router-dom';
-import { Card, CardContent } from "@/components/ui/card"
+import * as React from "react";
+import { Link, Navigate } from 'react-router-dom';
+import { Card, CardContent } from "@/components/ui/card";
 import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel"
+    Carousel,
+    CarouselContent,
+    CarouselItem
+} from "@/components/ui/carousel";
 import {
-  Menubar,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarSeparator,
-  MenubarShortcut,
-  MenubarTrigger,
-} from "@/components/ui/menubar"
- 
+    Menubar,
+    MenubarMenu,
+    MenubarTrigger
+} from "@/components/ui/menubar";
+import { jwtDecode } from "jwt-decode";
+
+const isTokenValid = () => {
+    const token = localStorage.getItem("jwt");
+    if (!token) return false;
+    try {
+        const decoded = jwtDecode(token);
+        const currentTime = Date.now() / 1000;
+        return decoded.exp > currentTime;
+        console.log("Token is valid");
+    } catch (error) {
+        return false;
+    }
+};
+
+const verifyToken = async () => {
+    const token = localStorage.getItem("jwt");
+    if (!token) return false;
+    try {
+        const response = await fetch("http://192.168.18.5:8080/auth/verify", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `${token}`,
+            },
+        });
+        return response.ok;
+    } catch (error) {
+        return false;
+    }
+};
+
 export default function CarouselSize() {
-  return (
-    <div>
-    <Carousel
-      opts={{
-        align: "start",
-      }}
-      className="w-[65vw] h-[70vh]"
-    >
-      <CarouselContent>
-       
-          <CarouselItem  className="md:basis-1/2 lg:basis-1/4">
-            <div className="p-1">
-            <Link to="/experimenti">
-              <Card className="hover:bg-pink-500 hover:text-white transition duration-300">
-                <CardContent className="flex aspect-square items-center justify-center p-6">
-                  <span className="text-3xl font-bold">Eksperimenti</span>
-                </CardContent>
-                
-              </Card >
-              </Link>
-            </div>
-          </CarouselItem>
-          
-          <CarouselItem  className="md:basis-1/2 lg:basis-1/4">
-            <div className="p-1">
-            <Link to="/komponente">
-              <Card className="hover:bg-pink-500 hover:text-white transition duration-300">
-                <CardContent className="flex aspect-square items-center justify-center p-6">
-                  <span className="text-3xl font-bold">Komponente</span>
-                </CardContent>
-                
-              </Card>
-              </Link>
-            </div>
-          </CarouselItem>
+    const [isAuthenticated, setIsAuthenticated] = React.useState(null);
 
-          <CarouselItem  className="md:basis-1/2 lg:basis-1/4">
-            <div className="p-1">
-              
-    <Link to="/experimentunos">
-              <Card className="hover:bg-pink-500 hover:text-white transition duration-300">
-                <CardContent className="flex aspect-square items-center justify-center p-6">
-                  <span className="text-3xl font-bold">Dodaj eksperiment +</span>
-                </CardContent>
-                
-              </Card>
-              </Link>
-            </div>
-          </CarouselItem>
-        
-          <CarouselItem  className="md:basis-1/2 lg:basis-1/4">
-            <div className="p-1">
-              
-    <Link to="/komponenteunos">
-              <Card className="hover:bg-pink-500 hover:text-white transition duration-300">
-                <CardContent className="flex aspect-square items-center justify-center p-6">
-                  <span className="text-3xl font-bold">Dodaj komponentu +</span>
-                </CardContent>
-                
-              </Card>
-              </Link>
-            </div>
-          </CarouselItem>
+    React.useEffect(() => {
+        verifyToken().then(setIsAuthenticated);
+    }, []);
 
-      </CarouselContent>
-      
-    </Carousel>
+    if (isAuthenticated === false || !isTokenValid()) {
+        localStorage.removeItem("jwt");
+        return <Navigate to="/login" />;
+    }
 
-    <Menubar>
-  <MenubarMenu>
-  <Link to="/home">
-    <MenubarTrigger className="w-40 hover:bg-red-500">Odjava</MenubarTrigger>
-    </Link>
-    
-  
+    if (isAuthenticated === null) {
+        return <p>Loading...</p>;
+    }
 
-    <Link to="/experimentiprimjer">
-    <MenubarTrigger className="w-40">Experiment primjer</MenubarTrigger>
-    </Link>
+    return (
+        <div>
+            <Carousel opts={{ align: "start" }} className="w-[65vw] h-[70vh]">
+                <CarouselContent>
+                    {[
+                        { path: "/experimenti", label: "Eksperimenti" },
+                        { path: "/komponente", label: "Komponente" },
+                        { path: "/experimentunos", label: "Dodaj eksperiment +" },
+                        { path: "/komponenteunos", label: "Dodaj komponentu +" }
+                    ].map((item, index) => (
+                        <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/4">
+                            <div className="p-1">
+                                <Link to={item.path}>
+                                    <Card className="hover:bg-pink-500 hover:text-white transition duration-300">
+                                        <CardContent className="flex aspect-square items-center justify-center p-6">
+                                            <span className="text-3xl font-bold">{item.label}</span>
+                                        </CardContent>
+                                    </Card>
+                                </Link>
+                            </div>
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+            </Carousel>
 
-    <Link to="/komponenteprimjer">
-    <MenubarTrigger className="w-40">Komponenta primjer</MenubarTrigger>
-    </Link>
-
-    
-
-
-  </MenubarMenu>
-</Menubar>
-    </div>
-
-    
-  )
+            <Menubar>
+                <MenubarMenu>
+                    <Link to="/home">
+                        <MenubarTrigger className="w-40 hover:bg-red-500" onClick={() => localStorage.removeItem("token")}>
+                            Odjava
+                        </MenubarTrigger>
+                    </Link>
+                    <Link to="/experimentiprimjer">
+                        <MenubarTrigger className="w-40">Experiment primjer</MenubarTrigger>
+                    </Link>
+                    <Link to="/komponenteprimjer">
+                        <MenubarTrigger className="w-40">Komponenta primjer</MenubarTrigger>
+                    </Link>
+                </MenubarMenu>
+            </Menubar>
+        </div>
+    );
 }
