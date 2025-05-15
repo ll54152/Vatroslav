@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 public class AuthenticationController {
 
     @Autowired
@@ -16,11 +16,11 @@ public class AuthenticationController {
 
     @GetMapping("/verify")
     public ResponseEntity<Void> verifyToken(@RequestHeader("Authorization") String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        String token = authHeader.substring(7);
+        String token = authHeader.substring(6).trim();
         boolean isValid = jwtService.validateToken(token);
 
         return isValid ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
