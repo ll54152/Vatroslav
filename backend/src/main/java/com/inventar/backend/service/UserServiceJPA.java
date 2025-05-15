@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.*;
 import org.springframework.stereotype.*;
+import org.springframework.transaction.TransactionSystemException;
 
 @Service
 public class UserServiceJPA {
@@ -31,9 +32,20 @@ public class UserServiceJPA {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    public User register(User user) {
+    public boolean register(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        return userRepo.save(user);
+
+        try {
+            User newUser = userRepo.save(user);
+            if (newUser != null) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (TransactionSystemException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public User registerDeprecated(User user) {
