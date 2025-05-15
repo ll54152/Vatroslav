@@ -51,7 +51,8 @@ public class EksperimentServiceJPA {
         }
 
         List<Log> logList = new ArrayList<>();
-        Log newLog = new Log(eksperiment, eksperimentAddDTO.getLog(), LocalDateTime.now());
+        //Todo: add real user
+        Log newLog = new Log(eksperiment, eksperimentAddDTO.getLog(), LocalDateTime.now(), null);
         logList.add(logServiceJPA.save(newLog));
         eksperiment.setLogs(logList);
 

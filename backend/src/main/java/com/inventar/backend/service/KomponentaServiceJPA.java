@@ -42,7 +42,8 @@ public class KomponentaServiceJPA {
         Komponenta newKomponenta = komponentaRepo.save(komponenta);
 
         List<Log> logList = new ArrayList<>();
-        Log newLog = new Log(newKomponenta, komponentaDTO.getLog(), LocalDateTime.now());
+        //Todo: add real user
+        Log newLog = new Log(newKomponenta, komponentaDTO.getLog(), LocalDateTime.now(), null);
         logList.add(logServiceJPA.save(newLog));
         newKomponenta.setLogs(logList);
 

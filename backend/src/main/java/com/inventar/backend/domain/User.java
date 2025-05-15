@@ -5,7 +5,6 @@ import jakarta.validation.constraints.*;
 
 import java.util.List;
 
-//ToDo: Dodaj Ime i Prezime Usera
 @Entity
 @Table(name = "users")
 public class User {
