@@ -29,6 +29,7 @@ public class Security {
     private static final String[] WHITE_LIST_URL = {
             "/user/login",
             "/user/register",
+            "/auth/verify",
     };
 
     @Bean
