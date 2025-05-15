@@ -31,8 +31,8 @@ public class JWTFilter extends OncePerRequestFilter {
         String token = null;
         String email = null;
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
+        if (authHeader != null && authHeader.startsWith("Bearer")) {
+            token = authHeader.substring(6).trim();
             email = jwtService.extractEmail(token);
         }
 
