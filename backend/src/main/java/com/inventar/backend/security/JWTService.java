@@ -1,6 +1,7 @@
 package com.inventar.backend.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -50,10 +51,21 @@ public class JWTService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public boolean validateToken(String token, UserDetails userDetails) {
+    public boolean validateTokenAndUser(String token, UserDetails userDetails) {
         final String userName = extractEmail(token);
         return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+
+    public boolean validateToken(String token) {
+        try {
+            Claims claims = extractAllClaims(token);
+
+            return claims.getExpiration().after(new Date()); // Provjera je li token istekao
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
 
     public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
