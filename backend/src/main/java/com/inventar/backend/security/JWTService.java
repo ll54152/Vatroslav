@@ -24,6 +24,7 @@ public class JWTService {
     public JWTService() {
         try {
             KeyGenerator keyGenerator = KeyGenerator.getInstance("HmacSHA256");
+            keyGenerator.init(256);
             SecretKey key = keyGenerator.generateKey();
             SECRET_KEY = Base64.getEncoder().encodeToString(key.getEncoded());
         } catch (NoSuchAlgorithmException e) {
@@ -58,9 +59,9 @@ public class JWTService {
 
     public boolean validateToken(String token) {
         try {
-            Claims claims = extractAllClaims(token);
+            Claims claims = extractAllClaims(token.trim());
 
-            return claims.getExpiration().after(new Date()); // Provjera je li token istekao
+            return claims.getExpiration().after(new Date());
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
