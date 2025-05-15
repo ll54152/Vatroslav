@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-//ToDo: Cors za testiranje
+
 @RestController
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 @RequestMapping("/component")
 public class KomponentaController {
 
