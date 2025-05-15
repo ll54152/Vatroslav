@@ -3,6 +3,8 @@ package com.inventar.backend.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
+import java.util.List;
+
 //ToDo: Dodaj Ime i Prezime Usera
 @Entity
 @Table(name = "users")
@@ -17,9 +19,26 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    private String firstName;
+
+    private String lastName;
+
+    @OneToMany(mappedBy = "user")
+    private List<Log> logs;
+
+    @OneToMany(mappedBy = "user")
+    private List<Files> files;
+
     public User(String email, String password) {
         this.email = email;
         this.password = password;
+    }
+
+    public User(String email, String password, String firstName, String lastName) {
+        this.email = email;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
     public User() {
@@ -39,6 +58,38 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public List<Log> getLogs() {
+        return logs;
+    }
+
+    public void setLogs(List<Log> logs) {
+        this.logs = logs;
+    }
+
+    public List<Files> getFiles() {
+        return files;
+    }
+
+    public void setFiles(List<Files> files) {
+        this.files = files;
     }
 }
 

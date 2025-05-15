@@ -24,36 +24,44 @@ public class Files {
     @JoinColumn(name = "eksperiment_id")
     private Eksperiment eksperiment;
 
-    public Files(String name, byte[] fileByte, String fileType, Komponenta komponenta, Eksperiment eksperiment) {
+    @ManyToOne
+    @JoinColumn(name = "user_email")
+    private User user;
+
+    public Files(String name, byte[] fileByte, String fileType, Komponenta komponenta, Eksperiment eksperiment, User user) {
         // Konstruktor sa komponentom i eksperimentom
         this.name = name;
         this.fileByte = fileByte;
         this.fileType = fileType;
         this.komponenta = komponenta;
         this.eksperiment = eksperiment;
+        this.user = user;
     }
 
-    public Files(String name, byte[] fileByte, String fileType, Eksperiment eksperiment) {
+    public Files(String name, byte[] fileByte, String fileType, Eksperiment eksperiment, User user) {
         // Konstruktor sa eksperimenom
         this.name = name;
         this.fileByte = fileByte;
         this.fileType = fileType;
         this.eksperiment = eksperiment;
+        this.user = user;
     }
 
-    public Files(String name, byte[] fileByte, String fileType, Komponenta komponenta) {
+    public Files(String name, byte[] fileByte, String fileType, Komponenta komponenta, User user) {
         // Konstruktor sa komponentom
         this.name = name;
         this.fileByte = fileByte;
         this.fileType = fileType;
         this.komponenta = komponenta;
+        this.user = user;
     }
 
-    public Files(String name, byte[] fileByte, String fileType) {
+    public Files(String name, byte[] fileByte, String fileType, User user) {
         // Konstruktor bez komponente i eksperimenta
         this.name = name;
         this.fileByte = fileByte;
         this.fileType = fileType;
+        this.user = user;
     }
 
     public Files() {
@@ -106,5 +114,13 @@ public class Files {
 
     public void setEksperiment(Eksperiment eksperiment) {
         this.eksperiment = eksperiment;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
