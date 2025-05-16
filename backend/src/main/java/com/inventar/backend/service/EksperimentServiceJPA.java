@@ -3,6 +3,8 @@ package com.inventar.backend.service;
 import com.inventar.backend.DTO.*;
 import com.inventar.backend.domain.*;
 import com.inventar.backend.repo.*;
+import com.inventar.backend.security.JWTService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.*;
 
@@ -24,12 +26,28 @@ public class EksperimentServiceJPA {
     @Autowired
     private KomponentaRepo komponentaRepo;
 
+    @Autowired
+    private AuthenticationServiceJPA authenticationServiceJPA;
+
+    @Autowired
+    private HttpServletRequest request;
+
+    @Autowired
+    private UserServiceJPA userServiceJPA;
+
     public Eksperiment save(EksperimentAddDTO eksperimentAddDTO) {
-        System.out.println(eksperimentAddDTO);
+
+        String email = authenticationServiceJPA.getEmailFromToken(request.getHeader("Authorization"));
+        String firstName = userServiceJPA.findByEmail(email).getFirstName();
+        String lastName = userServiceJPA.findByEmail(email).getLastName();
+        String note = "Korisnik '" + firstName + " " + lastName + "' je dodao eksperiment '" + eksperimentAddDTO.getName() + "' u bazu podataka";
+
 
         List<Komponenta> komponente = new ArrayList<>();
-        for (Komponenta komponenta : eksperimentAddDTO.getKomponente()) {
-            komponente.add(komponentaServiceJPA.findById(Long.valueOf(komponenta.getId())));
+        if (eksperimentAddDTO.getKomponente() != null) {
+            for (Komponenta komponenta : eksperimentAddDTO.getKomponente()) {
+                komponente.add(komponentaServiceJPA.findById(Long.valueOf(komponenta.getId())));
+            }
         }
 
         Eksperiment eksperiment = new Eksperiment(
@@ -39,7 +57,11 @@ public class EksperimentServiceJPA {
                 eksperimentAddDTO.getDescription(),
                 eksperimentAddDTO.getMaterials()
         );
-        eksperiment.setKomponente(komponente);
+
+        if (!komponente.isEmpty()) {
+            eksperiment.setKomponente(komponente);
+        }
+
         eksperimentRepo.save(eksperiment);
 
 
@@ -47,12 +69,18 @@ public class EksperimentServiceJPA {
             List<Eksperiment> eksperimenti = komponenta.getEksperimenti();
             eksperimenti.add(eksperiment);
             komponenta.setEksperimenti(eksperimenti);
+
+            List<Log> komponentaLogs = komponenta.getLogs();
+            String noteKomponent  = "Korisnik '" + firstName + " " + lastName + "' je povezao komponentu '" + komponenta.getName() + "' sa eksperimentom '" + eksperiment.getName() + "'";
+            Log logKomponenta = new Log(komponenta, noteKomponent, LocalDateTime.now(), userServiceJPA.findByEmail(email));
+            komponentaLogs.add(logKomponenta);
+            komponenta.setLogs(komponentaLogs);
+
             komponentaRepo.save(komponenta);
         }
 
         List<Log> logList = new ArrayList<>();
-        //Todo: add real user
-        Log newLog = new Log(eksperiment, eksperimentAddDTO.getLog(), LocalDateTime.now(), null);
+        Log newLog = new Log(eksperiment, note, LocalDateTime.now(), userServiceJPA.findByEmail(email));
         logList.add(logServiceJPA.save(newLog));
         eksperiment.setLogs(logList);
 
