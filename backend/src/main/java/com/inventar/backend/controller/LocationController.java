@@ -39,6 +39,17 @@ public class LocationController {
         return new ResponseEntity<>(locationDTOs, HttpStatus.OK);
     }
 
+    @GetMapping("/get/{id}")
+    public ResponseEntity<LocationDTO> getLocationById(@PathVariable Long id) {
+        Location location = locationServiceJPA.findById(id);
+        if (location != null) {
+            LocationDTO locationDTO = new LocationDTO(location.getId(), location.getAdress(), location.getRoom());
+            return new ResponseEntity<>(locationDTO, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteLocation(@PathVariable Long id) {
         Location location = locationServiceJPA.findById(id);
