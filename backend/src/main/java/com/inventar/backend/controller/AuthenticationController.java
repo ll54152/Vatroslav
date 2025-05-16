@@ -1,6 +1,6 @@
 package com.inventar.backend.controller;
 
-import com.inventar.backend.security.JWTService;
+import com.inventar.backend.service.AuthenticationServiceJPA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,18 +11,19 @@ import org.springframework.web.bind.annotation.*;
 //@CrossOrigin(origins = "*")
 public class AuthenticationController {
 
+
     @Autowired
-    private JWTService jwtService;
+    private AuthenticationServiceJPA authenticationServiceJPA;
 
     @GetMapping("/verify")
     public ResponseEntity<Void> verifyToken(@RequestHeader("Authorization") String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer")) {
+
+        boolean isValid = authenticationServiceJPA.verifyToken(authHeader);
+
+        if (isValid) {
+            return ResponseEntity.ok().build();
+        } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
-        String token = authHeader.substring(6).trim();
-        boolean isValid = jwtService.validateToken(token);
-
-        return isValid ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }
