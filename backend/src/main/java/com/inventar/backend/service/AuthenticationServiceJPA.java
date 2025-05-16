@@ -20,4 +20,15 @@ public class AuthenticationServiceJPA {
 
         return jwtService.validateToken(token);
     }
+
+    public String getEmailFromToken(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer")) {
+            return null;
+        }
+
+        String token = authHeader.substring(6).trim();
+
+        return jwtService.extractEmail(token);
+    }
+
 }
