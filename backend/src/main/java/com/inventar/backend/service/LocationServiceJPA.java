@@ -33,7 +33,7 @@ public class LocationServiceJPA {
         return locationRepo.findAll();
     }
 
-    public void delete(Long id) {
+    public void deleteById(Long id) {
         locationRepo.deleteById(id);
     }
 }

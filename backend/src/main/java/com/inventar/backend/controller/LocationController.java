@@ -43,7 +43,7 @@ public class LocationController {
     public ResponseEntity<String> deleteLocation(@PathVariable Long id) {
         Location location = locationServiceJPA.findById(id);
         if (location != null) {
-            locationServiceJPA.delete(id);
+            locationServiceJPA.deleteById(id);
             return new ResponseEntity<>("Lokacija obrisana uspešno", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Lokacija nije pronađena", HttpStatus.NOT_FOUND);
