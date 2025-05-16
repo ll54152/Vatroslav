@@ -23,4 +23,10 @@ public class LogController {
             return new ResponseEntity<>("Log nije pronađen", HttpStatus.NOT_FOUND);
         }
     }
+
+    @PostMapping("/add")
+    public ResponseEntity<String> addLog(@RequestBody Log log) {
+        logServiceJPA.save(log);
+        return new ResponseEntity<>("Log dodat uspešno", HttpStatus.CREATED);
+    }
 }

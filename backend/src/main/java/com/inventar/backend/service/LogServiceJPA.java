@@ -2,18 +2,35 @@ package com.inventar.backend.service;
 
 import com.inventar.backend.domain.*;
 import com.inventar.backend.repo.*;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class LogServiceJPA {
 
     @Autowired
+    private AuthenticationServiceJPA authenticationServiceJPA;
+
+    @Autowired
     private LogRepo logRepo;
 
+    @Autowired
+    private UserServiceJPA userServiceJPA;
+
+    @Autowired
+    private HttpServletRequest request;
+
     public Log save(Log log) {
+
+        String email = authenticationServiceJPA.getEmailFromToken(request.getHeader("Authorization"));
+
+        log.setTimestamp(LocalDateTime.now());
+        log.setUser(userServiceJPA.findByEmail(email));
+
         return logRepo.save(log);
     }
 
