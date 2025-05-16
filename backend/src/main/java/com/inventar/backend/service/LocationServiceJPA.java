@@ -32,4 +32,8 @@ public class LocationServiceJPA {
     public List<Location> findAll() {
         return locationRepo.findAll();
     }
+
+    public void delete(Long id) {
+        locationRepo.deleteById(id);
+    }
 }
