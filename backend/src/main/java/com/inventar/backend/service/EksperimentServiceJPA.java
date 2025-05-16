@@ -82,6 +82,11 @@ public class EksperimentServiceJPA {
         List<Log> logList = new ArrayList<>();
         Log newLog = new Log(eksperiment, note, LocalDateTime.now(), userServiceJPA.findByEmail(email));
         logList.add(logServiceJPA.save(newLog));
+
+        if (eksperimentAddDTO.getLog() != null) {
+            Log eksperimentLog = new Log(eksperiment, eksperimentAddDTO.getLog(), LocalDateTime.now(), userServiceJPA.findByEmail(email));
+            logList.add(logServiceJPA.save(eksperimentLog));
+        }
         eksperiment.setLogs(logList);
 
         return eksperiment;
