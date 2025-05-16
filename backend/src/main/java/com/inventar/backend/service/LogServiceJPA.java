@@ -38,4 +38,8 @@ public class LogServiceJPA {
                 .filter(log -> log.getKomponenta().getId().equals(komponentaId))
                 .toList();
     }
+
+    public void deleteById(Long id) {
+        logRepo.deleteById(id);
+    }
 }
