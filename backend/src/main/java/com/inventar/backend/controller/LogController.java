@@ -29,4 +29,15 @@ public class LogController {
         logServiceJPA.save(log);
         return new ResponseEntity<>("Log dodat uspešno", HttpStatus.CREATED);
     }
+
+    @GetMapping("/get/{id}")
+    public ResponseEntity<Log> getLog(@PathVariable Long id) {
+        //Todo: možda je bolje koristiti neki DTO kod vraćanja logova
+        Log log = logServiceJPA.findById(id);
+        if (log != null) {
+            return new ResponseEntity<>(log, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }
