@@ -60,4 +60,21 @@ public class LocationController {
             return new ResponseEntity<>("Lokacija nije pronađena", HttpStatus.NOT_FOUND);
         }
     }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<String> updateLocation(@PathVariable Long id, @RequestBody Location location) {
+        Location existingLocation = locationServiceJPA.findById(id);
+        if (existingLocation != null) {
+            if (location.getAdress() != null && !location.getAdress().isEmpty()) {
+                existingLocation.setAdress(location.getAdress());
+            }
+            if (location.getRoom() != null && !location.getRoom().isEmpty()) {
+                existingLocation.setRoom(location.getRoom());
+            }
+            locationServiceJPA.save(existingLocation);
+            return new ResponseEntity<>("Lokacija ažurirana uspešno", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Lokacija nije pronađena", HttpStatus.NOT_FOUND);
+        }
+    }
 }
