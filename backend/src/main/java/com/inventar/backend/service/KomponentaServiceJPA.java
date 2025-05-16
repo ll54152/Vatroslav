@@ -3,6 +3,7 @@ package com.inventar.backend.service;
 import com.inventar.backend.DTO.KomponentaAddDTO;
 import com.inventar.backend.domain.*;
 import com.inventar.backend.repo.*;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.*;
 
@@ -24,7 +25,22 @@ public class KomponentaServiceJPA {
     @Autowired
     private LogServiceJPA logServiceJPA;
 
+    @Autowired
+    private AuthenticationServiceJPA authenticationServiceJPA;
+
+    @Autowired
+    private HttpServletRequest request;
+
+    @Autowired
+    private UserServiceJPA userServiceJPA;
+
     public Komponenta save(KomponentaAddDTO komponentaDTO) {
+
+        String email = authenticationServiceJPA.getEmailFromToken(request.getHeader("Authorization"));
+        String firstName = userServiceJPA.findByEmail(email).getFirstName();
+        String lastName = userServiceJPA.findByEmail(email).getLastName();
+        String note = "Korisnik '" + firstName + " " + lastName + "' je dodao komponentu '" + komponentaDTO.getName() + "' u bazu podataka";
+
         Location location = locationRepo.findById((long) komponentaDTO.getLocationID()).orElse(null);
 
         List<Eksperiment> eksperimentList = new ArrayList<>();
@@ -42,9 +58,13 @@ public class KomponentaServiceJPA {
         Komponenta newKomponenta = komponentaRepo.save(komponenta);
 
         List<Log> logList = new ArrayList<>();
-        //Todo: add real user
-        Log newLog = new Log(newKomponenta, komponentaDTO.getLog(), LocalDateTime.now(), null);
+        Log newLog = new Log(newKomponenta, note, LocalDateTime.now(), userServiceJPA.findByEmail(email));
         logList.add(logServiceJPA.save(newLog));
+
+        if (komponentaDTO.getLog() != null) {
+            Log eksperimentLog = new Log(newKomponenta, komponentaDTO.getLog(), LocalDateTime.now(), userServiceJPA.findByEmail(email));
+            logList.add(logServiceJPA.save(eksperimentLog));
+        }
         newKomponenta.setLogs(logList);
 
         return newKomponenta;
