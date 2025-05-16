@@ -99,4 +99,24 @@ public class EksperimentServiceJPA {
     public Eksperiment findById(Long id) {
         return eksperimentRepo.findById(id).orElse(null);
     }
+
+    public void deleteById(Long id) {
+        Eksperiment eksperiment = eksperimentRepo.findById(id).orElse(null);
+        if (eksperiment != null) {
+            List<Komponenta> komponente = eksperiment.getKomponente();
+            for (Komponenta komponenta : komponente) {
+                List<Eksperiment> eksperimenti = komponenta.getEksperimenti();
+                eksperimenti.remove(eksperiment);
+                komponenta.setEksperimenti(eksperimenti);
+                komponentaRepo.save(komponenta);
+            }
+
+            List<Log> eksperimentLogs = eksperiment.getLogs();
+            for (Log log : eksperimentLogs) {
+                logServiceJPA.deleteById(log.getId());
+            }
+
+            eksperimentRepo.deleteById(id);
+        }
+    }
 }

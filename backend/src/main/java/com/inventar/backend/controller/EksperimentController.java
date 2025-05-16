@@ -21,7 +21,7 @@ public class EksperimentController {
     @PostMapping("/add")
     public ResponseEntity<String> addExperiment(@RequestBody EksperimentAddDTO eksperimentAddDTO) {
         eksperimentServiceJPA.save(eksperimentAddDTO);
-        return new ResponseEntity<>("Eksperiment added successfully", HttpStatus.CREATED);
+        return new ResponseEntity<>("Eksperiment dodan uspješno", HttpStatus.CREATED);
     }
 
     @GetMapping("/getAll")
@@ -39,5 +39,16 @@ public class EksperimentController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(eksperiment, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteExperiment(@PathVariable Long id) {
+        Eksperiment eksperiment = eksperimentServiceJPA.findById(id);
+        if (eksperiment != null) {
+            eksperimentServiceJPA.deleteById(id);
+            return new ResponseEntity<>("Eksperiment obrisan uspešno", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Eksperiment nije pronađen", HttpStatus.NOT_FOUND);
+        }
     }
 }
