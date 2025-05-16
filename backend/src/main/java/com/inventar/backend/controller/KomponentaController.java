@@ -58,4 +58,15 @@ public class KomponentaController {
 
         return new ResponseEntity<>(komponentaShowDTO, HttpStatus.OK);
     }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteComponent(@PathVariable Long id) {
+        Komponenta komponenta = komponentaServiceJPA.findById(id);
+        if (komponenta != null) {
+            komponentaServiceJPA.deleteById(id);
+            return new ResponseEntity<>("Komponenta obrisana uspešno", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Komponenta nije pronađena", HttpStatus.NOT_FOUND);
+        }
+    }
 }

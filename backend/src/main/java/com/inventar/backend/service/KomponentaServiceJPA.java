@@ -81,4 +81,15 @@ public class KomponentaServiceJPA {
     public List<Komponenta> findAll() {
         return komponentaRepo.findAll();
     }
+
+    public void deleteById(Long id) {
+        Komponenta komponenta = komponentaRepo.findById(id).orElse(null);
+        if (komponenta != null) {
+            List<Log> logList = komponenta.getLogs();
+            for (Log log : logList) {
+                logServiceJPA.deleteById(log.getId());
+            }
+            komponentaRepo.deleteById(id);
+        }
+    }
 }
