@@ -21,9 +21,6 @@ public class EksperimentServiceJPA {
     private KomponentaServiceJPA komponentaServiceJPA;
 
     @Autowired
-    private LogServiceJPA logServiceJPA;
-
-    @Autowired
     private KomponentaRepo komponentaRepo;
 
     @Autowired
@@ -34,6 +31,9 @@ public class EksperimentServiceJPA {
 
     @Autowired
     private UserServiceJPA userServiceJPA;
+
+    @Autowired
+    private LogRepo logRepo;
 
     public Eksperiment save(EksperimentAddDTO eksperimentAddDTO) {
 
@@ -81,11 +81,11 @@ public class EksperimentServiceJPA {
 
         List<Log> logList = new ArrayList<>();
         Log newLog = new Log(eksperiment, note, LocalDateTime.now(), userServiceJPA.findByEmail(email));
-        logList.add(logServiceJPA.save(newLog));
+        logList.add(logRepo.save(newLog));
 
         if (eksperimentAddDTO.getLog() != null) {
             Log eksperimentLog = new Log(eksperiment, eksperimentAddDTO.getLog(), LocalDateTime.now(), userServiceJPA.findByEmail(email));
-            logList.add(logServiceJPA.save(eksperimentLog));
+            logList.add(logRepo.save(eksperimentLog));
         }
         eksperiment.setLogs(logList);
 
@@ -113,7 +113,7 @@ public class EksperimentServiceJPA {
 
             List<Log> eksperimentLogs = eksperiment.getLogs();
             for (Log log : eksperimentLogs) {
-                logServiceJPA.deleteById(log.getId());
+                logRepo.deleteById(log.getId());
             }
 
             eksperimentRepo.deleteById(id);
