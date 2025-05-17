@@ -38,9 +38,8 @@ public class EksperimentServiceJPA {
     public Eksperiment save(EksperimentAddDTO eksperimentAddDTO) {
 
         String email = authenticationServiceJPA.getEmailFromToken(request.getHeader("Authorization"));
-        String firstName = userServiceJPA.findByEmail(email).getFirstName();
-        String lastName = userServiceJPA.findByEmail(email).getLastName();
-        String note = "Korisnik '" + firstName + " " + lastName + "' je dodao eksperiment '" + eksperimentAddDTO.getName() + "' u bazu podataka";
+        User user = userServiceJPA.findByEmail(email);
+        String note = "Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao eksperiment '" + eksperimentAddDTO.getName() + "' u bazu podataka";
 
 
         List<Komponenta> komponente = new ArrayList<>();
@@ -70,18 +69,18 @@ public class EksperimentServiceJPA {
             eksperimenti.add(eksperiment);
             komponenta.setEksperimenti(eksperimenti);
 
-            String noteKomponent = "Korisnik '" + firstName + " " + lastName + "' je povezao komponentu '" + komponenta.getName() + "' sa eksperimentom '" + eksperiment.getName() + "'";
-            Log logKomponenta = new Log(komponenta, noteKomponent, LocalDateTime.now(), userServiceJPA.findByEmail(email));
+            String noteKomponent = "Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je povezao komponentu '" + komponenta.getName() + "' sa eksperimentom '" + eksperiment.getName() + "'";
+            Log logKomponenta = new Log(komponenta, noteKomponent, LocalDateTime.now(), user);
             logRepo.save(logKomponenta);
 
             komponentaRepo.save(komponenta);
         }
 
-        Log newLog = new Log(eksperiment, note, LocalDateTime.now(), userServiceJPA.findByEmail(email));
+        Log newLog = new Log(eksperiment, note, LocalDateTime.now(), user);
         logRepo.save(newLog);
 
         if (eksperimentAddDTO.getLog() != null) {
-            Log eksperimentLog = new Log(eksperiment, eksperimentAddDTO.getLog(), LocalDateTime.now(), userServiceJPA.findByEmail(email));
+            Log eksperimentLog = new Log(eksperiment, eksperimentAddDTO.getLog(), LocalDateTime.now(), user);
             logRepo.save(eksperimentLog);
         }
 
