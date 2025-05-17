@@ -55,19 +55,17 @@ public class KomponentaServiceJPA {
                 , location
                 , eksperimentList
         );
-        Komponenta newKomponenta = komponentaRepo.save(komponenta);
+        komponentaRepo.save(komponenta);
 
-        List<Log> logList = new ArrayList<>();
-        Log newLog = new Log(newKomponenta, note, LocalDateTime.now(), userServiceJPA.findByEmail(email));
-        logList.add(logRepo.save(newLog));
+        Log newLog = new Log(komponenta, note, LocalDateTime.now(), userServiceJPA.findByEmail(email));
+        logRepo.save(newLog);
 
         if (komponentaDTO.getLog() != null) {
-            Log eksperimentLog = new Log(newKomponenta, komponentaDTO.getLog(), LocalDateTime.now(), userServiceJPA.findByEmail(email));
-            logList.add(logRepo.save(eksperimentLog));
+            Log eksperimentLog = new Log(komponenta, komponentaDTO.getLog(), LocalDateTime.now(), userServiceJPA.findByEmail(email));
+            logRepo.save(eksperimentLog);
         }
-        newKomponenta.setLogs(logList);
 
-        return newKomponenta;
+        return komponenta;
     }
 
     public Komponenta findByZpf(String zpf) {
