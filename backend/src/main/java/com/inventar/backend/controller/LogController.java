@@ -1,5 +1,6 @@
 package com.inventar.backend.controller;
 
+import com.inventar.backend.DTO.LogAddDTO;
 import com.inventar.backend.domain.*;
 import com.inventar.backend.service.LogServiceJPA;
 import org.springframework.beans.factory.annotation.*;
@@ -25,8 +26,8 @@ public class LogController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<String> addLog(@RequestBody Log log) {
-        logServiceJPA.save(log);
+    public ResponseEntity<String> addLog(@RequestBody LogAddDTO logAddDTO) {
+        logServiceJPA.save(logAddDTO);
         return new ResponseEntity<>("Log dodat uspešno", HttpStatus.CREATED);
     }
 
