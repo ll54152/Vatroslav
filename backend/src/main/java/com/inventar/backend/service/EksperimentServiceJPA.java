@@ -70,24 +70,20 @@ public class EksperimentServiceJPA {
             eksperimenti.add(eksperiment);
             komponenta.setEksperimenti(eksperimenti);
 
-            List<Log> komponentaLogs = komponenta.getLogs();
-            String noteKomponent  = "Korisnik '" + firstName + " " + lastName + "' je povezao komponentu '" + komponenta.getName() + "' sa eksperimentom '" + eksperiment.getName() + "'";
+            String noteKomponent = "Korisnik '" + firstName + " " + lastName + "' je povezao komponentu '" + komponenta.getName() + "' sa eksperimentom '" + eksperiment.getName() + "'";
             Log logKomponenta = new Log(komponenta, noteKomponent, LocalDateTime.now(), userServiceJPA.findByEmail(email));
-            komponentaLogs.add(logKomponenta);
-            komponenta.setLogs(komponentaLogs);
+            logRepo.save(logKomponenta);
 
             komponentaRepo.save(komponenta);
         }
 
-        List<Log> logList = new ArrayList<>();
         Log newLog = new Log(eksperiment, note, LocalDateTime.now(), userServiceJPA.findByEmail(email));
-        logList.add(logRepo.save(newLog));
+        logRepo.save(newLog);
 
         if (eksperimentAddDTO.getLog() != null) {
             Log eksperimentLog = new Log(eksperiment, eksperimentAddDTO.getLog(), LocalDateTime.now(), userServiceJPA.findByEmail(email));
-            logList.add(logRepo.save(eksperimentLog));
+            logRepo.save(eksperimentLog);
         }
-        eksperiment.setLogs(logList);
 
         return eksperiment;
     }
