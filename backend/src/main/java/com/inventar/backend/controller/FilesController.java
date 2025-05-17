@@ -5,9 +5,7 @@ import com.inventar.backend.domain.Files;
 import com.inventar.backend.service.FilesServiceJPA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/files")
@@ -40,6 +38,17 @@ public class FilesController {
             return ResponseEntity.badRequest().body(null);
         }
 
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteFile(@PathVariable Long id) {
+        Files file = filesServiceJPA.findById(id);
+        if (file != null) {
+            filesServiceJPA.deleteById(id);
+            return ResponseEntity.ok("Datoteka je obrisana uspešno");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }

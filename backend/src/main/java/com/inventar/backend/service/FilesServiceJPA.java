@@ -89,4 +89,15 @@ public class FilesServiceJPA {
 
         return filesRepo.save(file);
     }
+
+    public Files findById(Long fileId) {
+        return filesRepo.findById(fileId).orElse(null);
+    }
+
+    public void deleteById(Long fileId) {
+        Files file = filesRepo.findById(fileId).orElse(null);
+        if (file != null) {
+            filesRepo.delete(file);
+        }
+    }
 }
