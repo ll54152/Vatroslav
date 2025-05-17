@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Blob;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FilesServiceJPA {
@@ -24,16 +25,16 @@ public class FilesServiceJPA {
     private HttpServletRequest request;
 
     @Autowired
-    private EksperimentServiceJPA eksperimentServiceJPA;
+    private EksperimentRepo eksperimentRepo;
 
     @Autowired
     private AuthenticationServiceJPA authenticationServiceJPA;
 
     @Autowired
-    private KomponentaServiceJPA komponentaServiceJPA;
+    private KomponentaRepo komponentaRepo;
 
     @Autowired
-    private UserServiceJPA userServiceJPA;
+    private UserRepo userRepo;
 
     public Files save(Files file) {
         return filesRepo.save(file);
@@ -55,7 +56,7 @@ public class FilesServiceJPA {
 
         String email = authenticationServiceJPA.getEmailFromToken(request.getHeader("Authorization"));
 
-        Eksperiment eksperiment = eksperimentServiceJPA.findById(filesDTO.getEntityId());
+        Eksperiment eksperiment = eksperimentRepo.findById(filesDTO.getEntityId()).get();
 
         byte[] bytes = uploadFile(filesDTO.getData());
 
@@ -63,7 +64,7 @@ public class FilesServiceJPA {
                 filesDTO.getName(),
                 bytes,
                 filesDTO.getData().getContentType(),
-                userServiceJPA.findByEmail(email)
+                userRepo.findByEmail(email).get()
         );
 
         file.setEksperiment(eksperiment);
@@ -74,7 +75,7 @@ public class FilesServiceJPA {
     public Files uploadComponentFile(FilesDTO filesDTO) {
         String email = authenticationServiceJPA.getEmailFromToken(request.getHeader("Authorization"));
 
-        Komponenta komponenta = komponentaServiceJPA.findById(filesDTO.getEntityId());
+        Optional<Komponenta> komponenta = komponentaRepo.findById(filesDTO.getEntityId());
 
         byte[] bytes = uploadFile(filesDTO.getData());
 
@@ -82,10 +83,10 @@ public class FilesServiceJPA {
                 filesDTO.getName(),
                 bytes,
                 filesDTO.getData().getContentType(),
-                userServiceJPA.findByEmail(email)
+                userRepo.findByEmail(email).get()
         );
 
-        file.setKomponenta(komponenta);
+        file.setKomponenta(komponenta.get());
 
         return filesRepo.save(file);
     }
