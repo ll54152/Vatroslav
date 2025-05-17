@@ -37,9 +37,8 @@ public class KomponentaServiceJPA {
     public Komponenta save(KomponentaAddDTO komponentaDTO) {
 
         String email = authenticationServiceJPA.getEmailFromToken(request.getHeader("Authorization"));
-        String firstName = userServiceJPA.findByEmail(email).getFirstName();
-        String lastName = userServiceJPA.findByEmail(email).getLastName();
-        String note = "Korisnik '" + firstName + " " + lastName + "' je dodao komponentu '" + komponentaDTO.getName() + "' u bazu podataka";
+        User user = userServiceJPA.findByEmail(email);
+        String note = "Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao komponentu '" + komponentaDTO.getName() + "' u bazu podataka";
 
         Location location = locationRepo.findById((long) komponentaDTO.getLocationID()).orElse(null);
 
@@ -57,11 +56,11 @@ public class KomponentaServiceJPA {
         );
         komponentaRepo.save(komponenta);
 
-        Log newLog = new Log(komponenta, note, LocalDateTime.now(), userServiceJPA.findByEmail(email));
+        Log newLog = new Log(komponenta, note, LocalDateTime.now(), user);
         logRepo.save(newLog);
 
         if (komponentaDTO.getLog() != null) {
-            Log eksperimentLog = new Log(komponenta, komponentaDTO.getLog(), LocalDateTime.now(), userServiceJPA.findByEmail(email));
+            Log eksperimentLog = new Log(komponenta, komponentaDTO.getLog(), LocalDateTime.now(), user);
             logRepo.save(eksperimentLog);
         }
 
