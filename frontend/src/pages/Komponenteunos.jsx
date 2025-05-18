@@ -271,15 +271,7 @@ function Komponenteunos() {
                             />
                         </div>
 
-                        <div className="flex flex-col space-y-1.5">
-                            <CardTitle>Napomene</CardTitle>
-                            <Input
-                                id="napomene"
-                                placeholder="Unesite napomene"
-                                value={notes}
-                                onChange={(e) => setNotes(e.target.value)}
-                            />
-                        </div>
+                        
 
                         <div className="flex flex-col space-y-1.5">
                             <Select value={status} onValueChange={setStatus}>

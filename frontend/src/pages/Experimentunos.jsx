@@ -176,15 +176,7 @@ function Experimentunos() {
                 />
               </div>
 
-              <div className="flex flex-col space-y-1.5">
-                <CardTitle>Napomene</CardTitle>
-                <Input
-                    id="log"
-                    placeholder="Unesite napomene"
-                    value={formData.log}
-                    onChange={handleInputChange}
-                />
-              </div>
+              
               <br />
 
               <Tabs defaultValue="komponente" className="w-100">
