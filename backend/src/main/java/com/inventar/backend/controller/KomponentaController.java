@@ -43,20 +43,8 @@ public class KomponentaController {
         if (komponenta == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        KomponentaShowDTO komponentaShowDTO = new KomponentaShowDTO(
-                komponenta.getId(),
-                komponenta.getName(),
-                komponenta.getZpf(),
-                komponenta.getFer(),
-                komponenta.getQuantity(),
-                komponenta.getLocation().getAdress(),
-                komponenta.getLocation().getRoom(),
-                komponenta.getDescription(),
-                komponenta.getLogs(),
-                komponenta.getEksperimenti()
-        );
 
-        return new ResponseEntity<>(komponentaShowDTO, HttpStatus.OK);
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")

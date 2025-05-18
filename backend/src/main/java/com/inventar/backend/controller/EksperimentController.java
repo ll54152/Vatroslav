@@ -33,12 +33,14 @@ public class EksperimentController {
     }
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<Eksperiment> getExperiment(@PathVariable Long id) {
+    public ResponseEntity<EksperimentShowDTO> getExperiment(@PathVariable Long id) {
         Eksperiment eksperiment = eksperimentServiceJPA.findById(id);
         if (eksperiment == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            EksperimentShowDTO eksperimentShowDTO = eksperimentServiceJPA.getSpecific(eksperiment);
+            return new ResponseEntity<>(eksperimentShowDTO, HttpStatus.OK);
         }
-        return new ResponseEntity<>(eksperiment, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")

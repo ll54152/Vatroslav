@@ -114,4 +114,65 @@ public class EksperimentServiceJPA {
             eksperimentRepo.deleteById(id);
         }
     }
+
+    public EksperimentShowDTO getSpecific(Eksperiment eksperiment) {
+        EksperimentShowDTO eksperimentShowDTO = new EksperimentShowDTO();
+        eksperimentShowDTO.setId(eksperiment.getId());
+        eksperimentShowDTO.setName(eksperiment.getName());
+        eksperimentShowDTO.setField(eksperiment.getField());
+        eksperimentShowDTO.setSubject(eksperiment.getSubject());
+        eksperimentShowDTO.setDescription(eksperiment.getDescription());
+        eksperimentShowDTO.setMaterials(eksperiment.getMaterials());
+
+        List<KomponentaShowDTO> komponentaShowDTOList = new ArrayList<>();
+        if (eksperiment.getKomponente() != null) {
+            for (Komponenta komponenta : eksperiment.getKomponente()) {
+                KomponentaShowDTO komponentaShowDTO = new KomponentaShowDTO();
+                komponentaShowDTO.setId(komponenta.getId());
+                komponentaShowDTO.setName(komponenta.getName());
+                komponentaShowDTO.setDescription(komponenta.getDescription());
+                komponentaShowDTO.setZpf(komponenta.getZpf());
+                komponentaShowDTO.setFer(komponenta.getFer());
+                komponentaShowDTO.setQuantity(komponenta.getQuantity());
+                komponentaShowDTOList.add(komponentaShowDTO);
+            }
+        }
+        eksperimentShowDTO.setKomponente(komponentaShowDTOList);
+
+        List<LogShowDTO> logShowDTOList = new ArrayList<>();
+        if (eksperiment.getLogs() != null) {
+            for (Log log : eksperiment.getLogs()) {
+                LogShowDTO logShowDTO = new LogShowDTO();
+                logShowDTO.setId(log.getId());
+                logShowDTO.setNote(log.getNote());
+                logShowDTO.setTimestamp(log.getTimestamp());
+
+                if (log.getUser() != null) {
+                    UserShowDTO userShowDTO = new UserShowDTO();
+                    userShowDTO.setEmail(log.getUser().getEmail());
+                    userShowDTO.setFirstName(log.getUser().getFirstName());
+                    userShowDTO.setLastName(log.getUser().getLastName());
+                    logShowDTO.setUser(userShowDTO);
+                }
+
+                logShowDTOList.add(logShowDTO);
+            }
+        }
+        eksperimentShowDTO.setLogs(logShowDTOList);
+
+        List<FilesShowDTO> filesShowDTOList = new ArrayList<>();
+        if (eksperiment.getFiles() != null) {
+            for (Files files : eksperiment.getFiles()) {
+                FilesShowDTO filesShowDTO = new FilesShowDTO();
+                filesShowDTO.setId(files.getId());
+                filesShowDTO.setName(files.getName());
+                filesShowDTO.setFileByte(Base64.getEncoder().encodeToString(files.getFileByte()));
+                filesShowDTOList.add(filesShowDTO);
+            }
+        }
+        eksperimentShowDTO.setFiles(filesShowDTOList);
+
+
+        return eksperimentShowDTO;
+    }
 }
