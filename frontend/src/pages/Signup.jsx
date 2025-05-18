@@ -39,7 +39,7 @@ function Signup() {
             return;
         }
 
-        const response = await fetch("http://192.168.18.5:8080/user/register", {
+        const response = await fetch("http://localhost:8080/user/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: formData.email, password: formData.password }),
@@ -58,6 +58,19 @@ function Signup() {
             <CardContent>
                 <form onSubmit={handleSubmit}>
                     <div className="grid w-full items-center gap-4">
+
+                       
+
+                        <div className="flex flex-col space-y-1.5">
+                            <Label htmlFor="ime">Ime</Label>
+                            <Input id="ime" name="ime" placeholder="ime" onChange={handleChange} />
+                        </div>
+
+                         <div className="flex flex-col space-y-1.5">
+                            <Label htmlFor="prezime">Prezime</Label>
+                            <Input id="prezime" name="prezime" placeholder="prezime" onChange={handleChange} />
+                        </div>
+
                         <div className="flex flex-col space-y-1.5">
                             <Label htmlFor="email">Email</Label>
                             <Input id="email" name="email" placeholder="email" onChange={handleChange} />
