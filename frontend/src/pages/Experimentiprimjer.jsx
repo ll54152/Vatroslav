@@ -169,7 +169,10 @@ function Experimentiprimjer() {
                                 </h4>
                                 {eksperiment.komponente?.map((komp) => (
                                     <React.Fragment key={komp.id}>
-                                        <div className="text-sm">
+                                        <div
+                                            className="text-sm cursor-pointer"
+                                            onClick={() => navigate(`/komponenteprimjer/${komp.id}`)}
+                                        >
                                             {komp.name}
                                         </div>
                                         <Separator className="my-2" />
