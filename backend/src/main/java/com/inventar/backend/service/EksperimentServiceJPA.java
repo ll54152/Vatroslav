@@ -115,7 +115,7 @@ public class EksperimentServiceJPA {
         }
     }
 
-    public EksperimentShowDTO getSpecific(Eksperiment eksperiment) {
+    public EksperimentShowDTO getShowDTO(Eksperiment eksperiment) {
         EksperimentShowDTO eksperimentShowDTO = new EksperimentShowDTO();
         eksperimentShowDTO.setId(eksperiment.getId());
         eksperimentShowDTO.setName(eksperiment.getName());
@@ -124,8 +124,9 @@ public class EksperimentServiceJPA {
         eksperimentShowDTO.setDescription(eksperiment.getDescription());
         eksperimentShowDTO.setMaterials(eksperiment.getMaterials());
 
-        List<KomponentaShowDTO> komponentaShowDTOList = new ArrayList<>();
+
         if (eksperiment.getKomponente() != null) {
+            List<KomponentaShowDTO> komponentaShowDTOList = new ArrayList<>();
             for (Komponenta komponenta : eksperiment.getKomponente()) {
                 KomponentaShowDTO komponentaShowDTO = new KomponentaShowDTO();
                 komponentaShowDTO.setId(komponenta.getId());
@@ -136,11 +137,13 @@ public class EksperimentServiceJPA {
                 komponentaShowDTO.setQuantity(komponenta.getQuantity());
                 komponentaShowDTOList.add(komponentaShowDTO);
             }
-        }
-        eksperimentShowDTO.setKomponente(komponentaShowDTOList);
 
-        List<LogShowDTO> logShowDTOList = new ArrayList<>();
+            eksperimentShowDTO.setKomponente(komponentaShowDTOList);
+        }
+
+
         if (eksperiment.getLogs() != null) {
+            List<LogShowDTO> logShowDTOList = new ArrayList<>();
             for (Log log : eksperiment.getLogs()) {
                 LogShowDTO logShowDTO = new LogShowDTO();
                 logShowDTO.setId(log.getId());
@@ -157,11 +160,13 @@ public class EksperimentServiceJPA {
 
                 logShowDTOList.add(logShowDTO);
             }
-        }
-        eksperimentShowDTO.setLogs(logShowDTOList);
 
-        List<FilesShowDTO> filesShowDTOList = new ArrayList<>();
+            eksperimentShowDTO.setLogs(logShowDTOList);
+        }
+
+
         if (eksperiment.getFiles() != null) {
+            List<FilesShowDTO> filesShowDTOList = new ArrayList<>();
             for (Files files : eksperiment.getFiles()) {
                 FilesShowDTO filesShowDTO = new FilesShowDTO();
                 filesShowDTO.setId(files.getId());
@@ -169,8 +174,9 @@ public class EksperimentServiceJPA {
                 filesShowDTO.setFileByte(Base64.getEncoder().encodeToString(files.getFileByte()));
                 filesShowDTOList.add(filesShowDTO);
             }
+
+            eksperimentShowDTO.setFiles(filesShowDTOList);
         }
-        eksperimentShowDTO.setFiles(filesShowDTOList);
 
 
         return eksperimentShowDTO;

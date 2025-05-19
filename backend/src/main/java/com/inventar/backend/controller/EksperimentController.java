@@ -38,8 +38,7 @@ public class EksperimentController {
         if (eksperiment == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            EksperimentShowDTO eksperimentShowDTO = eksperimentServiceJPA.getSpecific(eksperiment);
-            return new ResponseEntity<>(eksperimentShowDTO, HttpStatus.OK);
+            return new ResponseEntity<>(eksperimentServiceJPA.getShowDTO(eksperiment), HttpStatus.OK);
         }
     }
 
