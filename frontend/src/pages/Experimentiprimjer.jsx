@@ -25,6 +25,7 @@ function Experimentiprimjer() {
     const [eksperiment, setEksperiment] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [newLog, setNewLog] = useState("");
 
     const isTokenValid = () => {
         const token = localStorage.getItem("jwt");
@@ -86,6 +87,42 @@ function Experimentiprimjer() {
         fetchEksperiment();
     }, [id, navigate]);
 
+    const handleAddLog = async () => {
+        const token = localStorage.getItem("jwt");
+
+        const logData = {
+            note: newLog,
+            entityType: "eksperiment",  // po zahtjevu
+            entityId: Number(id),      // id iz useParams
+        };
+
+        try {
+            const response = await fetch(`http://localhost:8080/log/add`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `${token}`,
+                },
+                body: JSON.stringify(logData),
+            });
+
+            if (!response.ok) {
+                throw new Error("Neuspješno dodavanje loga.");
+            }
+
+            const addedLog = await response.text();
+
+            setEksperiment((prev) => ({
+                ...prev,
+                logs: [addedLog, ...(prev.logs || [])],
+            }));
+
+            setNewLog("");
+        } catch (err) {
+            alert(err.message);
+        }
+    };
+
     if (loading) return <p>Učitavanje...</p>;
     if (error) return <p className="text-red-500">{error}</p>;
     if (!eksperiment) return null;
@@ -129,9 +166,10 @@ function Experimentiprimjer() {
                     {eksperiment.files && eksperiment.files.length > 0 ? (
                         <ul className="list-disc pl-5">
                             {eksperiment.files.map((file, idx) => {
-                                // Decode Base64 string to Blob
                                 const byteCharacters = atob(file.fileByte);
-                                const byteNumbers = new Array(byteCharacters.length).fill().map((_, i) => byteCharacters.charCodeAt(i));
+                                const byteNumbers = new Array(byteCharacters.length)
+                                    .fill()
+                                    .map((_, i) => byteCharacters.charCodeAt(i));
                                 const byteArray = new Uint8Array(byteNumbers);
                                 const blob = new Blob([byteArray]);
                                 const url = URL.createObjectURL(blob);
@@ -216,8 +254,21 @@ function Experimentiprimjer() {
                     ) : (
                         <CardDescription>Nema logova za ovaj eksperiment.</CardDescription>
                     )}
-                </div>
 
+                    {/* Unos novog loga */}
+                    <div className="mt-4 space-y-2">
+                        <textarea
+                            className="w-full border rounded-md p-2 text-sm"
+                            rows={3}
+                            placeholder="Unesite novi log..."
+                            value={newLog}
+                            onChange={(e) => setNewLog(e.target.value)}
+                        />
+                        <Button onClick={handleAddLog} disabled={!newLog.trim()}>
+                            Dodaj log
+                        </Button>
+                    </div>
+                </div>
             </CardContent>
 
             <CardFooter className="flex justify-between"></CardFooter>
