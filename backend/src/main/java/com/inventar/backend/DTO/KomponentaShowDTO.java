@@ -1,8 +1,5 @@
 package com.inventar.backend.DTO;
 
-import com.fasterxml.jackson.annotation.*;
-import com.inventar.backend.domain.*;
-
 import java.util.*;
 
 public class KomponentaShowDTO {

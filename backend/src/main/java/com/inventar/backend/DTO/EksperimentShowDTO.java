@@ -1,10 +1,5 @@
 package com.inventar.backend.DTO;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.inventar.backend.domain.Files;
-import com.inventar.backend.domain.Komponenta;
-import com.inventar.backend.domain.Log;
-
 import java.util.List;
 
 public class EksperimentShowDTO {
