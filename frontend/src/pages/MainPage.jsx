@@ -60,6 +60,7 @@ export default function CarouselSize() {
     }
 
     return (
+        <div className="min-h-screen flex flex-col items-center justify-center">
         <div>
             <Carousel opts={{ align: "start" }} className="w-[65vw] h-[70vh]">
                 <CarouselContent>
@@ -99,6 +100,7 @@ export default function CarouselSize() {
                     </Link>
                 </MenubarMenu>
             </Menubar>
+        </div>
         </div>
     );
 }
