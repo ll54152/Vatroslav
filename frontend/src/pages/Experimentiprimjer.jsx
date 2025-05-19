@@ -121,6 +121,23 @@ function Experimentiprimjer() {
         } catch (err) {
             alert(err.message);
         }
+
+        setNewLog("");
+
+        // Ponovno dohvaćanje eksperimenta da osvježiš logove
+        try {
+            const response = await fetch(`http://localhost:8080/experiment/get/${id}`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `${token}`,
+                },
+            });
+            if (!response.ok) throw new Error("Ne mogu dohvatiti eksperiment.");
+            const data = await response.json();
+            setEksperiment(data);
+        } catch (err) {
+            alert(err.message);
+        }
     };
 
     if (loading) return <p>Učitavanje...</p>;
@@ -235,25 +252,26 @@ function Experimentiprimjer() {
                     {eksperiment.logs && eksperiment.logs.length > 0 ? (
                         <ScrollArea className="h-60 w-full rounded-md border">
                             <div className="p-4 space-y-2">
-                                {eksperiment.logs.map((log, index) => (
-                                    <div key={index} className="text-sm">
-                                        <p>
-                                            <strong>
-                                                {new Date(log.timestamp).toLocaleString()}
-                                            </strong>{" "}
-                                            — {log.note}
-                                        </p>
-                                        <p className="text-xs text-gray-500">
-                                            Dodao: {log.user?.firstName} {log.user?.lastName}
-                                        </p>
-                                        <Separator className="my-2" />
-                                    </div>
-                                ))}
+                                {eksperiment.logs
+                                    .slice()
+                                    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                                    .map((log, index) => (
+                                        <div key={index} className="text-sm">
+                                            <p>
+                                                <strong>{new Date(log.timestamp).toLocaleString()}</strong> — {log.note}
+                                            </p>
+                                            <p className="text-xs text-gray-500">
+                                                Dodao: {log.user?.firstName} {log.user?.lastName}
+                                            </p>
+                                            <Separator className="my-2" />
+                                        </div>
+                                    ))}
                             </div>
                         </ScrollArea>
                     ) : (
                         <CardDescription>Nema logova za ovaj eksperiment.</CardDescription>
                     )}
+
 
                     {/* Unos novog loga */}
                     <div className="mt-4 space-y-2">
