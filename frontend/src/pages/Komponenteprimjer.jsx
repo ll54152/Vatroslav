@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from "react";
-import {useParams, useNavigate} from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
     Card,
     CardContent,
@@ -8,26 +8,74 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion";
+import { jwtDecode } from "jwt-decode";
 
 function Komponenteprimjer() {
-    const {id} = useParams(); // Dohvat ID-a iz URL-a
+    const { id } = useParams();
     const [component, setComponent] = useState(null);
-    const navigate = useNavigate();
-
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
+
+    const isTokenValid = () => {
+        const token = localStorage.getItem("jwt");
+        if (!token) return false;
+        try {
+            const decoded = jwtDecode(token);
+            const currentTime = Date.now() / 1000;
+            return decoded.exp > currentTime;
+        } catch (error) {
+            return false;
+        }
+    };
+
+    const verifyToken = async () => {
+        const token = localStorage.getItem("jwt");
+        if (!token) return false;
+        try {
+            const response = await fetch("http://localhost:8080/auth/verify", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `${token}`,
+                },
+            });
+            return response.ok;
+        } catch (error) {
+            return false;
+        }
+    };
 
     useEffect(() => {
         const fetchComponent = async () => {
+            const token = localStorage.getItem("jwt");
+
+            const isValid = isTokenValid();
+            const isVerified = await verifyToken();
+
+            if (!isValid || !isVerified) {
+                localStorage.removeItem("jwt");
+                navigate("/login");
+                return;
+            }
+
             try {
-                const response = await fetch(`http://localhost:8080/component/get/${id}`);
+                const response = await fetch(`http://localhost:8080/component/get/${id}`, {
+                    headers: {
+                        Authorization: `${token}`,
+                    },
+                });
                 if (!response.ok) {
                     throw new Error("Greška prilikom dohvaćanja podataka!");
                 }
                 const data = await response.json();
-                console.log(data);
-                setComponent(data); // Postavljanje dobijenih podataka
+                setComponent(data);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -36,7 +84,7 @@ function Komponenteprimjer() {
         };
 
         fetchComponent();
-    }, [id]);
+    }, [id, navigate]);
 
     if (loading) return <div>Učitavanje...</div>;
     if (error) return <div>Greška: {error}</div>;
@@ -53,27 +101,25 @@ function Komponenteprimjer() {
             <CardContent>
                 <form>
                     <div className="grid w-full justify-center gap-4">
+                        {/* Prikaz svih informacija o komponenti */}
                         <div className="flex flex-col space-y-1.5">
                             <CardTitle>Interna oznaka (ZPF)</CardTitle>
                             <Card className="w-[20vw] h-[5vh]">
                                 <CardContent>{component.zpf || "N/A"}</CardContent>
                             </Card>
                         </div>
-
                         <div className="flex flex-col space-y-1.5">
                             <CardTitle>FER Status (Active/InActive/Unknown)</CardTitle>
                             <Card className="w-[20vw] h-[5vh]">
                                 <CardContent>{component.fer || "N/A"}</CardContent>
                             </Card>
                         </div>
-
                         <div className="flex flex-col space-y-1.5">
                             <CardTitle>Kratki opis</CardTitle>
                             <Card className="w-[20vw] h-[5vh]">
                                 <CardContent>{component.description || "N/A"}</CardContent>
                             </Card>
                         </div>
-
                         <div className="flex flex-col space-y-1.5">
                             <CardTitle>Gdje se nalazi</CardTitle>
                             <Card className="w-[20vw] h-[5vh]">
@@ -84,47 +130,49 @@ function Komponenteprimjer() {
                                 </CardContent>
                             </Card>
                         </div>
-
                         <div className="flex flex-col space-y-1.5">
                             <CardTitle>Količina</CardTitle>
                             <Card className="w-[20vw] h-[5vh]">
                                 <CardContent>{component.quantity || "N/A"}</CardContent>
                             </Card>
                         </div>
-
                         <div className="flex flex-col space-y-1.5">
                             <CardTitle>Zapisi (Logs)</CardTitle>
                             <CardContent>
                                 {component.logs && component.logs.length > 0 ? (
                                     <ul>
                                         {component.logs.map((log, index) => (
-                                            <li key={index}>{log}</li>
+                                            <li key={index}>
+                                                <strong>Bilješka:</strong> {log.note} <br />
+                                                <strong>Vrijeme:</strong> {new Date(log.timestamp).toLocaleString()} <br />
+                                                <strong>Korisnik:</strong> {log.user?.name || "Nepoznato"}
+                                            </li>
                                         ))}
                                     </ul>
                                 ) : (
                                     "Nema zapisa"
                                 )}
+
                             </CardContent>
                         </div>
-
                         <Accordion type="single" collapsible className="w-full">
                             <AccordionItem value="eksperiments">
                                 <AccordionTrigger
                                     style={{
-                                        backgroundColor: "white", // Bijela pozadina
-                                        color: "black", // Crni tekst
-                                        padding: "0.5rem 1rem", // Dodajte razmak
-                                        borderRadius: "0.25rem", // Zaobljeni rubovi
-                                        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", // Blaga sjena
-                                        textAlign: "center", // Centriraj tekst
+                                        backgroundColor: "white",
+                                        color: "black",
+                                        padding: "0.5rem 1rem",
+                                        borderRadius: "0.25rem",
+                                        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                                        textAlign: "center",
                                     }}
                                 >
                                     Eksperimenti
                                 </AccordionTrigger>
                                 <AccordionContent>
-                                    {component.eksperiments && component.eksperiments.length > 0 ? (
+                                    {component.eksperimenti && component.eksperimenti.length > 0 ? (
                                         <ul>
-                                            {component.eksperiments.map((experiment) => (
+                                            {component.eksperimenti.map((experiment) => (
                                                 <li
                                                     key={experiment.id}
                                                     className="cursor-pointer text-blue-500 hover:underline"
