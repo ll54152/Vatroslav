@@ -42,9 +42,11 @@ public class KomponentaController {
         Komponenta komponenta = komponentaServiceJPA.findById(id);
         if (komponenta == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(komponentaServiceJPA.getShowDTO(komponenta), HttpStatus.OK);
         }
 
-        return new ResponseEntity<>(null, HttpStatus.OK);
+
     }
 
     @DeleteMapping("/delete/{id}")
