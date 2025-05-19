@@ -72,7 +72,7 @@ export default function Experimenti() {
     const handleDeleteExperiment = async (id) => {
         const token = localStorage.getItem("jwt");
         try {
-            const response = await fetch(`http://localhost:8080/component/experiment/${id}`, {
+            const response = await fetch(`http://localhost:8080/experiment/delete/${id}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `${token}`,
