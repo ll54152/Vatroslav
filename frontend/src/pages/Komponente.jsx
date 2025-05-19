@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
+import React, {useEffect, useState} from "react";
+import {Link, useNavigate} from "react-router-dom";
+import {jwtDecode} from "jwt-decode";
 
 export default function Komponente() {
     const [components, setComponents] = useState([]);
@@ -89,34 +89,37 @@ export default function Komponente() {
     };
 
     return (
-        <div>
-            <header className="fixed top-0 left-0 w-full bg-pink-500 text-white py-4 text-center text-2xl font-bold z-50">
-                Lista Komponenata
-            </header>
+        <div className="min-h-screen flex flex-col items-center justify-center">
+            <div>
+                <header
+                    className="fixed top-0 left-0 w-full bg-pink-500 text-white py-4 text-center text-2xl font-bold z-50">
+                    Lista Komponenata
+                </header>
 
-            <div className="pt-20">
-                {loading && <p>Učitavanje podataka...</p>}
-                {error && <p className="text-red-500">{error}</p>}
-                {!loading && !error && components.length === 0 && (
-                    <p>Nema dostupnih komponenti.</p>
-                )}
-                {!loading && !error && components.map((component) => (
-                    <div
-                        key={component.id}
-                        className="flex items-center justify-between bg-pink-200 p-5 mb-4 rounded-lg shadow-lg"
-                        style={{ width: "80vw" }}
-                    >
-                        <Link to={`/komponenteprimjer/${component.id}`} className="text-blue-500">
-                            {component.name}
-                        </Link>
-                        <button
-                            className="bg-red-500 text-white px-3 py-1 rounded"
-                            onClick={() => handleDeleteComponent(component.id)}
+                <div className="pt-20">
+                    {loading && <p>Učitavanje podataka...</p>}
+                    {error && <p className="text-red-500">{error}</p>}
+                    {!loading && !error && components.length === 0 && (
+                        <p>Nema dostupnih komponenti.</p>
+                    )}
+                    {!loading && !error && components.map((component) => (
+                        <div
+                            key={component.id}
+                            className="flex items-center justify-between bg-pink-200 p-5 mb-4 rounded-lg shadow-lg"
+                            style={{width: "80vw"}}
                         >
-                            Delete
-                        </button>
-                    </div>
-                ))}
+                            <Link to={`/komponenteprimjer/${component.id}`} className="text-blue-500">
+                                {component.name}
+                            </Link>
+                            <button
+                                className="bg-red-500 text-white px-3 py-1 rounded"
+                                onClick={() => handleDeleteComponent(component.id)}
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );
