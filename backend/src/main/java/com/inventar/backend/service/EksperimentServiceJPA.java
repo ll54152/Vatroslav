@@ -18,9 +18,6 @@ public class EksperimentServiceJPA {
     private EksperimentRepo eksperimentRepo;
 
     @Autowired
-    private KomponentaServiceJPA komponentaServiceJPA;
-
-    @Autowired
     private KomponentaRepo komponentaRepo;
 
     @Autowired
@@ -35,6 +32,9 @@ public class EksperimentServiceJPA {
     @Autowired
     private LogRepo logRepo;
 
+    @Autowired
+    private FilesRepo filesRepo;
+
     public Eksperiment save(EksperimentAddDTO eksperimentAddDTO) {
 
         String email = authenticationServiceJPA.getEmailFromToken(request.getHeader("Authorization"));
@@ -44,8 +44,14 @@ public class EksperimentServiceJPA {
 
         List<Komponenta> komponente = new ArrayList<>();
         if (eksperimentAddDTO.getKomponente() != null) {
-            for (Komponenta komponenta : eksperimentAddDTO.getKomponente()) {
-                komponente.add(komponentaServiceJPA.findById(Long.valueOf(komponenta.getId())));
+            for (KomponentaDTO komponenta : eksperimentAddDTO.getKomponente()) {
+                if (komponenta.getId() != null) {
+                    Komponenta existingKomponenta = komponentaRepo.findById(Long.valueOf(komponenta.getId())).orElse(null);
+                    if (existingKomponenta != null) {
+                        komponente.add(existingKomponenta);
+                    }
+
+                }
             }
         }
 
@@ -63,6 +69,26 @@ public class EksperimentServiceJPA {
 
         eksperimentRepo.save(eksperiment);
 
+        if (eksperimentAddDTO.getFiles() != null) {
+            for (FilesDTO filesDTO : eksperimentAddDTO.getFiles()) {
+                Files files = new Files();
+                files.setName(filesDTO.getName());
+                files.setEksperiment(eksperiment);
+                files.setFileType(filesDTO.getData().getContentType());
+                files.setUser(user);
+                try {
+                    files.setFileByte(filesDTO.getData().getBytes());
+                    filesRepo.save(files);
+
+                    String noteFile = "Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao datoteku '" + files.getName() + "' u eksperiment '" + eksperiment.getName() + "'";
+                    logRepo.save(new Log(eksperiment, noteFile, LocalDateTime.now(), user));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        logRepo.save(new Log(eksperiment, note, LocalDateTime.now(), user));
 
         for (Komponenta komponenta : komponente) {
             List<Eksperiment> eksperimenti = komponenta.getEksperimenti();
@@ -70,22 +96,15 @@ public class EksperimentServiceJPA {
             komponenta.setEksperimenti(eksperimenti);
 
             String noteKomponent = "Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je povezao komponentu '" + komponenta.getName() + "' sa eksperimentom '" + eksperiment.getName() + "'";
-            Log logKomponenta = new Log(komponenta, noteKomponent, LocalDateTime.now(), user);
-            logRepo.save(logKomponenta);
+            logRepo.save(new Log(komponenta, noteKomponent, LocalDateTime.now(), user));
 
             komponentaRepo.save(komponenta);
         }
 
-        Log newLog = new Log(eksperiment, note, LocalDateTime.now(), user);
-        logRepo.save(newLog);
-
-        if (eksperimentAddDTO.getLog() != null) {
-            Log eksperimentLog = new Log(eksperiment, eksperimentAddDTO.getLog(), LocalDateTime.now(), user);
-            logRepo.save(eksperimentLog);
-        }
 
         return eksperiment;
     }
+
 
     public List<Eksperiment> findAll() {
         return eksperimentRepo.findAll();

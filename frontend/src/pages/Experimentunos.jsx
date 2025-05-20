@@ -11,6 +11,7 @@ function Experimentunos() {
     const [searchResults, setSearchResults] = useState([]);
     const [allComponents, setAllComponents] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
+    const [files, setFiles] = useState([]);
     const [isSearchVisible, setIsSearchVisible] = useState(false); // Kontrolira prikaz pretrage
     const [formData, setFormData] = useState({
         name: "",
@@ -47,36 +48,46 @@ function Experimentunos() {
         fetchComponents();
     }, []);
 
-    const handleSaveExperiment = async () => {
-        const dataToSend = {
-            ...formData,
-            komponente,
-        };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const token = localStorage.getItem("jwt");
+
+        const formToSend = new FormData();
+        formToSend.append("name", formData.name);
+        formToSend.append("field", formData.field);
+        formToSend.append("subject", formData.subject);
+        formToSend.append("description", formData.description);
+        formToSend.append("materials", formData.materials);
+        formToSend.append("komponente", JSON.stringify(komponente));
+
+        files.forEach((file) => {
+            formToSend.append("files", file);
+        });
 
         try {
-            const token = localStorage.getItem("jwt");
             const response = await fetch("http://localhost:8080/experiment/add", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
                     Authorization: `${token}`,
+                    // NE stavljati Content-Type — browser će sam staviti multipart boundary
                 },
-                body: JSON.stringify(dataToSend),
+                body: formToSend,
             });
 
-
             if (response.ok) {
-                alert("Eksperiment uspješno dodan!");
-                navigate("/mainpage");
+                navigate("/experiments");
             } else {
-                console.error("Server error:", response.statusText);
-                alert("Došlo je do pogreške prilikom dodavanja eksperimenta.");
+                const text = await response.text();
+                console.error("Greška:", text);
+                alert("Greška pri slanju eksperimenta.");
             }
         } catch (error) {
-            console.error("Fetch error:", error);
-            alert("Nije moguće povezati se s backendom.");
+            console.error("Greška:", error);
+            alert("Došlo je do greške prilikom slanja.");
         }
     };
+
 
     const handleInputChange = (e) => {
         const {id, value} = e.target;
@@ -184,14 +195,13 @@ function Experimentunos() {
                                 onChange={handleInputChange}
                             />
                         </div>
-
-                        <div className="flex flex-col space-y-1.5">
-                            <CardTitle>Napomene</CardTitle>
-                            <Input
-                                id="log"
-                                placeholder="Unesite napomene"
-                                value={formData.log}
-                                onChange={handleInputChange}
+                        <div>
+                            <label htmlFor="files">Dodaj dokumentaciju (više datoteka):</label>
+                            <input
+                                type="file"
+                                id="files"
+                                multiple
+                                onChange={(e) => setFiles(Array.from(e.target.files))}
                             />
                         </div>
                         <br/>
@@ -256,7 +266,7 @@ function Experimentunos() {
                     <Button
                         type="button"
                         className="m-5 bg-pink-500 text-white"
-                        onClick={handleSaveExperiment}
+                        onClick={handleSubmit}
                     >
                         Završi
                     </Button>

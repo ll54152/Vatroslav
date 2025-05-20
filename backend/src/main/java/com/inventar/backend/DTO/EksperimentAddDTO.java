@@ -1,8 +1,5 @@
 package com.inventar.backend.DTO;
 
-
-import com.inventar.backend.domain.*;
-
 import java.util.*;
 
 public class EksperimentAddDTO {
@@ -16,21 +13,21 @@ public class EksperimentAddDTO {
 
     private String materials;
 
-    private List<Komponenta> komponente;
+    private List<KomponentaDTO> komponente;
 
-    private String log;
+    private List<FilesDTO> files;
 
     public EksperimentAddDTO() {
     }
 
-    public EksperimentAddDTO(String name, String field, String subject, String description, String materials, List<Komponenta> komponente, String log) {
+    public EksperimentAddDTO(String name, String field, String subject, String description, String materials, List<KomponentaDTO> komponente, List<FilesDTO> files) {
         this.name = name;
         this.field = field;
         this.subject = subject;
         this.description = description;
         this.materials = materials;
         this.komponente = komponente;
-        this.log = log;
+        this.files = files;
     }
 
     public String getName() {
@@ -73,19 +70,19 @@ public class EksperimentAddDTO {
         this.materials = materials;
     }
 
-    public List<Komponenta> getKomponente() {
+    public List<KomponentaDTO> getKomponente() {
         return komponente;
     }
 
-    public void setKomponente(List<Komponenta> komponente) {
+    public void setKomponente(List<KomponentaDTO> komponente) {
         this.komponente = komponente;
     }
 
-    public String getLog() {
-        return log;
+    public List<FilesDTO> getFiles() {
+        return files;
     }
 
-    public void setLog(String log) {
-        this.log = log;
+    public void setFiles(List<FilesDTO> files) {
+        this.files = files;
     }
 }

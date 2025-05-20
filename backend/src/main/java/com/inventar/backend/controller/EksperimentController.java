@@ -1,11 +1,13 @@
 package com.inventar.backend.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inventar.backend.DTO.*;
 import com.inventar.backend.domain.*;
 import com.inventar.backend.service.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -19,7 +21,44 @@ public class EksperimentController {
     private EksperimentServiceJPA eksperimentServiceJPA;
 
     @PostMapping("/add")
-    public ResponseEntity<String> addExperiment(@RequestBody EksperimentAddDTO eksperimentAddDTO) {
+    public ResponseEntity<String> addExperiment(@RequestPart("name") String name,
+                                                @RequestPart("field") String field,
+                                                @RequestPart("subject") String subject,
+                                                @RequestPart("description") String description,
+                                                @RequestPart("materials") String materials,
+                                                @RequestPart("komponente") String komponenteJson,
+                                                @RequestPart(value = "files", required = false) MultipartFile[] files) {
+
+        EksperimentAddDTO eksperimentAddDTO = new EksperimentAddDTO();
+        eksperimentAddDTO.setName(name);
+        eksperimentAddDTO.setField(field);
+        eksperimentAddDTO.setSubject(subject);
+        eksperimentAddDTO.setDescription(description);
+        eksperimentAddDTO.setMaterials(materials);
+
+
+        if (komponenteJson != null && !komponenteJson.isEmpty()) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                eksperimentAddDTO.setKomponente(Arrays.asList(objectMapper.readValue(komponenteJson, KomponentaDTO[].class)));
+            } catch (Exception e) {
+                return new ResponseEntity<>("Greška prilikom parsiranja JSON-a", HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        if (files != null && files.length > 0) {
+            List<FilesDTO> filesDTOList = new ArrayList<>();
+            for (MultipartFile file : files) {
+                FilesDTO filesDTO = new FilesDTO();
+                filesDTO.setName(file.getOriginalFilename());
+                filesDTO.setEntityType("eksperiment");
+                filesDTO.setData(file);
+                filesDTOList.add(filesDTO);
+            }
+            eksperimentAddDTO.setFiles(filesDTOList);
+        }
+
+
         eksperimentServiceJPA.save(eksperimentAddDTO);
         return new ResponseEntity<>("Eksperiment dodan uspješno", HttpStatus.CREATED);
     }
