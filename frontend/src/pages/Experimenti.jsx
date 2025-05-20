@@ -110,12 +110,20 @@ export default function Experimenti() {
                             <Link to={`/experimentiprimjer/${component.id}`} className="text-blue-500">
                                 {component.name}
                             </Link>
-                            <button
-                                className="bg-red-500 text-white px-3 py-1 rounded"
-                                onClick={() => handleDeleteExperiment(component.id)}
-                            >
-                                Delete
-                            </button>
+                            <div className="flex gap-2">
+                                <Link
+                                    to={`/experimenti/edit/${component.id}`}
+                                    className="bg-yellow-500 text-white px-3 py-1 rounded"
+                                >
+                                    Edit
+                                </Link>
+                                <button
+                                    className="bg-red-500 text-white px-3 py-1 rounded"
+                                    onClick={() => handleDeleteExperiment(component.id)}
+                                >
+                                    Delete
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>
