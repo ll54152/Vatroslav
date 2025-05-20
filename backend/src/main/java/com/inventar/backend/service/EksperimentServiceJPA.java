@@ -69,6 +69,8 @@ public class EksperimentServiceJPA {
 
         eksperimentRepo.save(eksperiment);
 
+        logRepo.save(new Log(eksperiment, note, LocalDateTime.now(), user));
+
         if (eksperimentAddDTO.getFiles() != null) {
             for (FilesDTO filesDTO : eksperimentAddDTO.getFiles()) {
                 Files files = new Files();
@@ -88,7 +90,6 @@ public class EksperimentServiceJPA {
             }
         }
 
-        logRepo.save(new Log(eksperiment, note, LocalDateTime.now(), user));
 
         for (Komponenta komponenta : komponente) {
             List<Eksperiment> eksperimenti = komponenta.getEksperimenti();
@@ -119,17 +120,35 @@ public class EksperimentServiceJPA {
     public void deleteById(Long id) {
         Eksperiment eksperiment = eksperimentRepo.findById(id).orElse(null);
         if (eksperiment != null) {
-            List<Komponenta> komponente = eksperiment.getKomponente();
-            for (Komponenta komponenta : komponente) {
-                List<Eksperiment> eksperimenti = komponenta.getEksperimenti();
-                eksperimenti.remove(eksperiment);
-                komponenta.setEksperimenti(eksperimenti);
-                komponentaRepo.save(komponenta);
+
+            String email = authenticationServiceJPA.getEmailFromToken(request.getHeader("Authorization"));
+            User user = userServiceJPA.findByEmail(email);
+
+            if (eksperiment.getKomponente() != null && !eksperiment.getKomponente().isEmpty()) {
+                List<Komponenta> komponente = eksperiment.getKomponente();
+                for (Komponenta komponenta : komponente) {
+                    List<Eksperiment> eksperimenti = komponenta.getEksperimenti();
+                    eksperimenti.remove(eksperiment);
+                    komponenta.setEksperimenti(eksperimenti);
+                    komponentaRepo.save(komponenta);
+
+                    String noteKomponent = "Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio eksperiment '" + eksperiment.getName() + "' iz komponente '" + komponenta.getName() + "'";
+                    logRepo.save(new Log(komponenta, noteKomponent, LocalDateTime.now(), user));
+                }
             }
 
-            List<Log> eksperimentLogs = eksperiment.getLogs();
-            for (Log log : eksperimentLogs) {
-                logRepo.deleteById(log.getId());
+            if (eksperiment.getLogs() != null && !eksperiment.getLogs().isEmpty()) {
+                List<Log> eksperimentLogs = eksperiment.getLogs();
+                for (Log log : eksperimentLogs) {
+                    logRepo.deleteById(log.getId());
+                }
+            }
+
+            if (eksperiment.getFiles() != null && !eksperiment.getFiles().isEmpty()) {
+                List<Files> filesList = eksperiment.getFiles();
+                for (Files files : filesList) {
+                    filesRepo.deleteById(files.getId());
+                }
             }
 
             eksperimentRepo.deleteById(id);
