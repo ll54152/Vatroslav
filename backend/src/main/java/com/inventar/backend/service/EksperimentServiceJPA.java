@@ -96,7 +96,9 @@ public class EksperimentServiceJPA {
             komponenta.setEksperimenti(eksperimenti);
 
             String noteKomponent = "Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je povezao komponentu '" + komponenta.getName() + "' sa eksperimentom '" + eksperiment.getName() + "'";
-            logRepo.save(new Log(komponenta, noteKomponent, LocalDateTime.now(), user));
+            LocalDateTime timestamp = LocalDateTime.now();
+            logRepo.save(new Log(komponenta, noteKomponent, timestamp, user));
+            logRepo.save(new Log(eksperiment, noteKomponent, timestamp, user));
 
             komponentaRepo.save(komponenta);
         }
