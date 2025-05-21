@@ -39,7 +39,7 @@ function Komponenteprimjer() {
         const token = localStorage.getItem("jwt");
         if (!token) return false;
         try {
-            const response = await fetch("http://localhost:8080/auth/verify", {
+            const response = await fetch("/aplikacija/api/auth/verify", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -66,7 +66,7 @@ function Komponenteprimjer() {
             }
 
             try {
-                const response = await fetch(`http://localhost:8080/component/get/${id}`, {
+                const response = await fetch(`/aplikacija/api/component/get/${id}`, {
                     headers: {
                         Authorization: `${token}`,
                     },
