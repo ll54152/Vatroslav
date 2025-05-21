@@ -169,46 +169,4 @@ public class KomponentaServiceJPA {
 
         return komponentaShowDTO;
     }
-
-    public void update(KomponentaShowDTO komponentaShowDTO) {
-        Komponenta komponenta = komponentaRepo.findById(Long.valueOf(komponentaShowDTO.getId())).orElse(null);
-        if (komponenta != null) {
-            komponenta.setName(komponentaShowDTO.getName());
-            komponenta.setDescription(komponentaShowDTO.getDescription());
-            komponenta.setFer(komponentaShowDTO.getFer());
-            komponenta.setZpf(komponentaShowDTO.getZpf());
-            komponenta.setQuantity(komponentaShowDTO.getQuantity());
-
-            List<EksperimentShowDTO> eksperimentShowDTOList = komponentaShowDTO.getEksperimenti();
-            List<Eksperiment> eksperimentList = new ArrayList<>();
-            for (EksperimentShowDTO eksperimentShowDTO : eksperimentShowDTOList) {
-                Eksperiment eksperiment = eksperimentRepo.findById(eksperimentShowDTO.getId()).orElse(null);
-                if (eksperiment != null) {
-                    eksperimentList.add(eksperiment);
-                }
-            }
-            komponenta.setEksperimenti(eksperimentList);
-
-            List<FilesShowDTO> filesShowDTOList = komponentaShowDTO.getFiles();
-            List<Files> filesList = new ArrayList<>();
-            for (FilesShowDTO filesShowDTO : filesShowDTOList) {
-                Files file = new Files();
-                file.setId(filesShowDTO.getId());
-                file.setName(filesShowDTO.getName());
-                file.setFileByte(Base64.getDecoder().decode(filesShowDTO.getFileByte()));
-                filesList.add(file);
-            }
-
-
-            komponentaRepo.save(komponenta);
-        }
-
-        if (komponentaShowDTO.getLocation() != null) {
-            Location location = locationRepo.findById(komponentaShowDTO.getLocation().getId()).orElse(null);
-            komponenta.setLocation(location);
-        }
-
-        komponentaRepo.save(komponenta);
-    }
 }
-
