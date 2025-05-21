@@ -30,7 +30,7 @@ const verifyToken = async () => {
     const token = localStorage.getItem("jwt");
     if (!token) return false;
     try {
-        const response = await fetch("/aplikacija/api/auth/verify", {
+        const response = await fetch("http://localhost:8080/auth/verify", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
