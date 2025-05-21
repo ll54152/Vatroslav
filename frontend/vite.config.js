@@ -1,25 +1,24 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import path from 'path'
+import path from "path"
 
-export default defineConfig(({ mode }) => ({
+// https://vite.dev/config/
+export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      "@": path.resolve(__dirname, "./src"),
     },
   },
   server: {
-    host: '0.0.0.0',
-    port: 5173,
-    proxy: {
-      '/aplikacija/api': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/aplikacija\/api/, ''),
+  host: "0.0.0.0", // Omogućava pristup sa drugih uređaja u mreži
+  port: 5173, // Port frontend aplikacije
+  proxy: {
+    "/component": {
+      target: "http://localhost:8080", // Pošto backend i frontend rade na istom računalu
+      changeOrigin: true,
+      secure: false,
       },
     },
   },
-  base: mode === 'production' ? '/aplikacija/' : '/',
-}))
+})
