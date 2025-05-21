@@ -45,6 +45,8 @@ public class KomponentaController {
         } else {
             return new ResponseEntity<>(komponentaServiceJPA.getShowDTO(komponenta), HttpStatus.OK);
         }
+
+
     }
 
     @DeleteMapping("/delete/{id}")
@@ -56,17 +58,5 @@ public class KomponentaController {
         } else {
             return new ResponseEntity<>("Komponenta nije pronađena", HttpStatus.NOT_FOUND);
         }
-    }
-
-    @PutMapping("/update/{id}")
-    public ResponseEntity<String> updateComponent(@PathVariable Long id, @RequestBody KomponentaShowDTO komponentaShowDTO) {
-        Komponenta komponenta = komponentaServiceJPA.findById(Long.valueOf(komponentaShowDTO.getId()));
-        if (komponenta == null) {
-            return new ResponseEntity<>("Komponenta nije pronađena", HttpStatus.NOT_FOUND);
-        } else {
-            komponentaServiceJPA.update(komponentaShowDTO);
-            return new ResponseEntity<>("Komponenta ažurirana uspešno", HttpStatus.OK);
-        }
-
     }
 }
