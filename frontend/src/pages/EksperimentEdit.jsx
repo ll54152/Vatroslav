@@ -151,7 +151,7 @@ export default function EksperimentEdit() {
             data.append("files", empty, "");
         }
 
-        const response = await fetch(`http://localhost:8080/experiment/update/${id}`, {
+        const response = await fetch(`http://192.168.18.27:8080/experiment/update/${id}`, {
             method: "PUT",
             headers: {
                 Authorization: `${token}`,

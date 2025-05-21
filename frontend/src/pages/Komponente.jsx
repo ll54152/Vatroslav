@@ -24,7 +24,7 @@ export default function Komponente() {
         const token = localStorage.getItem("jwt");
         if (!token) return false;
         try {
-            const response = await fetch("http://localhost:8080/auth/verify", {
+            const response = await fetch("http://192.168.18.27:8080/auth/verify", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -50,7 +50,7 @@ export default function Komponente() {
             }
 
             try {
-                const response = await fetch("http://localhost:8080/component/getAll", {
+                const response = await fetch("http://192.168.18.27:8080/component/getAll", {
                     headers: {
                         Authorization: `${token}`,
                     },
@@ -73,7 +73,7 @@ export default function Komponente() {
     const handleDeleteComponent = async (id) => {
         const token = localStorage.getItem("jwt");
         try {
-            const response = await fetch(`http://localhost:8080/component/delete/${id}`, {
+            const response = await fetch(`http://192.168.18.27:8080/component/delete/${id}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `${token}`,

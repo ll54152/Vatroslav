@@ -40,6 +40,7 @@ public class EksperimentServiceJPA {
         User user = userServiceJPA.findByEmail(email);
         String note = "Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao eksperiment '" + eksperimentAddDTO.getName() + "' u bazu podataka";
 
+        LocalDateTime timestamp = LocalDateTime.now();
 
         List<Komponenta> komponente = new ArrayList<>();
         if (eksperimentAddDTO.getKomponente() != null) {
@@ -68,7 +69,7 @@ public class EksperimentServiceJPA {
 
         eksperimentRepo.save(eksperiment);
 
-        logRepo.save(new Log(eksperiment, note, LocalDateTime.now(), user));
+        logRepo.save(new Log(eksperiment, note, timestamp, user));
 
         if (eksperimentAddDTO.getFiles() != null) {
             for (FilesDTO filesDTO : eksperimentAddDTO.getFiles()) {
@@ -82,7 +83,7 @@ public class EksperimentServiceJPA {
                     filesRepo.save(files);
 
                     String noteFile = "Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao datoteku '" + files.getName() + "' u eksperiment '" + eksperiment.getName() + "'";
-                    logRepo.save(new Log(eksperiment, noteFile, LocalDateTime.now(), user));
+                    logRepo.save(new Log(eksperiment, noteFile, timestamp, user));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -96,7 +97,6 @@ public class EksperimentServiceJPA {
             komponenta.setEksperimenti(eksperimenti);
 
             String noteKomponent = "Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je povezao komponentu '" + komponenta.getName() + "' sa eksperimentom '" + eksperiment.getName() + "'";
-            LocalDateTime timestamp = LocalDateTime.now();
             logRepo.save(new Log(komponenta, noteKomponent, timestamp, user));
             logRepo.save(new Log(eksperiment, noteKomponent, timestamp, user));
 
