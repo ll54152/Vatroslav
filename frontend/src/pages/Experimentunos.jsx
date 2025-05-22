@@ -186,97 +186,6 @@ function Experimentunos() {
                         </div>
                         <br/>
 
-
-  return (
-      <Card
-          className="w-[75vw] h-[160vh]"
-          style={{
-            backgroundImage: `url('/images/background1.jpg')`,
-            backgroundSize: "cover",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center",
-          }}
-      >
-        <CardHeader>
-          <CardTitle className="text-4xl font-bold grid w-full justify-center gap-4">
-            Naziv eksperimenta
-          </CardTitle>
-          <div className="flex flex-col space-y-1.5">
-            <Input
-                id="name"
-                placeholder="Unesite naziv eksperimenta"
-                value={formData.name}
-                onChange={handleInputChange}
-            />
-          </div>
-          <br />
-        </CardHeader>
-        <CardContent>
-          <form>
-            <div className="grid w-full justify-center gap-4">
-              {/* Područje fizike */}
-              <div className="flex flex-col space-y-1.5">
-                <CardTitle>Područje fizike</CardTitle>
-                <Input
-                    id="field"
-                    placeholder="Unesite naziv područja fizike"
-                    value={formData.field}
-                    onChange={handleInputChange}
-                />
-              </div>
-              <br />
-
-              <div className="flex flex-col space-y-1.5">
-                <CardTitle>Nastavni predmet</CardTitle>
-                <Input
-                    id="subject"
-                    placeholder="Unesite naziv predmeta"
-                    value={formData.subject}
-                    onChange={handleInputChange}
-                />
-              </div>
-              <br />
-
-              <div className="flex flex-col space-y-1.5">
-                <CardTitle>Kratak opis</CardTitle>
-                <Input
-                    id="description"
-                    placeholder="Unesite kratak opis"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                />
-              </div>
-              <br />
-
-              <div className="flex flex-col space-y-1.5">
-                <CardTitle>Potrošni materijal</CardTitle>
-                <Input
-                    id="materials"
-                    placeholder="Unesite napomene"
-                    value={formData.materials}
-                    onChange={handleInputChange}
-                />
-              </div>
-
-              
-              <br />
-
-              <Tabs defaultValue="komponente" className="w-100">
-                <TabsList className="grid w-full grid-cols-1">
-                  <TabsTrigger value="komponente" onClick={toggleSearchVisibility}>
-                    Komponente
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="komponente">
-                  {isSearchVisible && (
-                      <ScrollArea className="w-200 rounded-md border p-4">
-                        <div className="mb-4">
-                          <Input
-                              placeholder="Pretraži komponente"
-                              value={searchQuery}
-                              onChange={handleSearchChange}
-                          />
-
                         <div className="flex flex-col space-y-1.5">
                             <CardTitle>Potrošni materijal</CardTitle>
                             <Input
@@ -285,7 +194,6 @@ function Experimentunos() {
                                 value={formData.materials}
                                 onChange={handleInputChange}
                             />
-
                         </div>
                         <div>
                             <label htmlFor="files">Dodaj dokumentaciju (više datoteka):</label>
