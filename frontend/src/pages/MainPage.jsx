@@ -30,7 +30,7 @@ const verifyToken = async () => {
     const token = localStorage.getItem("jwt");
     if (!token) return false;
     try {
-        const response = await fetch("http://localhost:8080/auth/verify", {
+        const response = await fetch("http://192.168.18.27:8080/auth/verify", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -60,6 +60,7 @@ export default function CarouselSize() {
     }
 
     return (
+        <div className="min-h-screen flex flex-col items-center justify-center">
         <div>
             <Carousel opts={{ align: "start" }} className="w-[65vw] h-[70vh]">
                 <CarouselContent>
@@ -99,6 +100,7 @@ export default function CarouselSize() {
                     </Link>
                 </MenubarMenu>
             </Menubar>
+        </div>
         </div>
     );
 }

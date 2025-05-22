@@ -1,6 +1,6 @@
 package com.inventar.backend.service;
 
-import com.inventar.backend.DTO.KomponentaAddDTO;
+import com.inventar.backend.DTO.*;
 import com.inventar.backend.domain.*;
 import com.inventar.backend.repo.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -98,5 +98,75 @@ public class KomponentaServiceJPA {
 
             komponentaRepo.deleteById(id);
         }
+    }
+
+    public KomponentaShowDTO getShowDTO(Komponenta komponenta) {
+        KomponentaShowDTO komponentaShowDTO = new KomponentaShowDTO();
+        komponentaShowDTO.setId(komponenta.getId());
+        komponentaShowDTO.setFer(komponenta.getFer());
+        komponentaShowDTO.setZpf(komponenta.getZpf());
+        komponentaShowDTO.setName(komponenta.getName());
+        komponentaShowDTO.setDescription(komponenta.getDescription());
+        komponentaShowDTO.setQuantity(komponenta.getQuantity());
+
+        if (komponenta.getLocation() != null) {
+            LocationDTO locationDTO = new LocationDTO();
+            locationDTO.setId(komponenta.getLocation().getId());
+            locationDTO.setAdress(komponenta.getLocation().getAdress());
+            locationDTO.setRoom(komponenta.getLocation().getRoom());
+            komponentaShowDTO.setLocation(locationDTO);
+        }
+
+        if (komponenta.getEksperimenti() != null) {
+            List<EksperimentShowDTO> eksperimentShowDTOList = new ArrayList<>();
+            for (Eksperiment eksperiment : komponenta.getEksperimenti()) {
+                EksperimentShowDTO eksperimentShowDTO = new EksperimentShowDTO();
+                eksperimentShowDTO.setId(eksperiment.getId());
+                eksperimentShowDTO.setName(eksperiment.getName());
+                eksperimentShowDTO.setField(eksperiment.getField());
+                eksperimentShowDTO.setSubject(eksperiment.getSubject());
+                eksperimentShowDTO.setDescription(eksperiment.getDescription());
+                eksperimentShowDTO.setMaterials(eksperiment.getMaterials());
+                eksperimentShowDTOList.add(eksperimentShowDTO);
+            }
+
+            komponentaShowDTO.setEksperimenti(eksperimentShowDTOList);
+        }
+
+        if (komponenta.getLogs() != null) {
+            List<LogShowDTO> logShowDTOList = new ArrayList<>();
+            for (Log log : komponenta.getLogs()) {
+                LogShowDTO logShowDTO = new LogShowDTO();
+                logShowDTO.setId(log.getId());
+                logShowDTO.setNote(log.getNote());
+                logShowDTO.setTimestamp(log.getTimestamp());
+
+                if (log.getUser() != null) {
+                    UserShowDTO userShowDTO = new UserShowDTO();
+                    userShowDTO.setEmail(log.getUser().getEmail());
+                    userShowDTO.setFirstName(log.getUser().getFirstName());
+                    userShowDTO.setLastName(log.getUser().getLastName());
+                    logShowDTO.setUser(userShowDTO);
+                }
+                logShowDTOList.add(logShowDTO);
+            }
+
+            komponentaShowDTO.setLogs(logShowDTOList);
+        }
+
+        if (komponenta.getFiles() != null) {
+            List<FilesShowDTO> filesShowDTOList = new ArrayList<>();
+            for (Files file : komponenta.getFiles()) {
+                FilesShowDTO filesShowDTO = new FilesShowDTO();
+                filesShowDTO.setId(file.getId());
+                filesShowDTO.setName(file.getName());
+                filesShowDTO.setFileByte(Base64.getEncoder().encodeToString(file.getFileByte()));
+                filesShowDTOList.add(filesShowDTO);
+            }
+
+            komponentaShowDTO.setFiles(filesShowDTOList);
+        }
+
+        return komponentaShowDTO;
     }
 }

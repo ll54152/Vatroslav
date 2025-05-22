@@ -20,7 +20,7 @@ const isTokenValid = (token) => {
 const verifyToken = async (token) => {
     if (!token) return false;
     try {
-        const response = await fetch("http://localhost:8080/auth/verify", {
+        const response = await fetch("http://192.168.18.27:8080/auth/verify", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -65,7 +65,7 @@ function Login() {
         e.preventDefault();
 
         try {
-            const response = await fetch("http://localhost:8080/user/login", {
+            const response = await fetch("http://192.168.18.27:8080/user/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
