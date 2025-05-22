@@ -31,7 +31,7 @@ function Komponenteunos() {
     useEffect(() => {
         const fetchLocations = async () => {
             try {
-                const response = await fetch("/aplikacija/api/location/getAll");
+                const response = await fetch("/inventar/api/location/getAll");
                 if (response.ok) {
                     const data = await response.json();
                     setLocations(data);
@@ -45,7 +45,7 @@ function Komponenteunos() {
 
         const fetchExperiments = async () => {  // Nova funkcija za dohvat eksperimenata
             try {
-                const response = await fetch("/aplikacija/api/experiment/getAll");
+                const response = await fetch("/inventar/api/experiment/getAll");
                 if (response.ok) {
                     const data = await response.json();
                     setExperiments(data);
@@ -74,7 +74,7 @@ function Komponenteunos() {
         };
 
         try {
-            const response = await fetch("/aplikacija/api/component/add", {
+            const response = await fetch("/inventar/api/component/add", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -104,7 +104,7 @@ function Komponenteunos() {
         };
 
         try {
-            const response = await fetch("/aplikacija/api/location/add", {
+            const response = await fetch("/inventar/api/location/add", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

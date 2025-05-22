@@ -13,13 +13,13 @@ export default defineConfig(({ mode }) => ({
     host: '0.0.0.0',
     port: 5173,
     proxy: {
-      '/aplikacija/api': {
+      '/inventar/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/aplikacija\/api/, ''),
+        rewrite: (path) => path.replace(/^\/inventar\/api/, ''),
       },
     }
   },
-  base: mode === 'production' ? '/aplikacija/' : '/',
+  base: mode === 'production' ? '/inventar/' : '/',
 }))

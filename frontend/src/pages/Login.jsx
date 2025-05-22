@@ -20,7 +20,7 @@ const isTokenValid = (token) => {
 const verifyToken = async (token) => {
     if (!token) return false;
     try {
-        const response = await fetch("/aplikacija/api/auth/verify", {
+        const response = await fetch("/inventar/api/auth/verify", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -65,7 +65,7 @@ function Login() {
         e.preventDefault();
 
         try {
-            const response = await fetch("/aplikacija/api/user/login", {
+            const response = await fetch("/inventar/api/user/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
