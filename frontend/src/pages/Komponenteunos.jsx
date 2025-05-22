@@ -270,9 +270,6 @@ function Komponenteunos() {
                                 onChange={(e) => setDescription(e.target.value)}
                             />
                         </div>
-
-                        
-
                         <div className="flex flex-col space-y-1.5">
                             <Select value={status} onValueChange={setStatus}>
                                 <SelectTrigger id="framework">
