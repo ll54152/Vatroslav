@@ -28,7 +28,7 @@ function Experimentunos() {
         const fetchComponents = async () => {
             try {
                 const token = localStorage.getItem("jwt");
-                const response = await fetch("http://192.168.18.27:8080/component/getAll", {
+                const response = await fetch("/aplikacija/api/component/getAll", {
                     headers: {
                         "Content-Type": "application/json",
                         Authorization: `${token}`,
@@ -66,11 +66,10 @@ function Experimentunos() {
         });
 
         try {
-            const response = await fetch("http://localhost:8080/experiment/add", {
+            const response = await fetch("/aplikacija/api/experiment/add", {
                 method: "POST",
                 headers: {
                     Authorization: `${token}`,
-                    // NE stavljati Content-Type — browser će sam staviti multipart boundary
                 },
                 body: formToSend,
             });

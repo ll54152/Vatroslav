@@ -43,7 +43,7 @@ function Experimentiprimjer() {
         const token = localStorage.getItem("jwt");
         if (!token) return false;
         try {
-            const response = await fetch("http://192.168.18.27:8080/auth/verify", {
+            const response = await fetch("/aplikacija/api/auth/verify", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -68,7 +68,7 @@ function Experimentiprimjer() {
 
             const token = localStorage.getItem("jwt");
             try {
-                const response = await fetch(`http://192.168.18.27:8080/experiment/get/${id}`, {
+                const response = await fetch(`/aplikacija/api/experiment/get/${id}`, {
                     headers: {
                         "Content-Type": "application/json",
                         Authorization: `${token}`,
@@ -97,7 +97,7 @@ function Experimentiprimjer() {
         };
 
         try {
-            const response = await fetch(`http://192.168.18.27:8080/log/add`, {
+            const response = await fetch(`/aplikacija/api/log/add`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -126,7 +126,7 @@ function Experimentiprimjer() {
 
         // Ponovno dohvaćanje eksperimenta da osvježiš logove
         try {
-            const response = await fetch(`http://localhost:8080/experiment/get/${id}`, {
+            const response = await fetch(`/aplikacija/api/experiment/get/${id}`, {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `${token}`,

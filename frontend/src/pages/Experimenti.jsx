@@ -24,7 +24,7 @@ export default function Experimenti() {
         const token = localStorage.getItem("jwt");
         if (!token) return false;
         try {
-            const response = await fetch("http://localhost:8080/auth/verify", {
+            const response = await fetch("/aplikacija/api/auth/verify", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -49,7 +49,7 @@ export default function Experimenti() {
 
             const token = localStorage.getItem("jwt");
             try {
-                const response = await fetch("http://localhost:8080/experiment/getAll", {
+                const response = await fetch("/aplikacija/api/experiment/getAll", {
                     headers: {
                         Authorization: `${token}`,
                     },
@@ -72,7 +72,7 @@ export default function Experimenti() {
     const handleDeleteExperiment = async (id) => {
         const token = localStorage.getItem("jwt");
         try {
-            const response = await fetch(`http://192.168.18.27:8080/experiment/delete/${id}`, {
+            const response = await fetch(`/aplikacija/api/experiment/delete/${id}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `${token}`,

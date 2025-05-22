@@ -34,7 +34,7 @@ export default function EksperimentEdit() {
 
         const fetchExperiment = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/experiment/get/${id}`, {
+                const response = await fetch(`/aplikacija/api/experiment/get/${id}`, {
                     headers: {
                         "Content-Type": "application/json",
                         Authorization: `${token}`,
@@ -63,7 +63,7 @@ export default function EksperimentEdit() {
         };
 
         const fetchComponents = async () => {
-            const response = await fetch("http://localhost:8080/component/getAll", {
+            const response = await fetch("/aplikacija/api/component/getAll", {
                 headers: {
                     Authorization: `${token}`,
                 },
@@ -151,7 +151,7 @@ export default function EksperimentEdit() {
             data.append("files", empty, "");
         }
 
-        const response = await fetch(`http://192.168.18.27:8080/experiment/update/${id}`, {
+        const response = await fetch(`/aplikacija/api/experiment/update/${id}`, {
             method: "PUT",
             headers: {
                 Authorization: `${token}`,
