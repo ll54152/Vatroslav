@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => ({
         secure: false,
         rewrite: (path) => path.replace(/^\/aplikacija\/api/, ''),
       },
-    },
+    }
   },
   base: mode === 'production' ? '/aplikacija/' : '/',
 }))
