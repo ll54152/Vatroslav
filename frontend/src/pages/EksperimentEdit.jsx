@@ -178,13 +178,21 @@ export default function EksperimentEdit() {
             </CardHeader>
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    <CardTitle className="text-left text-[20px]">Naziv</CardTitle>
                     <Input id="name" placeholder="Naziv" value={formData.name} onChange={handleInputChange}/>
+                    <br></br>
+                    <CardTitle className="text-left text-[20px]">Područje fizike</CardTitle>
                     <Input id="field" placeholder="Područje fizike" value={formData.field}
                            onChange={handleInputChange}/>
+                    <CardTitle className="text-left text-[20px]">Nastavni predmet</CardTitle>
                     <Input id="subject" placeholder="Nastavni predmet" value={formData.subject}
                            onChange={handleInputChange}/>
+                            <br></br>
+                     <CardTitle className="text-left text-[20px]">Opis</CardTitle>
                     <Textarea id="description" placeholder="Opis" value={formData.description}
                               onChange={handleInputChange}/>
+                              <br></br>
+                     <CardTitle className="text-left text-[20px]">Potrošni materijal</CardTitle>
                     <Textarea id="materials" placeholder="Potrošni materijal" value={formData.materials}
                               onChange={handleInputChange}/>
 

@@ -97,7 +97,7 @@ function Komponenteprimjer() {
                     <CardTitle className="text-4xl font-bold grid w-full justify-center gap-4 ">
                         {component.name || "Naziv komponente"}
                     </CardTitle>
-                    <CardDescription>Detalji o komponenti</CardDescription>
+                    
                 </CardHeader>
                 <CardContent>
                     <form>
@@ -105,37 +105,38 @@ function Komponenteprimjer() {
                             {/* Prikaz svih informacija o komponenti */}
                             <div className="flex flex-col space-y-1.5">
                                 <CardTitle>Interna oznaka (ZPF)</CardTitle>
-                                <Card className="w-[20vw] h-[5vh]">
-                                    <CardContent>{component.zpf || "N/A"}</CardContent>
-                                </Card>
+                               <CardDescription className="text-blue-900 text-lg">{component.zpf || "N/A"}</CardDescription>
+                                    
+                                
                             </div>
                             <div className="flex flex-col space-y-1.5">
                                 <CardTitle>FER Status (Active/InActive/Unknown)</CardTitle>
-                                <Card className="w-[20vw] h-[5vh]">
-                                    <CardContent>{component.fer || "N/A"}</CardContent>
-                                </Card>
+                               
+                                    <CardDescription className="text-blue-900 text-lg">{component.fer || "N/A"}</CardDescription>
+                            
                             </div>
                             <div className="flex flex-col space-y-1.5">
                                 <CardTitle>Kratki opis</CardTitle>
-                                <Card className="w-[20vw] h-[5vh]">
-                                    <CardContent>{component.description || "N/A"}</CardContent>
-                                </Card>
+                                
+                                  <CardDescription className="text-blue-900 text-lg">{component.description|| "N/A"}</CardDescription>
+                               
                             </div>
+
                             <div className="flex flex-col space-y-1.5">
                                 <CardTitle>Gdje se nalazi</CardTitle>
-                                <Card className="w-[20vw] h-[5vh]">
-                                    <CardContent>
+                               
+                                    <CardDescription className="text-blue-900 text-lg">
                                         {component.location && component.location.adress && component.location.room
                                             ? `${component.location.adress}, ${component.location.room}`
                                             : "Lokacija nije dostupna"}
-                                    </CardContent>
-                                </Card>
+                                   </CardDescription>
+                                
                             </div>
                             <div className="flex flex-col space-y-1.5">
                                 <CardTitle>Količina</CardTitle>
-                                <Card className="w-[20vw] h-[5vh]">
-                                    <CardContent>{component.quantity || "N/A"}</CardContent>
-                                </Card>
+                                
+                                     <CardDescription className="text-blue-900 text-lg">{component.quantity|| "N/A"}</CardDescription>
+                               
                             </div>
                             <div className="flex flex-col space-y-1.5">
                                 <CardTitle>Zapisi (Logs)</CardTitle>

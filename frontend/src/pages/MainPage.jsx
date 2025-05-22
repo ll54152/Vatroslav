@@ -92,12 +92,7 @@ export default function CarouselSize() {
                             Odjava
                         </MenubarTrigger>
                     </Link>
-                    <Link to="/experimentiprimjer">
-                        <MenubarTrigger className="w-40">Experiment primjer</MenubarTrigger>
-                    </Link>
-                    <Link to="/komponenteprimjer">
-                        <MenubarTrigger className="w-40">Komponenta primjer</MenubarTrigger>
-                    </Link>
+                   
                 </MenubarMenu>
             </Menubar>
         </div>
