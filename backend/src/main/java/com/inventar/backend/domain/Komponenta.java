@@ -13,7 +13,7 @@ public class Komponenta {
 
     private String name;    //Naziv
 
-    private String zpf; //Interna oznaka ZPF; XXYYY
+    private String zpf; //Interna oznaka ZPF; Todo: Samo slova, u bacendu dodaj toUpperCase, NEMA BROJEVA, SUSTAV MORA ODBITI BROJEVE
 
     private String fer; //Interna oznaka FER; Active;Inactive;Unknown
 
