@@ -13,13 +13,13 @@ export default defineConfig(({ mode }) => ({
     host: '0.0.0.0',
     port: 5173,
     proxy: {
-      '/inventar/api': {
+      '/vatroslav/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/inventar\/api/, ''),
+        rewrite: (path) => path.replace(/^\/vatroslav\/api/, ''),
       },
     }
   },
-  base: mode === 'production' ? '/inventar/' : '/',
+  base: mode === 'production' ? '/vatroslav/' : '/',
 }))

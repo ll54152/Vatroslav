@@ -28,7 +28,7 @@ function Experimentunos() {
         const fetchComponents = async () => {
             try {
                 const token = localStorage.getItem("jwt");
-                const response = await fetch("/inventar/api/component/getAll", {
+                const response = await fetch("/vatroslav/api/component/getAll", {
                     headers: {
                         "Content-Type": "application/json",
                         Authorization: `${token}`,
@@ -66,7 +66,7 @@ function Experimentunos() {
         });
 
         try {
-            const response = await fetch("/inventar/api/experiment/add", {
+            const response = await fetch("/vatroslav/api/experiment/add", {
                 method: "POST",
                 headers: {
                     Authorization: `${token}`,

@@ -6,7 +6,7 @@ import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
-        <BrowserRouter basename={import.meta.env.MODE === 'production' ? '/inventar' : '/'}>
+        <BrowserRouter basename={import.meta.env.MODE === 'production' ? '/vatroslav' : '/'}>
             <App />
         </BrowserRouter>
     </StrictMode>,
