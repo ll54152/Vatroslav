@@ -34,34 +34,77 @@ public class KomponentaServiceJPA {
     @Autowired
     private LogRepo logRepo;
 
-    public Komponenta save(KomponentaAddDTO komponentaDTO) {
+    @Autowired
+    private FilesRepo filesRepo;
+
+    public Komponenta save(KomponentaAddDTO komponentaAddDTO) {
 
         String email = authenticationServiceJPA.getEmailFromToken(request.getHeader("Authorization"));
         User user = userServiceJPA.findByEmail(email);
-        String note = "Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao komponentu '" + komponentaDTO.getName() + "' u bazu podataka";
+        String note = "Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao komponentu '" + komponentaAddDTO.getName() + "' u bazu podataka";
 
-        Location location = locationRepo.findById((long) komponentaDTO.getLocationID()).orElse(null);
+        LocalDateTime timestamp = LocalDateTime.now();
 
-        List<Eksperiment> eksperimentList = new ArrayList<>();
-        eksperimentList.add(eksperimentRepo.findById((long) komponentaDTO.getEksperimentID()).orElse(null));
+        Location location = locationRepo.findById((long) komponentaAddDTO.getLocationID()).orElse(null);
+
+        List<Eksperiment> eksperimenti = new ArrayList<>();
+        if (komponentaAddDTO.getEksperiments() != null) {
+            for (EksperimentDTO eksperiment : komponentaAddDTO.getEksperiments()) {
+                if (eksperiment.getId() != null) {
+                    Eksperiment existingEksperiment = eksperimentRepo.findById(Long.valueOf(eksperiment.getId())).orElse(null);
+                    if (existingEksperiment != null) {
+                        eksperimenti.add(existingEksperiment);
+                    }
+                }
+            }
+        }
 
         Komponenta komponenta = new Komponenta(
-                komponentaDTO.getName()
-                , komponentaDTO.getZpf()
-                , komponentaDTO.getFer()
-                , komponentaDTO.getQuantity()
-                , komponentaDTO.getDescription()
+                komponentaAddDTO.getName()
+                , komponentaAddDTO.getZpf()
+                , komponentaAddDTO.getFer()
+                , komponentaAddDTO.getQuantity()
+                , komponentaAddDTO.getDescription()
                 , location
-                , eksperimentList
         );
+
+        if (!eksperimenti.isEmpty()) {
+            komponenta.setEksperimenti(eksperimenti);
+        }
+
         komponentaRepo.save(komponenta);
 
-        Log newLog = new Log(komponenta, note, LocalDateTime.now(), user);
-        logRepo.save(newLog);
+        logRepo.save(new Log(komponenta, note, timestamp, user));
 
-        if (komponentaDTO.getLog() != null) {
-            Log eksperimentLog = new Log(komponenta, komponentaDTO.getLog(), LocalDateTime.now(), user);
-            logRepo.save(eksperimentLog);
+        if (komponentaAddDTO.getFiles() != null) {
+            for (FilesDTO filesDTO : komponentaAddDTO.getFiles()) {
+                Files files = new Files();
+                files.setName(filesDTO.getName());
+                files.setKomponenta(komponenta);
+                files.setFileType(filesDTO.getData().getContentType());
+                files.setUser(user);
+                try {
+                    files.setFileByte(filesDTO.getData().getBytes());
+                    filesRepo.save(files);
+
+                    String noteFile = "Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao datoteku '" + files.getName() + "' u komponentu '" + komponenta.getName() + "'";
+                    logRepo.save(new Log(komponenta, noteFile, timestamp, user));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        for (Eksperiment eksperiment : eksperimenti) {
+            List<Komponenta> komponente = eksperiment.getKomponente();
+            komponente.add(komponenta);
+            eksperiment.setKomponente(komponente);
+
+            String noteKomponent = "Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je povezao komponentu '" + komponenta.getName() + "' sa eksperimentom '" + eksperiment.getName() + "'";
+            logRepo.save(new Log(komponenta, noteKomponent, timestamp, user));
+            logRepo.save(new Log(eksperiment, noteKomponent, timestamp, user));
+
+            eksperimentRepo.save(eksperiment);
         }
 
         return komponenta;
