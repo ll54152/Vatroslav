@@ -31,7 +31,13 @@ function Komponenteunos() {
     useEffect(() => {
         const fetchLocations = async () => {
             try {
-                const response = await fetch("/vatroslav/api/location/getAll");
+                const token = localStorage.getItem("jwt");
+                const response = await fetch("/vatroslav/api/location/getAll", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `${token}`,
+                    },
+                });
                 if (response.ok) {
                     const data = await response.json();
                     setLocations(data);
@@ -45,7 +51,13 @@ function Komponenteunos() {
 
         const fetchExperiments = async () => {  // Nova funkcija za dohvat eksperimenata
             try {
-                const response = await fetch("/vatroslav/api/experiment/getAll");
+                const token = localStorage.getItem("jwt");
+                const response = await fetch("/vatroslav/api/experiment/getAll", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `${token}`,
+                    },
+                });
                 if (response.ok) {
                     const data = await response.json();
                     setExperiments(data);
@@ -74,9 +86,11 @@ function Komponenteunos() {
         };
 
         try {
+            const token = localStorage.getItem("jwt");
             const response = await fetch("/vatroslav/api/component/add", {
                 method: "POST",
                 headers: {
+                    Authorization: `${token}`,
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(newComponent),
@@ -104,9 +118,11 @@ function Komponenteunos() {
         };
 
         try {
+            const token = localStorage.getItem("jwt");
             const response = await fetch("/vatroslav/api/location/add", {
                 method: "POST",
                 headers: {
+                    Authorization: `${token}`,
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(newLocation),
