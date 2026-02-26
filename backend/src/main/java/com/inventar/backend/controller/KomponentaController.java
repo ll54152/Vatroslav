@@ -1,31 +1,81 @@
 package com.inventar.backend.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inventar.backend.DTO.*;
 import com.inventar.backend.domain.*;
 import com.inventar.backend.service.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
-//ToDo: Cors za testiranje
+
 @RestController
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 @RequestMapping("/component")
 public class KomponentaController {
 
     @Autowired
     private KomponentaServiceJPA komponentaServiceJPA;
 
-    @PostMapping("/add")
-    public ResponseEntity<String> addComponent(@RequestBody KomponentaAddDTO komponentaDTO) {
-        Komponenta oldKomponenta = komponentaServiceJPA.findByZpf(komponentaDTO.getZpf());
-        if (oldKomponenta != null) {
-            return new ResponseEntity<>("Komponenta već postoji", HttpStatus.BAD_REQUEST);
+    @Autowired
+    private EksperimentServiceJPA eksperimentServiceJPA;
+
+    @PostMapping(value = "/add")
+    public ResponseEntity<String> addComponent(
+            @RequestPart("name") String name,
+            @RequestPart("zpf") String zpf,
+            @RequestPart("fer") String fer,
+            @RequestPart("quantity") String quantityStr,
+            @RequestPart("locationID") String locationIDStr,
+            @RequestPart("description") String description,
+            @RequestPart("eksperimentIDs") String eksperimentIDsJson,
+            @RequestPart(value = "files", required = false) MultipartFile[] files) {
+
+        KomponentaAddDTO komponentaAddDTO = new KomponentaAddDTO();
+        komponentaAddDTO.setName(name);
+        komponentaAddDTO.setZpf(zpf);
+        komponentaAddDTO.setFer(fer);
+        komponentaAddDTO.setQuantity(Integer.parseInt(quantityStr));
+        komponentaAddDTO.setLocationID(Integer.parseInt(locationIDStr));
+        komponentaAddDTO.setDescription(description);
+
+
+        if (eksperimentIDsJson != null && !eksperimentIDsJson.isEmpty()) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                List<Integer> ids = objectMapper.readValue(eksperimentIDsJson, new TypeReference<>() {
+                });
+                List<EksperimentDTO> eksperimentsDTO = new ArrayList<>();
+                for (Integer id : ids) {
+                    Eksperiment eksperiment = eksperimentServiceJPA.findById(Long.valueOf(id));
+                    if (eksperiment != null) {
+                        eksperimentsDTO.add(new EksperimentDTO(eksperiment.getId(), eksperiment.getName()));
+                    }
+                }
+                komponentaAddDTO.setEksperiments(eksperimentsDTO);
+            } catch (Exception e) {
+                return new ResponseEntity<>("Greška prilikom parsiranja JSON-a", HttpStatus.BAD_REQUEST);
+            }
+
         }
 
-        komponentaServiceJPA.save(komponentaDTO);
+        if (files != null && files.length > 0) {
+            List<FilesDTO> filesDTOList = new ArrayList<>();
+            for (MultipartFile file : files) {
+                FilesDTO filesDTO = new FilesDTO();
+                filesDTO.setName(file.getOriginalFilename());
+                filesDTO.setEntityType("eksperiment");
+                filesDTO.setData(file);
+                filesDTOList.add(filesDTO);
+            }
+            komponentaAddDTO.setFiles(filesDTOList);
+        }
+        komponentaServiceJPA.save(komponentaAddDTO);
         return new ResponseEntity<>("Komponenta dodata uspešno", HttpStatus.CREATED);
     }
 
@@ -42,20 +92,21 @@ public class KomponentaController {
         Komponenta komponenta = komponentaServiceJPA.findById(id);
         if (komponenta == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(komponentaServiceJPA.getShowDTO(komponenta), HttpStatus.OK);
         }
-        KomponentaShowDTO komponentaShowDTO = new KomponentaShowDTO(
-                komponenta.getId(),
-                komponenta.getName(),
-                komponenta.getZpf(),
-                komponenta.getFer(),
-                komponenta.getQuantity(),
-                komponenta.getLocation().getAdress(),
-                komponenta.getLocation().getRoom(),
-                komponenta.getDescription(),
-                komponenta.getLogs(),
-                komponenta.getEksperimenti()
-        );
 
-        return new ResponseEntity<>(komponentaShowDTO, HttpStatus.OK);
+
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteComponent(@PathVariable Long id) {
+        Komponenta komponenta = komponentaServiceJPA.findById(id);
+        if (komponenta != null) {
+            komponentaServiceJPA.deleteById(id);
+            return new ResponseEntity<>("Komponenta obrisana uspešno", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Komponenta nije pronađena", HttpStatus.NOT_FOUND);
+        }
     }
 }

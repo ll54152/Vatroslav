@@ -24,7 +24,9 @@ public class Log {
 
     private LocalDateTime timestamp;
 
-    //ToDo: private User user;
+    @ManyToOne
+    @JoinColumn(name = "user_email")
+    private User user;
 
 
     public Log() {
@@ -35,18 +37,20 @@ public class Log {
         this.timestamp = timestamp;
     }
 
-    public Log(Eksperiment eksperiment, String note, LocalDateTime timestamp) {
+    public Log(Eksperiment eksperiment, String note, LocalDateTime timestamp, User user) {
         // Konstruktor za eksperiment
         this.eksperiment = eksperiment;
         this.note = note;
         this.timestamp = timestamp;
+        this.user = user;
     }
 
-    public Log(Komponenta komponenta, String note, LocalDateTime timestamp) {
+    public Log(Komponenta komponenta, String note, LocalDateTime timestamp, User user) {
         // Konstruktor za komponentu
         this.komponenta = komponenta;
         this.note = note;
         this.timestamp = timestamp;
+        this.user = user;
     }
 
     public Long getId() {
@@ -87,5 +91,13 @@ public class Log {
 
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

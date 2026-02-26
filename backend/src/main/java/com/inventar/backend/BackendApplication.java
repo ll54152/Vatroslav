@@ -4,8 +4,8 @@ import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;
 import org.springframework.boot.autoconfigure.security.servlet.*;
 
-@SpringBootApplication(exclude = SecurityAutoConfiguration.class)
-//@SpringBootApplication
+//@SpringBootApplication(exclude = SecurityAutoConfiguration.class)
+@SpringBootApplication
 public class BackendApplication {
 
     public static void main(String[] args) {

@@ -1,33 +1,43 @@
 package com.inventar.backend.DTO;
 
-import java.util.*;
+import java.util.List;
 
-public class EksperimentAddDTO {
+public class EksperimentShowDTO {
+
+    private Long id;
     private String name;
-
     private String field;
-
     private String subject;
-
     private String description;
-
     private String materials;
 
-    private List<KomponentaDTO> komponente;
+    private List<KomponentaShowDTO> komponente;
 
-    private List<FilesDTO> files;
+    private List<LogShowDTO> logs;
 
-    public EksperimentAddDTO() {
-    }
+    private List<FilesShowDTO> files;
 
-    public EksperimentAddDTO(String name, String field, String subject, String description, String materials, List<KomponentaDTO> komponente, List<FilesDTO> files) {
+    public EksperimentShowDTO(Long id, String name, String field, String subject, String description, String materials, List<KomponentaShowDTO> komponente, List<LogShowDTO> logs, List<FilesShowDTO> files) {
+        this.id = id;
         this.name = name;
         this.field = field;
         this.subject = subject;
         this.description = description;
         this.materials = materials;
         this.komponente = komponente;
+        this.logs = logs;
         this.files = files;
+    }
+
+    public EksperimentShowDTO() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -70,19 +80,27 @@ public class EksperimentAddDTO {
         this.materials = materials;
     }
 
-    public List<KomponentaDTO> getKomponente() {
+    public List<KomponentaShowDTO> getKomponente() {
         return komponente;
     }
 
-    public void setKomponente(List<KomponentaDTO> komponente) {
+    public void setKomponente(List<KomponentaShowDTO> komponente) {
         this.komponente = komponente;
     }
 
-    public List<FilesDTO> getFiles() {
+    public List<LogShowDTO> getLogs() {
+        return logs;
+    }
+
+    public void setLogs(List<LogShowDTO> logs) {
+        this.logs = logs;
+    }
+
+    public List<FilesShowDTO> getFiles() {
         return files;
     }
 
-    public void setFiles(List<FilesDTO> files) {
+    public void setFiles(List<FilesShowDTO> files) {
         this.files = files;
     }
 }

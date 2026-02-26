@@ -1,167 +1,309 @@
-import * as React from "react"
-import { Link } from 'react-router-dom';
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
-import { Button } from "@/components/ui/button"
+import * as React from "react";
+import {useEffect, useState} from "react";
+import {useParams, useNavigate} from "react-router-dom";
+import {ScrollArea} from "@/components/ui/scroll-area";
+import {Separator} from "@/components/ui/separator";
+import {Button} from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuPortal,
-    DropdownMenuSeparator,
-    DropdownMenuShortcut,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
-    DropdownMenuTrigger,
-  } from "@/components/ui/dropdown-menu"
-
-
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
 import {
     Tabs,
     TabsContent,
     TabsList,
     TabsTrigger,
-  } from "@/components/ui/tabs"
+} from "@/components/ui/tabs";
 
-  const tags = Array.from({ length: 10 }).map(
-    (_, i, a) => `v1.2.0-beta.${a.length - i}`
-  )
 function Experimentiprimjer() {
+    const {id} = useParams();
+    const navigate = useNavigate();
+    const [eksperiment, setEksperiment] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [newLog, setNewLog] = useState("");
+
+    const isTokenValid = () => {
+        const token = localStorage.getItem("jwt");
+        if (!token) return false;
+        try {
+            const decoded = JSON.parse(atob(token.split(".")[1]));
+            const currentTime = Date.now() / 1000;
+            return decoded.exp > currentTime;
+        } catch (error) {
+            return false;
+        }
+    };
+
+    const verifyToken = async () => {
+        const token = localStorage.getItem("jwt");
+        if (!token) return false;
+        try {
+            const response = await fetch("/vatroslav/api/auth/verify", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `${token}`,
+                },
+            });
+            return response.ok;
+        } catch (error) {
+            return false;
+        }
+    };
+
+    useEffect(() => {
+        const fetchEksperiment = async () => {
+            const isValid = isTokenValid();
+            const isVerified = await verifyToken();
+            if (!isValid || !isVerified) {
+                localStorage.removeItem("jwt");
+                navigate("/login");
+                return;
+            }
+
+            const token = localStorage.getItem("jwt");
+            try {
+                const response = await fetch(`/vatroslav/api/experiment/get/${id}`, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `${token}`,
+                    },
+                });
+                if (!response.ok) throw new Error("Eksperiment nije pronađen.");
+                const data = await response.json();
+                setEksperiment(data);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchEksperiment();
+    }, [id, navigate]);
+
+    const handleAddLog = async () => {
+        const token = localStorage.getItem("jwt");
+
+        const logData = {
+            note: newLog,
+            entityType: "eksperiment",  // po zahtjevu
+            entityId: Number(id),      // id iz useParams
+        };
+
+        try {
+            const response = await fetch(`/vatroslav/api/log/add`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `${token}`,
+                },
+                body: JSON.stringify(logData),
+            });
+
+            if (!response.ok) {
+                throw new Error("Neuspješno dodavanje loga.");
+            }
+
+            const addedLog = await response.text();
+
+            setEksperiment((prev) => ({
+                ...prev,
+                logs: [addedLog, ...(prev.logs || [])],
+            }));
+
+            setNewLog("");
+        } catch (err) {
+            alert(err.message);
+        }
+
+        setNewLog("");
+
+        // Ponovno dohvaćanje eksperimenta da osvježiš logove
+        try {
+            const response = await fetch(`/vatroslav/api/experiment/get/${id}`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `${token}`,
+                },
+            });
+            if (!response.ok) throw new Error("Ne mogu dohvatiti eksperiment.");
+            const data = await response.json();
+            setEksperiment(data);
+        } catch (err) {
+            alert(err.message);
+        }
+    };
+
+    if (loading) return <p>Učitavanje...</p>;
+    if (error) return <p className="text-red-500">{error}</p>;
+    if (!eksperiment) return null;
+
     return (
-
-      <Card className="w-[75vw] h-[160vh]">
+       <div className="min-h-screen flex flex-col items-center justify-center">
+    <Card className="w-[75vw] min-h-screen">
         <CardHeader>
-        <CardTitle className="text-4xl font-bold grid w-full justify-center gap-4 ">Naziv experimenta</CardTitle>
-
-          <CardDescription>...</CardDescription>
+            <CardTitle className="text-4xl font-bold grid w-full justify-center gap-4">
+                {eksperiment.name}
+            </CardTitle>
+           
         </CardHeader>
 
         <CardContent>
-          <form>
             <div className="grid w-full justify-center gap-4">
-              <div className="flex flex-col space-y-1.5">
-              <CardTitle>Područje fizike</CardTitle>
-              <CardDescription>Naziv...</CardDescription>
-              </div>
+                <div className="flex flex-col space-y-1.5">
+                    <CardTitle>Područje fizike</CardTitle>
+                    <CardDescription className="text-blue-900 text-lg">
+                        {eksperiment.field}
+                    </CardDescription>
+                </div>
 
-              <div className="flex flex-col space-y-1.5">
-              <CardTitle>Nastavni predmet</CardTitle>
-              <CardDescription>Naziv...</CardDescription> 
-              </div>
-            <br></br>
-              <div className="flex flex-col space-y-1.5">
-              <CardTitle>Kratak opis</CardTitle>
-              <CardDescription></CardDescription> 
-              </div>
-             
+                <div className="flex flex-col space-y-1.5">
+                    <CardTitle>Nastavni predmet</CardTitle>
+                    <CardDescription className="text-blue-900 text-lg">
+                        {eksperiment.subject}
+                    </CardDescription>
+                </div>
+
+                <div className="flex flex-col space-y-1.5">
+                    <CardTitle>Kratak opis</CardTitle>
+                    <CardDescription className="text-blue-900 text-lg">
+                        {eksperiment.description}
+                    </CardDescription>
+                </div>
             </div>
-            
-       <Card className="w-[350px] grid w-full justify-center gap-4 ">
-      <CardHeader>
-        <CardDescription><p>&nbsp;</p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In turpis nulla, hendrerit sed commodo vitae, imperdiet at ipsum. Mauris malesuada pulvinar lectus a euismod. Vivamus non arcu accumsan, sollicitudin sapien non, eleifend neque. Proin semper non mi sed iaculis. Phasellus tristique, leo at imperdiet hendrerit, arcu ex elementum sapien, in viverra nulla mi quis urna. Curabitur lobortis ipsum ac porttitor accumsan. Nunc eleifend at augue mollis fringilla. Donec libero urna, placerat non ex vel, euismod rutrum erat. Donec ac lacus ligula.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        
-        
-      </CardContent>
-      <CardFooter className="flex justify-between">
-     
-      </CardFooter>
-    </Card>
 
-        <br></br>
-        <div className="flex flex-col space-y-1.5">
-              <CardTitle>Napomene</CardTitle>
-              <CardDescription></CardDescription> 
-              </div>
-    <Card className="w-[350px] grid w-full justify-center gap-4 ">
-      <CardHeader>
-        <CardDescription><p>&nbsp;</p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In turpis nulla, hendrerit sed commodo vitae, imperdiet at ipsum. Mauris malesuada pulvinar lectus a euismod. Vivamus non arcu accumsan, sollicitudin sapien non, eleifend neque. Proin semper non mi sed iaculis. Phasellus tristique, leo at imperdiet hendrerit, arcu ex elementum sapien, in viverra nulla mi quis urna. Curabitur lobortis ipsum ac porttitor accumsan. Nunc eleifend at augue mollis fringilla. Donec libero urna, placerat non ex vel, euismod rutrum erat. Donec ac lacus ligula.</CardDescription>
-        <CardDescription> <p>&nbsp;</p> Nam eget molestie quam. Nulla porta nisl in porta pellentesque. Vestibulum ut neque hendrerit, cursus massa venenatis, imperdiet ante. Curabitur volutpat ex fringilla erat tristique, sit amet posuere lectus pretium. Suspendisse lobortis tincidunt turpis, et laoreet nulla condimentum non. Suspendisse eu ligula id ante iaculis finibus vitae ac est. Donec non neque enim. In sed dolor rutrum, dictum lorem non, volutpat diam. Integer tristique quam ex, vitae varius turpis accumsan ut. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed cursus, arcu vel pulvinar rutrum, turpis neque tempor sem, id tincidunt enim nisl vitae justo. Mauris tempus odio blandit massa volutpat dictum in nec nisi. Nam vel massa nisl. Praesent egestas velit vel congue suscipit. Sed ornare ultricies ullamcorper. Suspendisse potenti.</CardDescription>
-      </CardHeader>
-    
-    </Card>
-    <br></br>
-        <div className="flex flex-col space-y-1.5">
-              <CardTitle>Dokumentacija</CardTitle>
-              <CardDescription></CardDescription> 
-              </div>
-    <Card className="w-[350px] grid w-full justify-center gap-4 ">
-      <CardHeader>
-        <CardDescription><p>&nbsp;</p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In turpis nulla, hendrerit sed commodo vitae, imperdiet at ipsum. Mauris malesuada pulvinar lectus a euismod. Vivamus non arcu accumsan, sollicitudin sapien non, eleifend neque. Proin semper non mi sed iaculis. Phasellus tristique, leo at imperdiet hendrerit, arcu ex elementum sapien, in viverra nulla mi quis urna. Curabitur lobortis ipsum ac porttitor accumsan. Nunc eleifend at augue mollis fringilla. Donec libero urna, placerat non ex vel, euismod rutrum erat. Donec ac lacus ligula.</CardDescription>
-        <CardDescription> <p>&nbsp;</p> Nam eget molestie quam. Nulla porta nisl in porta pellentesque. Vestibulum ut neque hendrerit, cursus massa venenatis, imperdiet ante. Curabitur volutpat ex fringilla erat tristique, sit amet posuere lectus pretium. Suspendisse lobortis tincidunt turpis, et laoreet nulla condimentum non. Suspendisse eu ligula id ante iaculis finibus vitae ac est. Donec non neque enim. In sed dolor rutrum, dictum lorem non, volutpat diam. Integer tristique quam ex, vitae varius turpis accumsan ut. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed cursus, arcu vel pulvinar rutrum, turpis neque tempor sem, id tincidunt enim nisl vitae justo. Mauris tempus odio blandit massa volutpat dictum in nec nisi. Nam vel massa nisl. Praesent egestas velit vel congue suscipit. Sed ornare ultricies ullamcorper. Suspendisse potenti.</CardDescription>
-      </CardHeader>
-    
-    </Card>
-    <br></br>
-
-
- <Tabs defaultValue="account" className="w-100">
-      <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="komponente">Komponente</TabsTrigger>
-        <TabsTrigger value="password">Potrošni materijal</TabsTrigger>
-      </TabsList>
-      <TabsContent value="komponente">
-      <ScrollArea className="h-72 w-100 rounded-md border">
-      <div className="p-4">
-        <h4 className="mb-4 text-sm font-medium leading-none">Komponente</h4>
-        {tags.map((tag) => (
-          <>
-            <div key={tag} className="text-sm">
-              {tag}
+            <br />
+            <div className="flex flex-col space-y-1.5">
+                <CardTitle>Napomene</CardTitle>
+                <CardDescription className="text-blue-900 text-lg">
+                    {eksperiment.materials}
+                </CardDescription>
             </div>
-            <Separator className="my-2" />
-          </>
-        ))}
-      </div>
-    </ScrollArea>  
 
+            <br />
+            <div className="flex flex-col space-y-1.5 mt-6">
+                <CardTitle>Dokumentacija</CardTitle>
+                {eksperiment.files && eksperiment.files.length > 0 ? (
+                    <ul className="list-disc pl-5 text-blue-900 text-lg">
+                        {eksperiment.files.map((file, idx) => {
+                            const byteCharacters = atob(file.fileByte);
+                            const byteNumbers = new Array(byteCharacters.length)
+                                .fill()
+                                .map((_, i) => byteCharacters.charCodeAt(i));
+                            const byteArray = new Uint8Array(byteNumbers);
+                            const blob = new Blob([byteArray]);
+                            const url = URL.createObjectURL(blob);
 
-      </TabsContent>
-      <TabsContent value="password">
-        <Card>
-        
-    
-            <br></br>
-            <CardDescription>
-            Sed euismod ultrices enim id facilisis. Nullam a elit tortor. Nulla posuere lorem a purus facilisis varius. Donec vulputate quam ut lacinia tempus. Integer molestie scelerisque quam, eget mollis arcu vehicula eu. Aliquam id diam non nibh vulputate lacinia.
-            </CardDescription>
-         
-          
-         
-        </Card>
-      </TabsContent>
-    </Tabs>
+                            return (
+                                <li key={idx}>
+                                    <a
+                                        href={url}
+                                        download={file.name}
+                                        className="text-blue-600 underline"
+                                    >
+                                        {file.name}
+                                    </a>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                ) : (
+                    <CardDescription className="text-blue-900 text-lg">
+                        Nema dostupne dokumentacije.
+                    </CardDescription>
+                )}
+            </div>
 
-        <br></br>
-   
-          </form>
+            <br />
+            <Tabs defaultValue="komponente" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="komponente">Komponente</TabsTrigger>
+                    <TabsTrigger value="materijal">Potrošni materijal</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="komponente">
+                    <ScrollArea className="h-72 w-full rounded-md border">
+                        <div className="p-4">
+                            <h4 className="mb-4 text-sm font-medium leading-none">Komponente</h4>
+                            {eksperiment.komponente?.map((komp) => (
+                                <React.Fragment key={komp.id}>
+                                    <div
+                                        className="text-sm cursor-pointer text-blue-900 text-lg"
+                                        onClick={() => navigate(`/komponenteprimjer/${komp.id}`)}
+                                    >
+                                        {komp.name}
+                                    </div>
+                                    <Separator className="my-2" />
+                                </React.Fragment>
+                            ))}
+                        </div>
+                    </ScrollArea>
+                </TabsContent>
+
+                <TabsContent value="materijal">
+                    <Card>
+                        <CardDescription className="p-4 text-blue-900 text-lg">
+                            {eksperiment.materials}
+                        </CardDescription>
+                    </Card>
+                </TabsContent>
+            </Tabs>
+
+            <br />
+            <div className="flex flex-col space-y-1.5 mt-6">
+                <CardTitle>Logovi eksperimenta</CardTitle>
+                {eksperiment.logs && eksperiment.logs.length > 0 ? (
+                    <ScrollArea className="h-60 w-full rounded-md border">
+                        <div className="p-4 space-y-2">
+                            {eksperiment.logs
+                                .slice()
+                                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                                .map((log, index) => (
+                                    <div key={index} className="text-sm text-blue-900 text-lg">
+                                        <p>
+                                            <strong>{new Date(log.timestamp).toLocaleString()}</strong> — {log.note}
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                            Dodao: {log.user?.firstName} {log.user?.lastName}
+                                        </p>
+                                        <Separator className="my-2" />
+                                    </div>
+                                ))}
+                        </div>
+                    </ScrollArea>
+                ) : (
+                    <CardDescription className="text-blue-900 text-lg">
+                        Nema logova za ovaj eksperiment.
+                    </CardDescription>
+                )}
+
+                {/* Unos novog loga */}
+                <div className="mt-4 space-y-2">
+                    <textarea
+                        className="w-full border rounded-md p-2 text-sm"
+                        rows={3}
+                        placeholder="Unesite novi log..."
+                        value={newLog}
+                        onChange={(e) => setNewLog(e.target.value)}
+                    />
+                    <Button onClick={handleAddLog} disabled={!newLog.trim()}>
+                        Dodaj log
+                    </Button>
+                </div>
+            </div>
         </CardContent>
-        <CardFooter className="flex justify-between">
-        
-          
-        </CardFooter>
-      </Card>
+
+        <CardFooter className="flex justify-between"></CardFooter>
+    </Card>
+</div>
+
     );
-  }
-  export default Experimentiprimjer;
+}
+
+export default Experimentiprimjer;

@@ -1,11 +1,9 @@
 package com.inventar.backend.DTO;
 
-import com.fasterxml.jackson.annotation.*;
-import com.inventar.backend.domain.*;
-
 import java.util.*;
 
 public class KomponentaShowDTO {
+
     private Integer id;
 
     private String name;
@@ -16,30 +14,38 @@ public class KomponentaShowDTO {
 
     private int quantity;
 
-    private String address;
-
-    private String room;
+    private LocationDTO location;
 
     private String description;
 
-    private List<Log> logs;
+    private List<EksperimentShowDTO> eksperimenti;
 
-    private List<Eksperiment> eksperiments;
+    private List<LogShowDTO> logs;
+
+    private List<FilesShowDTO> files;
 
     public KomponentaShowDTO() {
     }
 
-    public KomponentaShowDTO(Integer id, String name, String zpf, String fer, int quantity, String address, String room, String description, List<Log> logs, List<Eksperiment> eksperiments) {
+    public KomponentaShowDTO(Integer id, String name, String zpf, String fer, int quantity, LocationDTO location, String description, List<EksperimentShowDTO> eksperimenti, List<LogShowDTO> logs, List<FilesShowDTO> files) {
         this.id = id;
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
         this.quantity = quantity;
-        this.address = address;
-        this.room = room;
+        this.location = location;
         this.description = description;
+        this.eksperimenti = eksperimenti;
         this.logs = logs;
-        this.eksperiments = eksperiments;
+        this.files = files;
+    }
+
+    public List<EksperimentShowDTO> getEksperimenti() {
+        return eksperimenti;
+    }
+
+    public void setEksperimenti(List<EksperimentShowDTO> eksperimenti) {
+        this.eksperimenti = eksperimenti;
     }
 
     public Integer getId() {
@@ -82,20 +88,12 @@ public class KomponentaShowDTO {
         this.quantity = quantity;
     }
 
-    public String getAddress() {
-        return address;
+    public LocationDTO getLocation() {
+        return location;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getRoom() {
-        return room;
-    }
-
-    public void setRoom(String room) {
-        this.room = room;
+    public void setLocation(LocationDTO location) {
+        this.location = location;
     }
 
     public String getDescription() {
@@ -106,19 +104,19 @@ public class KomponentaShowDTO {
         this.description = description;
     }
 
-    public List<Log> getLogs() {
+    public List<LogShowDTO> getLogs() {
         return logs;
     }
 
-    public void setLogs(List<Log> logs) {
+    public void setLogs(List<LogShowDTO> logs) {
         this.logs = logs;
     }
 
-    public List<Eksperiment> getEksperiments() {
-        return eksperiments;
+    public List<FilesShowDTO> getFiles() {
+        return files;
     }
 
-    public void setEksperiments(List<Eksperiment> eksperiments) {
-        this.eksperiments = eksperiments;
+    public void setFiles(List<FilesShowDTO> files) {
+        this.files = files;
     }
 }

@@ -18,12 +18,14 @@ public class KomponentaAddDTO {
 
     private String log;
 
-    private int eksperimentID;
+    private List<EksperimentDTO> eksperiments;
+
+    private List<FilesDTO> files;
 
     public KomponentaAddDTO() {
     }
 
-    public KomponentaAddDTO(String name, String zpf, String fer, int quantity, int locationID, String description, String log, int eksperimentID) {
+    public KomponentaAddDTO(String name, String zpf, String fer, int quantity, int locationID, String description, String log, List<EksperimentDTO> eksperiments, List<FilesDTO> files) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
@@ -31,15 +33,38 @@ public class KomponentaAddDTO {
         this.locationID = locationID;
         this.description = description;
         this.log = log;
-        this.eksperimentID = eksperimentID;
+        this.eksperiments = eksperiments;
+        this.files = files;
     }
 
-    public int getEksperimentID() {
-        return eksperimentID;
+    public KomponentaAddDTO(String name, String zpf, String fer, int quantity, int locationID, String description, String log, List<EksperimentDTO> eksperiments) {
+        this.name = name;
+        this.zpf = zpf;
+        this.fer = fer;
+        this.quantity = quantity;
+        this.locationID = locationID;
+        this.description = description;
+        this.log = log;
+        this.eksperiments = eksperiments;
     }
 
-    public void setEksperimentID(int eksperimentID) {
-        this.eksperimentID = eksperimentID;
+    public KomponentaAddDTO(String name, String zpf, String fer, int quantity, int locationID, String description, String log) {
+        this.name = name;
+        this.zpf = zpf;
+        this.fer = fer;
+        this.quantity = quantity;
+        this.locationID = locationID;
+        this.description = description;
+        this.log = log;
+    }
+
+    public KomponentaAddDTO(String name, String zpf, String fer, int quantity, int locationID, String description) {
+        this.name = name;
+        this.zpf = zpf;
+        this.fer = fer;
+        this.quantity = quantity;
+        this.locationID = locationID;
+        this.description = description;
     }
 
     public String getName() {
@@ -96,5 +121,21 @@ public class KomponentaAddDTO {
 
     public void setLog(String log) {
         this.log = log;
+    }
+
+    public List<EksperimentDTO> getEksperiments() {
+        return eksperiments;
+    }
+
+    public void setEksperiments(List<EksperimentDTO> eksperiments) {
+        this.eksperiments = eksperiments;
+    }
+
+    public List<FilesDTO> getFiles() {
+        return files;
+    }
+
+    public void setFiles(List<FilesDTO> files) {
+        this.files = files;
     }
 }
