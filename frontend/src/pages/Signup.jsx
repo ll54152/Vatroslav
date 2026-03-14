@@ -42,7 +42,7 @@ function Signup() {
         const response = await fetch("/vatroslav/api/user/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: formData.email, password: formData.password }),
+            body: JSON.stringify({ email: formData.email, password: formData.password, firstName: formData.ime, lastName: formData.prezime }),
         });
 
         const data = await response.text();
