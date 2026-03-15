@@ -124,10 +124,10 @@ function Login() {
                             </div>
                         </div>
                         <CardFooter className="flex justify-between">
+                            <Button type="submit" className="m-5 bg-pink-500 text-white">Prijavi se</Button>
                             <Link to="/home">
                                 <Button className="m-5 bg-pink-500 text-white">Nazad</Button>
                             </Link>
-                            <Button type="submit" className="m-5 bg-pink-500 text-white">Prijavi se</Button>
                         </CardFooter>
                     </form>
                 </CardContent>
