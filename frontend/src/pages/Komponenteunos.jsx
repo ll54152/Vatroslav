@@ -11,6 +11,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {Label} from "@/components/ui/label";
+import reactRefresh from "eslint-plugin-react-refresh";
 
 function Komponenteunos() {
     const [componentName, setComponentName] = useState("");
@@ -35,6 +36,7 @@ function Komponenteunos() {
     const [newLocationRoom, setNewLocationRoom] = useState("");
     const [showAddLocation, setShowAddLocation] = useState(false);
     const [files, setFiles] = useState([]);
+    const [validationMessage, setValidationMessage] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -122,7 +124,7 @@ function Komponenteunos() {
     };
 
 
-    const handleAddLocation = async () => {
+    const handleAddLocation = async (event) => {
         event.preventDefault();
         const newLocation = {
             adress: newLocationAddress,
@@ -155,7 +157,7 @@ function Komponenteunos() {
 
             if (response.ok) {
                 alert("Nova lokacija je dodana");
-                setLocations([...locations, newLocation]);
+                setLocations([...locations, data]);
                 setNewLocationAddress("");
                 setNewLocationRoom("");
                 setShowAddLocation(false);
@@ -170,13 +172,7 @@ function Komponenteunos() {
 
     return (
         <Card
-            className="w-[75vw] h-[160vh]"
-            style={{
-                backgroundImage: 'url("/images/background1.jpg")',
-                backgroundSize: "cover",
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "center",
-            }}
+            className=""
         >
             <CardHeader className="flex flex-col items-center">
                 <CardTitle className="text-4xl font-bold mb-4">Naziv komponente</CardTitle>
@@ -197,10 +193,25 @@ function Komponenteunos() {
                         <CardTitle>Interna oznaka (ZPF)</CardTitle>
                         <Input
                             id="intozn"
-                            placeholder="Unesite internu oznaku"
+                            placeholder="Unesite internu oznaku (5 velikih slova)"
                             value={internalCode}
-                            onChange={(e) => setInternalCode(e.target.value)}
+                            onChange={(e) => {
+                                const value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 5);
+                                setInternalCode(value);
+                                // Live validation
+                                if (value.length === 5 && /^[A-Z]{5}$/.test(value)) {
+                                    setValidationMessage("Ispravno");
+                                } else {
+                                    setValidationMessage("Neispravno: Točno 5 velikih slova!");
+                                }
+                            }}
                         />
+                        {/* Display validation message */}
+                        {validationMessage && (
+                            <p className={`text-sm ${validationMessage === "Ispravno" ? "text-green-600" : "text-red-600"}`}>
+                                {validationMessage}
+                            </p>
+                        )}
                     </div>
 
                     <div className="flex flex-col space-y-1.5">
@@ -265,7 +276,7 @@ function Komponenteunos() {
                         <Select value={location} onValueChange={(value) => setLocation(value)}>
                             <SelectTrigger id="location">
                                 <SelectValue placeholder="Odaberite lokaciju">
-                                    {location ? locations.find(loc => loc.id === parseInt(location))?.adress : "Odaberite lokaciju"}
+                                    {location ? locations.find(loc => loc.id === parseInt(location))?.room.adress : "Odaberite lokaciju"}
                                 </SelectValue>
                             </SelectTrigger>
                             <SelectContent position="popper">

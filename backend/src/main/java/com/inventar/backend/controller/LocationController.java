@@ -18,7 +18,7 @@ public class LocationController {
     private LocationServiceJPA locationServiceJPA;
 
     @PostMapping("/add")
-    public ResponseEntity<String> addLocation(@RequestBody Location location) {
+    public ResponseEntity<Object> addLocation(@RequestBody Location location) {
         List<Location> locations = locationServiceJPA.findAll();
 
         for (Location loc : locations) {
@@ -27,8 +27,9 @@ public class LocationController {
             }
         }
 
-        locationServiceJPA.save(location);
-        return new ResponseEntity<>("Lokacija dodata uspešno", HttpStatus.CREATED);
+        Location saved = locationServiceJPA.save(location);
+        LocationDTO dto = new LocationDTO(saved.getId(), saved.getAdress(), saved.getRoom());
+        return new ResponseEntity<>(dto, HttpStatus.CREATED);
     }
 
     @GetMapping("/getAll")
