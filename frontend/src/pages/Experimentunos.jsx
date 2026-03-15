@@ -22,6 +22,21 @@ function Experimentunos() {
         log: "",
     });
     const navigate = useNavigate();
+    const [profileImage, setProfileImage] = useState(null);
+    const [otherFiles, setOtherFiles] = useState([]);
+    const handleProfileImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            setProfileImage(file);
+        } else {
+            alert('Please select a valid image file.');
+        }
+    };
+
+    const handleOtherFilesChange = (e) => {
+        setOtherFiles(Array.from(e.target.files));
+    };
+
 
     useEffect(() => {
         // Dohvaćanje svih komponenti iz backend-a
@@ -65,6 +80,15 @@ function Experimentunos() {
             formToSend.append("files", file);
         });
 
+        if (profileImage) {
+            formToSend.append("profileImage", profileImage);  // Or append to "files" with a category
+        }
+
+        // Append other files
+        otherFiles.forEach((file) => {
+            formToSend.append("files", file);
+        });
+
         try {
             const response = await fetch("/vatroslav/api/experiment/add", {
                 method: "POST",
@@ -75,7 +99,7 @@ function Experimentunos() {
             });
 
             if (response.ok) {
-                navigate("/experiments");
+                navigate("/experimenti/");
             } else {
                 const text = await response.text();
                 console.error("Greška:", text);
@@ -109,7 +133,7 @@ function Experimentunos() {
     };
 
     const addComponent = (component, event) => {
-        event.preventDefault(); // Sprječavanje osvježavanja stranice
+        event.preventDefault();
         if (!komponente.some((komp) => komp.id === component.id)) {
             setKomponente([...komponente, component]);
         }
@@ -126,13 +150,7 @@ function Experimentunos() {
 
     return (
         <Card
-    className="w-[75vw] h-[160vh]"
-    style={{
-        backgroundImage: `url('/images/background1.jpg')`,
-        backgroundSize: "cover",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center",
-    }}
+
 >
     <CardHeader>
         <CardTitle className="text-4xl font-bold grid w-full justify-center gap-4">
@@ -171,15 +189,36 @@ function Experimentunos() {
                 ))}
 
                 <div className="flex flex-col items-center w-full">
-                    <label htmlFor="files">Dodaj dokumentaciju (više datoteka):</label>
-                    <input
-                        className="w-[40vw]"
+                    <label htmlFor="profileImage" className="font-semibold">Profilna slika:</label>
+                    <Input
+                        id="profileImage"
                         type="file"
-                        id="files"
-                        multiple
-                        onChange={(e) => setFiles(Array.from(e.target.files))}
+                        accept="image/*"  // Restricts to images
+                        onChange={handleProfileImageChange}
                     />
+                    {profileImage && (
+                        <p className="text-sm text-gray-600">Selected: {profileImage.name}</p>
+                    )}
                 </div>
+
+                {/* Other Files Picker */}
+                <div className="flex flex-col items-center w-full">
+                    <label htmlFor="otherFiles" className="font-semibold">Ostale datoteke:</label>
+                    <Input
+                        id="otherFiles"
+                        type="file"
+                        multiple
+                        onChange={handleOtherFilesChange}
+                    />
+                    {otherFiles.length > 0 && (
+                        <ul className="text-sm text-gray-600">
+                            {otherFiles.map((file, idx) => (
+                                <li key={idx}>{file.name}</li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+
 
                 <Tabs defaultValue="komponente" className="w-[40vw] mx-auto">
                     <TabsList className="grid w-full grid-cols-1">

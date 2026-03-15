@@ -145,146 +145,154 @@ function Experimentiprimjer() {
     if (!eksperiment) return null;
 
     return (
-       <div className="min-h-screen flex flex-col items-center justify-center">
-    <Card className="w-[75vw] min-h-screen">
-        <CardHeader>
-            <CardTitle className="text-4xl font-bold grid w-full justify-center gap-4">
-                {eksperiment.name}
-            </CardTitle>
-           
-        </CardHeader>
-
-        <CardContent>
-            <div className="grid w-full justify-center gap-4">
-                <div className="flex flex-col space-y-1.5">
-                    <CardTitle>Područje fizike</CardTitle>
-                    <CardDescription className="text-blue-900 text-lg">
-                        {eksperiment.field}
-                    </CardDescription>
-                </div>
-
-                <div className="flex flex-col space-y-1.5">
-                    <CardTitle>Nastavni predmet</CardTitle>
-                    <CardDescription className="text-blue-900 text-lg">
-                        {eksperiment.subject}
-                    </CardDescription>
-                </div>
-
-                <div className="flex flex-col space-y-1.5">
-                    <CardTitle>Kratak opis</CardTitle>
-                    <CardDescription className="text-blue-900 text-lg">
-                        {eksperiment.description}
-                    </CardDescription>
-                </div>
-            </div>
-
-            <br />
-            <div className="flex flex-col space-y-1.5">
-                <CardTitle>Napomene</CardTitle>
-                <CardDescription className="text-blue-900 text-lg">
-                    {eksperiment.materials}
-                </CardDescription>
-            </div>
-
-            <br />
-            <div className="flex flex-col space-y-1.5 mt-6">
-                <CardTitle>Dokumentacija</CardTitle>
-                {eksperiment.files && eksperiment.files.length > 0 ? (
-                    <ul className="list-disc pl-5 text-blue-900 text-lg">
-                        {eksperiment.files.map((file, idx) => {
-                            const byteCharacters = atob(file.fileByte);
-                            const byteNumbers = new Array(byteCharacters.length)
-                                .fill()
-                                .map((_, i) => byteCharacters.charCodeAt(i));
-                            const byteArray = new Uint8Array(byteNumbers);
-                            const blob = new Blob([byteArray]);
-                            const url = URL.createObjectURL(blob);
-
-                            return (
-                                <li key={idx}>
-                                    <a
-                                        href={url}
-                                        download={file.name}
-                                        className="text-blue-600 underline"
-                                    >
-                                        {file.name}
-                                    </a>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                ) : (
-                    <CardDescription className="text-blue-900 text-lg">
-                        Nema dostupne dokumentacije.
-                    </CardDescription>
-                )}
-            </div>
-
-            <br />
-            <Tabs defaultValue="komponente" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="komponente">Komponente</TabsTrigger>
-                    <TabsTrigger value="materijal">Potrošni materijal</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="komponente">
-                    <ScrollArea className="h-72 w-full rounded-md border">
-                        <div className="p-4">
-                            <h4 className="mb-4 text-sm font-medium leading-none">Komponente</h4>
-                            {eksperiment.komponente?.map((komp) => (
-                                <React.Fragment key={komp.id}>
-                                    <div
-                                        className="text-sm cursor-pointer text-blue-900 text-lg"
-                                        onClick={() => navigate(`/komponenteprimjer/${komp.id}`)}
-                                    >
-                                        {komp.name}
-                                    </div>
-                                    <Separator className="my-2" />
-                                </React.Fragment>
-                            ))}
+        <div className="min-h-screen flex flex-col items-center justify-center">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="text-4xl font-bold grid w-full justify-center gap-4">
+                        {eksperiment.name}
+                    </CardTitle>
+                    {eksperiment.files && eksperiment.files.find(file => file.fileCategory === "profileImage") && (
+                        <div className="flex justify-center mt-4">
+                            <img
+                                src={`data:image/*;base64,${eksperiment.files.find(file => file.fileCategory === "profileImage").fileByte}`}
+                                alt="Profile Image"
+                                className="w-2/4"
+                            />
                         </div>
-                    </ScrollArea>
-                </TabsContent>
+                    )}
+                </CardHeader>
 
-                <TabsContent value="materijal">
-                    <Card>
-                        <CardDescription className="p-4 text-blue-900 text-lg">
+                <CardContent>
+                    <div className="grid w-full justify-center gap-4">
+                        <div className="flex flex-col space-y-1.5">
+                            <CardTitle>Područje fizike</CardTitle>
+                            <CardDescription className="text-blue-900 text-lg">
+                                {eksperiment.field}
+                            </CardDescription>
+                        </div>
+
+                        <div className="flex flex-col space-y-1.5">
+                            <CardTitle>Nastavni predmet</CardTitle>
+                            <CardDescription className="text-blue-900 text-lg">
+                                {eksperiment.subject}
+                            </CardDescription>
+                        </div>
+
+                        <div className="flex flex-col space-y-1.5">
+                            <CardTitle>Kratak opis</CardTitle>
+                            <CardDescription className="text-blue-900 text-lg">
+                                {eksperiment.description}
+                            </CardDescription>
+                        </div>
+                    </div>
+
+                    <br/>
+                    <div className="flex flex-col space-y-1.5">
+                        <CardTitle>Napomene</CardTitle>
+                        <CardDescription className="text-blue-900 text-lg">
                             {eksperiment.materials}
                         </CardDescription>
-                    </Card>
-                </TabsContent>
-            </Tabs>
+                    </div>
 
-            <br />
-            <div className="flex flex-col space-y-1.5 mt-6">
-                <CardTitle>Logovi eksperimenta</CardTitle>
-                {eksperiment.logs && eksperiment.logs.length > 0 ? (
-                    <ScrollArea className="h-60 w-full rounded-md border">
-                        <div className="p-4 space-y-2">
-                            {eksperiment.logs
-                                .slice()
-                                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-                                .map((log, index) => (
-                                    <div key={index} className="text-sm text-blue-900 text-lg">
-                                        <p>
-                                            <strong>{new Date(log.timestamp).toLocaleString()}</strong> — {log.note}
-                                        </p>
-                                        <p className="text-xs text-gray-500">
-                                            Dodao: {log.user?.firstName} {log.user?.lastName}
-                                        </p>
-                                        <Separator className="my-2" />
-                                    </div>
-                                ))}
-                        </div>
-                    </ScrollArea>
-                ) : (
-                    <CardDescription className="text-blue-900 text-lg">
-                        Nema logova za ovaj eksperiment.
-                    </CardDescription>
-                )}
+                    <br/>
+                    <div className="flex flex-col space-y-1.5 mt-6">
+                        <CardTitle>Dokumentacija</CardTitle>
+                        {eksperiment.files && eksperiment.files.length > 0 ? (
+                            <ul className="list-disc pl-5 text-blue-900 text-lg">
+                                {eksperiment.files.map((file, idx) => {
+                                    const byteCharacters = atob(file.fileByte);
+                                    const byteNumbers = new Array(byteCharacters.length)
+                                        .fill()
+                                        .map((_, i) => byteCharacters.charCodeAt(i));
+                                    const byteArray = new Uint8Array(byteNumbers);
+                                    const blob = new Blob([byteArray]);
+                                    const url = URL.createObjectURL(blob);
 
-                {/* Unos novog loga */}
-                <div className="mt-4 space-y-2">
+                                    return (
+                                        <li key={idx}>
+                                            <a
+                                                href={url}
+                                                download={file.name}
+                                                className="text-blue-600 underline"
+                                            >
+                                                {file.name}
+                                            </a>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        ) : (
+                            <CardDescription className="text-blue-900 text-lg">
+                                Nema dostupne dokumentacije.
+                            </CardDescription>
+                        )}
+                    </div>
+
+                    <br/>
+                    <Tabs defaultValue="komponente" className="w-full">
+                        <TabsList className="grid w-full grid-cols-2">
+                            <TabsTrigger value="komponente">Komponente</TabsTrigger>
+                            <TabsTrigger value="materijal">Potrošni materijal</TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="komponente">
+                            <ScrollArea className="h-72 w-full rounded-md border">
+                                <div className="p-4">
+                                    <h4 className="mb-4 text-sm font-medium leading-none">Komponente</h4>
+                                    {eksperiment.komponente?.map((komp) => (
+                                        <React.Fragment key={komp.id}>
+                                            <div
+                                                className="text-sm cursor-pointer text-blue-900 text-lg"
+                                                onClick={() => navigate(`/komponenteprimjer/${komp.id}`)}
+                                            >
+                                                {komp.name}
+                                            </div>
+                                            <Separator className="my-2"/>
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                            </ScrollArea>
+                        </TabsContent>
+
+                        <TabsContent value="materijal">
+                            <Card>
+                                <CardDescription className="p-4 text-blue-900 text-lg">
+                                    {eksperiment.materials}
+                                </CardDescription>
+                            </Card>
+                        </TabsContent>
+                    </Tabs>
+
+                    <br/>
+                    <div className="flex flex-col space-y-1.5 mt-6">
+                        <CardTitle>Logovi eksperimenta</CardTitle>
+                        {eksperiment.logs && eksperiment.logs.length > 0 ? (
+                            <ScrollArea className="h-60 w-full rounded-md border">
+                                <div className="p-4 space-y-2">
+                                    {eksperiment.logs
+                                        .slice()
+                                        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                                        .map((log, index) => (
+                                            <div key={index} className="text-sm text-blue-900 text-lg">
+                                                <p>
+                                                    <strong>{new Date(log.timestamp).toLocaleString()}</strong> — {log.note}
+                                                </p>
+                                                <p className="text-xs text-gray-500">
+                                                    Dodao: {log.user?.firstName} {log.user?.lastName}
+                                                </p>
+                                                <Separator className="my-2"/>
+                                            </div>
+                                        ))}
+                                </div>
+                            </ScrollArea>
+                        ) : (
+                            <CardDescription className="text-blue-900 text-lg">
+                                Nema logova za ovaj eksperiment.
+                            </CardDescription>
+                        )}
+
+                        {/* Unos novog loga */}
+                        <div className="mt-4 space-y-2">
                     <textarea
                         className="w-full border rounded-md p-2 text-sm"
                         rows={3}
@@ -292,16 +300,16 @@ function Experimentiprimjer() {
                         value={newLog}
                         onChange={(e) => setNewLog(e.target.value)}
                     />
-                    <Button onClick={handleAddLog} disabled={!newLog.trim()}>
-                        Dodaj log
-                    </Button>
-                </div>
-            </div>
-        </CardContent>
+                            <Button onClick={handleAddLog} disabled={!newLog.trim()}>
+                                Dodaj log
+                            </Button>
+                        </div>
+                    </div>
+                </CardContent>
 
-        <CardFooter className="flex justify-between"></CardFooter>
-    </Card>
-</div>
+                <CardFooter className="flex justify-between"></CardFooter>
+            </Card>
+        </div>
 
     );
 }

@@ -64,6 +64,7 @@ public class FilesServiceJPA {
                 filesDTO.getName(),
                 bytes,
                 filesDTO.getData().getContentType(),
+                filesDTO.getFileCategory(),
                 userRepo.findByEmail(email).get()
         );
 
@@ -83,6 +84,7 @@ public class FilesServiceJPA {
                 filesDTO.getName(),
                 bytes,
                 filesDTO.getData().getContentType(),
+                filesDTO.getFileCategory(),
                 userRepo.findByEmail(email).get()
         );
 

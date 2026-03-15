@@ -7,6 +7,7 @@ public class FilesDTO {
     private String name;
     private MultipartFile data;
     private String entityType;
+    private String fileCategory;
     private Long entityId;
 
     public FilesDTO() {
@@ -17,10 +18,11 @@ public class FilesDTO {
         this.data = data;
     }
 
-    public FilesDTO(String name, MultipartFile data, String entityType, Long entityId) {
+    public FilesDTO(String name, MultipartFile data, String entityType, String fileCategory, Long entityId) {
         this.name = name;
         this.data = data;
         this.entityType = entityType;
+        this.fileCategory = fileCategory;
         this.entityId = entityId;
     }
 
@@ -54,5 +56,13 @@ public class FilesDTO {
 
     public void setEntityId(Long entityId) {
         this.entityId = entityId;
+    }
+
+    public String getFileCategory() {
+        return fileCategory;
+    }
+
+    public void setFileCategory(String fileCategory) {
+        this.fileCategory = fileCategory;
     }
 }

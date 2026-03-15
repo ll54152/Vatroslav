@@ -71,6 +71,7 @@ public class KomponentaController {
                 filesDTO.setName(file.getOriginalFilename());
                 filesDTO.setEntityType("eksperiment");
                 filesDTO.setData(file);
+                filesDTO.setFileCategory("general");
                 filesDTOList.add(filesDTO);
             }
             komponentaAddDTO.setFiles(filesDTOList);

@@ -172,9 +172,19 @@ export default function EksperimentEdit() {
     if (!experiment) return <div>Učitavanje...</div>;
 
     return (
-        <Card className="w-[75vw] mx-auto mt-10 p-6">
+        <Card>
             <CardHeader>
                 <CardTitle>Uredi eksperiment</CardTitle>
+                {/* Add profile picture display here, centered below the title */}
+                {experiment.files && experiment.files.find(file => file.fileCategory === "profileImage") && (
+                    <div className="flex justify-center mt-4">
+                        <img
+                            src={`data:image/*;base64,${experiment.files.find(file => file.fileCategory === "profileImage").fileByte}`}
+                            alt="Profile Image"
+                            className="w-2/4"
+                        />
+                    </div>
+                )}
             </CardHeader>
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">

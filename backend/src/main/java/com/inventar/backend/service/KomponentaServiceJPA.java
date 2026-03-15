@@ -82,6 +82,7 @@ public class KomponentaServiceJPA {
                 files.setName(filesDTO.getName());
                 files.setKomponenta(komponenta);
                 files.setFileType(filesDTO.getData().getContentType());
+                files.setFileCategory(filesDTO.getFileCategory());
                 files.setUser(user);
                 try {
                     files.setFileByte(filesDTO.getData().getBytes());
@@ -203,6 +204,7 @@ public class KomponentaServiceJPA {
                 FilesShowDTO filesShowDTO = new FilesShowDTO();
                 filesShowDTO.setId(file.getId());
                 filesShowDTO.setName(file.getName());
+                filesShowDTO.setFileCategory(file.getFileCategory());
                 filesShowDTO.setFileByte(Base64.getEncoder().encodeToString(file.getFileByte()));
                 filesShowDTOList.add(filesShowDTO);
             }

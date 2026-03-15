@@ -76,6 +76,7 @@ public class EksperimentServiceJPA {
                 Files files = new Files();
                 files.setName(filesDTO.getName());
                 files.setEksperiment(eksperiment);
+                files.setFileCategory(filesDTO.getFileCategory());
                 files.setFileType(filesDTO.getData().getContentType());
                 files.setUser(user);
                 try {
@@ -210,6 +211,7 @@ public class EksperimentServiceJPA {
                 FilesShowDTO filesShowDTO = new FilesShowDTO();
                 filesShowDTO.setId(files.getId());
                 filesShowDTO.setName(files.getName());
+                filesShowDTO.setFileCategory(files.getFileCategory());
                 filesShowDTO.setFileByte(Base64.getEncoder().encodeToString(files.getFileByte()));
                 filesShowDTOList.add(filesShowDTO);
             }
@@ -336,6 +338,7 @@ public class EksperimentServiceJPA {
                 files.setName(filesDTO.getName());
                 files.setEksperiment(eksperiment);
                 files.setFileType(filesDTO.getData().getContentType());
+                files.setFileCategory(filesDTO.getFileCategory());
                 files.setUser(user);
                 try {
                     files.setFileByte(filesDTO.getData().getBytes());

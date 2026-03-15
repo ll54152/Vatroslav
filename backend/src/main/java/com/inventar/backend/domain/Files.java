@@ -16,6 +16,8 @@ public class Files {
 
     private String fileType;
 
+    private String fileCategory;
+
     @ManyToOne
     @JoinColumn(name = "komponenta_id")
     private Komponenta komponenta;
@@ -28,44 +30,47 @@ public class Files {
     @JoinColumn(name = "user_email")
     private User user;
 
-    public Files(String name, byte[] fileByte, String fileType, Komponenta komponenta, Eksperiment eksperiment, User user) {
+    public Files(String name, byte[] fileByte, String fileType, String fileCategory, Komponenta komponenta, Eksperiment eksperiment, User user) {
         // Konstruktor sa komponentom i eksperimentom
         this.name = name;
         this.fileByte = fileByte;
         this.fileType = fileType;
+        this.fileCategory = fileCategory;
         this.komponenta = komponenta;
         this.eksperiment = eksperiment;
         this.user = user;
     }
 
-    public Files(String name, byte[] fileByte, String fileType, Eksperiment eksperiment, User user) {
+    public Files(String name, byte[] fileByte, String fileType, String fileCategory, Eksperiment eksperiment, User user) {
         // Konstruktor sa eksperimenom
         this.name = name;
         this.fileByte = fileByte;
         this.fileType = fileType;
+        this.fileCategory = fileCategory;
         this.eksperiment = eksperiment;
         this.user = user;
     }
 
-    public Files(String name, byte[] fileByte, String fileType, Komponenta komponenta, User user) {
+    public Files(String name, byte[] fileByte, String fileType, String fileCategory, Komponenta komponenta, User user) {
         // Konstruktor sa komponentom
         this.name = name;
         this.fileByte = fileByte;
         this.fileType = fileType;
+        this.fileCategory = fileCategory;
         this.komponenta = komponenta;
         this.user = user;
     }
 
-    public Files(String name, byte[] fileByte, String fileType, User user) {
+    public Files(String name, byte[] fileByte, String fileType, String fileCategory, User user) {
         // Konstruktor bez komponente i eksperimenta
         this.name = name;
         this.fileByte = fileByte;
         this.fileType = fileType;
+        this.fileCategory = fileCategory;
         this.user = user;
     }
 
     public Files() {
-
     }
 
     public Long getId() {
@@ -122,5 +127,13 @@ public class Files {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getFileCategory() {
+        return fileCategory;
+    }
+
+    public void setFileCategory(String fileCategory) {
+        this.fileCategory = fileCategory;
     }
 }

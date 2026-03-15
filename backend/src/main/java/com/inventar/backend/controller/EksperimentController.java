@@ -27,7 +27,8 @@ public class EksperimentController {
                                                 @RequestPart("description") String description,
                                                 @RequestPart("materials") String materials,
                                                 @RequestPart("komponente") String komponenteJson,
-                                                @RequestPart(value = "files", required = false) MultipartFile[] files) {
+                                                @RequestPart(value = "files", required = false) MultipartFile[] files,
+                                                @RequestPart(value = "profileImage", required = false) MultipartFile[] profileImage) {
 
         EksperimentAddDTO eksperimentAddDTO = new EksperimentAddDTO();
         eksperimentAddDTO.setName(name);
@@ -46,15 +47,31 @@ public class EksperimentController {
             }
         }
 
-        if (files != null && files.length > 0) {
-            List<FilesDTO> filesDTOList = new ArrayList<>();
+        List<FilesDTO> filesDTOList = new ArrayList<>();
+
+        if (files != null) {
             for (MultipartFile file : files) {
                 FilesDTO filesDTO = new FilesDTO();
                 filesDTO.setName(file.getOriginalFilename());
                 filesDTO.setEntityType("eksperiment");
                 filesDTO.setData(file);
+                filesDTO.setFileCategory("general");
                 filesDTOList.add(filesDTO);
             }
+        }
+
+        if (profileImage != null) {
+            for (MultipartFile file : profileImage) {
+                FilesDTO filesDTO = new FilesDTO();
+                filesDTO.setName(file.getOriginalFilename());
+                filesDTO.setEntityType("eksperiment");
+                filesDTO.setData(file);
+                filesDTO.setFileCategory("profileImage");
+                filesDTOList.add(filesDTO);
+            }
+        }
+
+        if (!filesDTOList.isEmpty()){
             eksperimentAddDTO.setFiles(filesDTOList);
         }
 
@@ -146,6 +163,7 @@ public class EksperimentController {
                 filesDTO.setName(file.getOriginalFilename());
                 filesDTO.setEntityType("eksperiment");
                 filesDTO.setData(file);
+                filesDTO.setFileCategory("general");
                 filesList.add(filesDTO);
             }
             eksperimentAddDTO.setFiles(filesList);
