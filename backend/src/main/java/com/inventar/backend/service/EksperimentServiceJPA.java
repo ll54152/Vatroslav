@@ -270,6 +270,7 @@ public class EksperimentServiceJPA {
 
         for (Log log : logsForDelete) {
             logRepo.deleteById(log.getId());
+            eksperiment.getLogs().remove(log);
         }
 
 
@@ -320,6 +321,14 @@ public class EksperimentServiceJPA {
                 }
             }
         }
+
+        if (!logsForDelete.isEmpty()) {
+            for (Log log : logsForDelete) {
+                String noteLog = "Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio log '" + log.getNote() + "' iz eksperimenta '" + eksperiment.getName() + "'";
+                logRepo.save(new Log(eksperiment, noteLog, timestamp, user));
+            }
+        }
+
 
         if (filesList != null && !filesList.isEmpty()) {
             for (FilesDTO filesDTO : filesList) {

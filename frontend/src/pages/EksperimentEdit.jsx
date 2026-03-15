@@ -160,7 +160,7 @@ export default function EksperimentEdit() {
         });
 
         if (response.ok) {
-            navigate("/experiments");
+            navigate("/experimentiprimjer/" + id);
         } else {
             const text = await response.text();
             console.error("Greška:", text);
