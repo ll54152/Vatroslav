@@ -88,7 +88,7 @@ export default function CarouselSize() {
             <Menubar>
                 <MenubarMenu>
                     <Link to="/home">
-                        <MenubarTrigger className="w-40 hover:bg-red-500" onClick={() => localStorage.removeItem("token")}>
+                        <MenubarTrigger className="w-40 hover:bg-red-500" onClick={() => localStorage.removeItem("jwt")}>
                             Odjava
                         </MenubarTrigger>
                     </Link>
