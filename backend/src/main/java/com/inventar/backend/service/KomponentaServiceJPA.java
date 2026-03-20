@@ -127,17 +127,35 @@ public class KomponentaServiceJPA {
         Komponenta komponenta = komponentaRepo.findById(id).orElse(null);
 
         if (komponenta != null) {
-            List<Eksperiment> eksperimentList = komponenta.getEksperimenti();
-            for (Eksperiment eksperiment : eksperimentList) {
-                List<Komponenta> komponentaList = eksperiment.getKomponente();
-                komponentaList.remove(komponenta);
-                eksperiment.setKomponente(komponentaList);
-                eksperimentRepo.save(eksperiment);
+
+            String email = authenticationServiceJPA.getEmailFromToken(request.getHeader("Authorization"));
+            User user = userServiceJPA.findByEmail(email);
+
+            if (!komponenta.getEksperimenti().isEmpty() && komponenta.getEksperimenti() != null) {
+                List<Eksperiment> eksperimentList = komponenta.getEksperimenti();
+                for (Eksperiment eksperiment : eksperimentList) {
+                    List<Komponenta> komponentaList = eksperiment.getKomponente();
+                    komponentaList.remove(komponenta);
+                    eksperiment.setKomponente(komponentaList);
+                    eksperimentRepo.save(eksperiment);
+
+                    String noteExperiment = "Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio komponentu '" + komponenta.getName() + "' iz eksperimenta '" + eksperiment.getName() + "'";
+                    logRepo.save(new Log(eksperiment, noteExperiment, LocalDateTime.now(), user));
+                }
             }
 
-            List<Log> eksperimentLogs = komponenta.getLogs();
-            for (Log log : eksperimentLogs) {
-                logRepo.deleteById(log.getId());
+            if (!komponenta.getLogs().isEmpty() && komponenta.getLogs() != null) {
+                List<Log> eksperimentLogs = komponenta.getLogs();
+                for (Log log : eksperimentLogs) {
+                    logRepo.deleteById(log.getId());
+                }
+            }
+
+            if (!komponenta.getFiles().isEmpty() && komponenta.getFiles() != null) {
+                List<Files> eksperimentFiles = komponenta.getFiles();
+                for (Files file : eksperimentFiles) {
+                    filesRepo.deleteById(file.getId());
+                }
             }
 
             komponentaRepo.deleteById(id);

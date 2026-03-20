@@ -119,6 +119,7 @@ public class EksperimentServiceJPA {
 
     public void deleteById(Long id) {
         Eksperiment eksperiment = eksperimentRepo.findById(id).orElse(null);
+
         if (eksperiment != null) {
 
             String email = authenticationServiceJPA.getEmailFromToken(request.getHeader("Authorization"));
