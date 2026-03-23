@@ -1,20 +1,24 @@
 package com.inventar.backend.controller;
 
-import com.inventar.backend.domain.*;
-import com.inventar.backend.service.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
-
+import com.inventar.backend.domain.User;
+import com.inventar.backend.service.UserServiceJPA;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 //@CrossOrigin(origins = "*")
 @RequestMapping("/user")
 public class UserController {
 
-    @Autowired
     private UserServiceJPA userServiceJPA;
 
+    public UserController(UserServiceJPA userServiceJPA) {
+        this.userServiceJPA = userServiceJPA;
+    }
 
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody User user) {
@@ -23,7 +27,7 @@ public class UserController {
         if (oldUser != null) {
             String token = userServiceJPA.verifyLogin(user);
             if (token != null) {
-                return new ResponseEntity<>("Bearer"+ token, HttpStatus.OK);
+                return new ResponseEntity<>("Bearer" + token, HttpStatus.OK);
             }
         }
         return new ResponseEntity<>("Pogrešni podatci", HttpStatus.UNAUTHORIZED);

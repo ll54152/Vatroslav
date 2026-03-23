@@ -1,7 +1,7 @@
 package com.inventar.backend.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -21,14 +21,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class Security {
 
-    @Autowired
     private JWTFilter jwtFilter;
-
-    @Autowired
     private UserDetailsService userDetailsService;
+    private CustomCorsConfiguration customCorsConfiguration;
 
-    @Autowired
-    CustomCorsConfiguration customCorsConfiguration;
+    public Security(JWTFilter jwtFilter, UserDetailsService userDetailsService, CustomCorsConfiguration customCorsConfiguration) {
+        this.jwtFilter = jwtFilter;
+        this.userDetailsService = userDetailsService;
+        this.customCorsConfiguration = customCorsConfiguration;
+    }
 
     private static final String[] WHITE_LIST_URL = {
             "/user/login",
