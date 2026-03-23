@@ -63,7 +63,7 @@ public class UserServiceJPA {
             Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
 
             if (authentication.isAuthenticated()) {
-                return jwtService.generateToken(user.getEmail());
+                return jwtService.generateToken(user.getEmail(), user.getRole());
             } else {
                 return null;
             }

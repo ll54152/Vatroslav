@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -19,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class Security {
 
     private JWTFilter jwtFilter;
@@ -43,9 +45,10 @@ public class Security {
         return http
                 .authorizeHttpRequests(request -> request    // Authorize HTTP requests
                         .requestMatchers(WHITE_LIST_URL).permitAll()    // Allow all requests to the whitelist URLs
+                        //.requestMatchers("/experiment/**").hasAuthority("ROLE_ADMIN")  // Restrict all experiment endpoints to admins
                         .anyRequest().authenticated()).     // All other requests require authentication
-                httpBasic(Customizer.withDefaults()).   // Enable basic authentication
-                sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))    // Set session management to stateless
+                        httpBasic(Customizer.withDefaults()).   // Enable basic authentication
+                        sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))    // Set session management to stateless
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // Add JWT filter before the username/password authentication filter
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(c -> c.configurationSource(customCorsConfiguration))

@@ -37,11 +37,23 @@ export default function Experimenti() {
         }
     };
 
+    const getUserRole = () => {
+        const token = localStorage.getItem("jwt");
+        if (!token) return null;
+        try {
+            const decoded = jwtDecode(token);
+            return decoded.role;
+        } catch (error) {
+            return null;
+        }
+    };
+
     useEffect(() => {
         const checkAuthAndFetch = async () => {
             const isValid = isTokenValid();
             const isVerified = await verifyToken();
-            if (!isValid || !isVerified) {
+            const userRole = getUserRole();
+            if (!isValid || !isVerified || userRole !== "ROLE_ADMIN") {
                 localStorage.removeItem("jwt");
                 navigate("/login");
                 return;

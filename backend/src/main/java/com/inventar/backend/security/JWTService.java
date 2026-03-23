@@ -33,11 +33,12 @@ public class JWTService {
 
     }
 
-    public static String generateToken(String email) {
+    public static String generateToken(String email, String role) {
 
         Map<String, Object> claims = new HashMap<>();
         return Jwts.builder()
                 .claims()
+                .add("role", role)
                 .add(claims)
                 .subject(email)
                 .issuedAt(new Date(System.currentTimeMillis()))
@@ -70,6 +71,10 @@ public class JWTService {
 
     public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {

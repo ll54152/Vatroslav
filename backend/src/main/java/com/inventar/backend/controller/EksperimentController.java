@@ -6,6 +6,7 @@ import com.inventar.backend.domain.*;
 import com.inventar.backend.service.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -71,7 +72,7 @@ public class EksperimentController {
             }
         }
 
-        if (!filesDTOList.isEmpty()){
+        if (!filesDTOList.isEmpty()) {
             eksperimentAddDTO.setFiles(filesDTOList);
         }
 
@@ -80,6 +81,7 @@ public class EksperimentController {
         return new ResponseEntity<>("Eksperiment dodan uspješno", HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/getAll")
     public ResponseEntity<List<EksperimentDTO>> getAllExperiments() {
         List<EksperimentDTO> eksperimentDTOs = eksperimentServiceJPA.findAll().stream()
