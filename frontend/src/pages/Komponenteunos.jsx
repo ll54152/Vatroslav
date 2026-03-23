@@ -38,6 +38,7 @@ function Komponenteunos() {
     const [files, setFiles] = useState([]);
     const [validationMessage, setValidationMessage] = useState("");
     const navigate = useNavigate();
+    const [optionalNumbers, setOptionalNumbers] = useState("");
 
     useEffect(() => {
         const fetchLocations = async () => {
@@ -89,7 +90,7 @@ function Komponenteunos() {
 
         const formToSend = new FormData();
         formToSend.append("name", componentName);
-        formToSend.append("zpf", internalCode);
+        formToSend.append("zpf", internalCode + optionalNumbers);
         formToSend.append("locationID", location);
         formToSend.append("quantity", quantity);
         formToSend.append("description", description);
@@ -188,27 +189,37 @@ function Komponenteunos() {
 
             <CardContent>
                 <form className="flex flex-col items-center gap-4">
-                    {/* Common input block style */}
                     <div className="w-full max-w-[600px] flex flex-col space-y-1.5">
                         <CardTitle>Interna oznaka (ZPF)</CardTitle>
                         <Input
-                            id="intozn"
-                            placeholder="Unesite internu oznaku (5 velikih slova)"
+                            id="intozn-letters"
+                            placeholder="Unesite 5 velikih slova (obavezno)"
                             value={internalCode}
                             onChange={(e) => {
                                 const value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 5);
                                 setInternalCode(value);
-                                // Live validation
+                                // Live validation for letters
                                 if (value.length === 5 && /^[A-Z]{5}$/.test(value)) {
-                                    setValidationMessage("Ispravno");
+                                    setValidationMessage("Ispravno (slova)");
                                 } else {
                                     setValidationMessage("Neispravno: Točno 5 velikih slova!");
                                 }
                             }}
                         />
-                        {/* Display validation message */}
+                        <Input
+                            id="intozn-numbers"
+                            placeholder="Unesite 2 broja (opcionalno)"
+                            value={optionalNumbers}
+                            onChange={(e) => {
+                                const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 2);
+                                setOptionalNumbers(value);
+                                if (value.length === 0 || (value.length === 2 && /^[0-9]{2}$/.test(value))) {
+                                } else {
+                                }
+                            }}
+                        />
                         {validationMessage && (
-                            <p className={`text-sm ${validationMessage === "Ispravno" ? "text-green-600" : "text-red-600"}`}>
+                            <p className={`text-sm ${validationMessage === "Ispravno (slova)" ? "text-green-600" : "text-red-600"}`}>
                                 {validationMessage}
                             </p>
                         )}
