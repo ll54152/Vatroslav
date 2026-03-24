@@ -55,7 +55,7 @@ public class KomponentaController {
                 for (Integer id : ids) {
                     Eksperiment eksperiment = eksperimentServiceJPA.findById(Long.valueOf(id));
                     if (eksperiment != null) {
-                        eksperimentsDTO.add(new EksperimentDTO(eksperiment.getId(), eksperiment.getName()));
+                        eksperimentsDTO.add(new EksperimentDTO(eksperiment.getId(), eksperiment.getName(), eksperiment.getDescription()));
                     }
                 }
                 komponentaAddDTO.setEksperiments(eksperimentsDTO);

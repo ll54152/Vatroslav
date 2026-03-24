@@ -1,23 +1,23 @@
 import React, {useEffect, useState} from "react";
 import {useNavigate, Link} from "react-router-dom";
 import {jwtDecode} from "jwt-decode";
-import {Button} from "@/components/ui/button";
 
 export default function Experimenti() {
     const [experiments, setExperiments] = useState([]);
+    const [filteredExperiments, setFilteredExperiments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [role, setRole] = useState(null);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [showDescriptions, setShowDescriptions] = useState(false); // Global toggle
     const navigate = useNavigate();
 
-    // 🔹 frontend JWT check
     const isTokenValid = () => {
         const token = localStorage.getItem("jwt");
         if (!token) return false;
         try {
             const decoded = jwtDecode(token);
-            const currentTime = Date.now() / 1000;
-            return decoded.exp > currentTime;
+            return decoded.exp > Date.now() / 1000;
         } catch {
             return false;
         }
@@ -77,6 +77,7 @@ export default function Experimenti() {
 
                 const data = await response.json();
                 setExperiments(data);
+                setFilteredExperiments(data);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -96,36 +97,97 @@ export default function Experimenti() {
             });
 
             if (!response.ok) throw new Error("Greška prilikom brisanja eksperimenta!");
-            setExperiments(prev => prev.filter(c => c.id !== id));
+            const newExperiments = experiments.filter(c => c.id !== id);
+            setExperiments(newExperiments);
+            setFilteredExperiments(
+                newExperiments.filter(exp =>
+                    exp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    exp.description.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+            );
         } catch (err) {
             alert(err.message);
         }
     };
 
+    function HighlightedText({text, highlight}) {
+        if (!highlight) return <>{text}</>;
+
+        const regex = new RegExp(`(${highlight})`, "gi");
+        const parts = text.split(regex);
+
+        return (
+            <>
+                {parts.map((part, index) =>
+                        regex.test(part) ? (
+                            <span key={index} className="bg-yellow-300">
+            {part}
+          </span>
+                        ) : (
+                            <span key={index}>{part}</span>
+                        )
+                )}
+            </>
+        );
+    }
+
+    const handleSearch = (e) => {
+        const term = e.target.value;
+        setSearchTerm(term);
+
+        const filtered = experiments.filter(exp =>
+            exp.name.toLowerCase().includes(term.toLowerCase()) ||
+            exp.description.toLowerCase().includes(term.toLowerCase())
+        );
+
+        setFilteredExperiments(filtered);
+
+        const matchesDescription = filtered.some(exp =>
+            exp.description.toLowerCase().includes(term.toLowerCase())
+        );
+        setShowDescriptions(matchesDescription);
+    };
+
     return (
         <div className="min-h-screen flex flex-col items-center justify-center">
-            <div>
+            <div className="w-[80vw]">
                 <header
                     className="fixed top-0 left-0 w-full bg-pink-500 text-white py-4 text-center text-2xl font-bold z-50">
                     Lista Eksperimenata
                 </header>
 
-                <div className="pt-20 w-[80vw]">
-                    {loading && <p>Učitavanje podataka...</p>}
-                    {error && <p className="text-red-500">{error}</p>}
-                    {!loading && !error && experiments.length === 0 && <p>Nema dostupnih eksperimenata.</p>}
+                <div className="pt-24 mb-4 flex justify-between items-center">
+                    <input
+                        type="text"
+                        placeholder="Pretraži po imenu ili opisu..."
+                        value={searchTerm}
+                        onChange={handleSearch}
+                        className="w-full p-2 mb-4 rounded border border-gray-300 bg-white text-black focus:outline-none focus:ring-2 focus:ring-pink-500"/>
+                    <button
+                        onClick={() => setShowDescriptions(prev => !prev)}
+                        className="ml-4 px-4 py-2 bg-blue-500 text-white rounded"
+                    >
+                        {showDescriptions ? "Sakrij opise" : "Prikaži opise"}
+                    </button>
+                </div>
 
-                    {!loading && !error && experiments.map(exp => {
-                        const isAdmin = role === "ROLE_ADMIN";
+                {loading && <p>Učitavanje podataka...</p>}
+                {error && <p className="text-red-500">{error}</p>}
+                {!loading && !error && filteredExperiments.length === 0 && <p>Nema dostupnih eksperimenata.</p>}
 
-                        return (
-                            <div
-                                key={exp.id}
-                                className="flex items-center justify-between bg-pink-200 p-5 mb-4 rounded-lg shadow-lg"
-                            >
+                {!loading && !error && filteredExperiments.map(exp => {
+                    const isAdmin = role === "ROLE_ADMIN";
+
+                    return (
+                        <div
+                            key={exp.id}
+                            className="flex flex-col bg-pink-200 p-5 mb-4 rounded-lg shadow-lg"
+                        >
+                            <div className="flex justify-between items-center w-full">
                                 <Link to={`/experimentiprimjer/${exp.id}`} className="text-blue-500">
-                                    {exp.name}
+                                    <HighlightedText text={exp.name} highlight={searchTerm}/>
                                 </Link>
+
 
                                 <div className="flex gap-2">
                                     {isAdmin ? (
@@ -157,9 +219,15 @@ export default function Experimenti() {
                                     )}
                                 </div>
                             </div>
-                        );
-                    })}
-                </div>
+
+                            {showDescriptions && exp.description && (
+                                <p className="mt-2">
+                                    <HighlightedText text={exp.description} highlight={searchTerm}/>
+                                </p>
+                            )}
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );
