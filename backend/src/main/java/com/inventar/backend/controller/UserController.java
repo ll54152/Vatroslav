@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/user")
 public class UserController {
 
-    private UserServiceJPA userServiceJPA;
+    private final UserServiceJPA userServiceJPA;
 
     public UserController(UserServiceJPA userServiceJPA) {
         this.userServiceJPA = userServiceJPA;
@@ -23,7 +23,7 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody User user) {
         User oldUser = userServiceJPA.findByEmail(user.getEmail());
-
+        user.setRole(oldUser.getRole());
         if (oldUser != null) {
             String token = userServiceJPA.verifyLogin(user);
             if (token != null) {
