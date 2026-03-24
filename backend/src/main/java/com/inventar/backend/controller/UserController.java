@@ -4,6 +4,7 @@ import com.inventar.backend.domain.User;
 import com.inventar.backend.service.UserServiceJPA;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,15 +25,14 @@ public class UserController {
     public ResponseEntity<String> loginUser(@RequestBody User user) {
         User oldUser = userServiceJPA.findByEmail(user.getEmail());
         user.setRole(oldUser.getRole());
-        if (oldUser != null) {
-            String token = userServiceJPA.verifyLogin(user);
-            if (token != null) {
-                return new ResponseEntity<>("Bearer" + token, HttpStatus.OK);
-            }
+        String token = userServiceJPA.verifyLogin(user);
+        if (token != null) {
+            return new ResponseEntity<>("Bearer" + token, HttpStatus.OK);
         }
         return new ResponseEntity<>("Pogrešni podatci", HttpStatus.UNAUTHORIZED);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody User user) {
         User oldUser = userServiceJPA.findByEmail(user.getEmail());

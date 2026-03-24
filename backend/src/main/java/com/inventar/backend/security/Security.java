@@ -35,7 +35,7 @@ public class Security {
 
     private static final String[] WHITE_LIST_URL = {
             "/user/login",
-            "/user/register",
+            //"/user/register",
             "/auth/verify",
     };
 
@@ -46,9 +46,9 @@ public class Security {
                 .authorizeHttpRequests(request -> request    // Authorize HTTP requests
                         .requestMatchers(WHITE_LIST_URL).permitAll()    // Allow all requests to the whitelist URLs
                         //.requestMatchers("/experiment/**").hasAuthority("ROLE_ADMIN")  // Restrict all experiment endpoints to admins
-                        .anyRequest().authenticated()).     // All other requests require authentication
-                        httpBasic(Customizer.withDefaults()).   // Enable basic authentication
-                        sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))    // Set session management to stateless
+                        .anyRequest().authenticated())     // All other requests require authentication
+                //.httpBasic(Customizer.withDefaults())   // Enable basic authentication
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))    // Set session management to stateless
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // Add JWT filter before the username/password authentication filter
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(c -> c.configurationSource(customCorsConfiguration))
