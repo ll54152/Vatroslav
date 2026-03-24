@@ -81,7 +81,7 @@ public class EksperimentController {
         return new ResponseEntity<>("Eksperiment dodan uspješno", HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+
     @GetMapping("/getAll")
     public ResponseEntity<List<EksperimentDTO>> getAllExperiments() {
         List<EksperimentDTO> eksperimentDTOs = eksperimentServiceJPA.findAll().stream()
@@ -100,6 +100,7 @@ public class EksperimentController {
         }
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteExperiment(@PathVariable Long id) {
         Eksperiment eksperiment = eksperimentServiceJPA.findById(id);
@@ -111,6 +112,7 @@ public class EksperimentController {
         }
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PutMapping("/update/{id}")
     public ResponseEntity<String> updateExperiment(@PathVariable Long id,
                                                    @RequestPart(value = "name", required = false) String name,

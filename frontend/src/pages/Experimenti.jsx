@@ -1,13 +1,16 @@
 import React, {useEffect, useState} from "react";
 import {useNavigate, Link} from "react-router-dom";
 import {jwtDecode} from "jwt-decode";
+import {Button} from "@/components/ui/button";
 
 export default function Experimenti() {
     const [experiments, setExperiments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [role, setRole] = useState(null);
     const navigate = useNavigate();
 
+    // 🔹 frontend JWT check
     const isTokenValid = () => {
         const token = localStorage.getItem("jwt");
         if (!token) return false;
@@ -15,7 +18,7 @@ export default function Experimenti() {
             const decoded = jwtDecode(token);
             const currentTime = Date.now() / 1000;
             return decoded.exp > currentTime;
-        } catch (error) {
+        } catch {
             return false;
         }
     };
@@ -26,13 +29,10 @@ export default function Experimenti() {
         try {
             const response = await fetch("/vatroslav/api/auth/verify", {
                 method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `${token}`,
-                },
+                headers: {"Content-Type": "application/json", Authorization: `${token}`},
             });
             return response.ok;
-        } catch (error) {
+        } catch {
             return false;
         }
     };
@@ -43,32 +43,38 @@ export default function Experimenti() {
         try {
             const decoded = jwtDecode(token);
             return decoded.role;
-        } catch (error) {
+        } catch {
             return null;
         }
     };
 
     useEffect(() => {
-        const checkAuthAndFetch = async () => {
-            const isValid = isTokenValid();
-            const isVerified = await verifyToken();
-            const userRole = getUserRole();
-            if (!isValid || !isVerified || userRole !== "ROLE_ADMIN") {
+        const init = async () => {
+            const validLocal = isTokenValid();
+            const validBackend = await verifyToken();
+
+            if (!validLocal || !validBackend) {
                 localStorage.removeItem("jwt");
                 navigate("/login");
                 return;
             }
 
+            setRole(getUserRole());
+
             const token = localStorage.getItem("jwt");
             try {
                 const response = await fetch("/vatroslav/api/experiment/getAll", {
-                    headers: {
-                        Authorization: `${token}`,
-                    },
+                    headers: {Authorization: `${token}`},
                 });
+
                 if (!response.ok) {
-                    throw new Error("Greška prilikom dohvaćanja podataka!");
+                    if (response.status === 403) setError("Nemate ovlasti za pregled eksperimenata.");
+                    else if (response.status === 401) setError("Niste prijavljeni. Molimo prijavite se.");
+                    else setError("Greška prilikom dohvaćanja podataka!");
+                    setLoading(false);
+                    return;
                 }
+
                 const data = await response.json();
                 setExperiments(data);
             } catch (err) {
@@ -78,7 +84,7 @@ export default function Experimenti() {
             }
         };
 
-        checkAuthAndFetch();
+        init();
     }, [navigate]);
 
     const handleDeleteExperiment = async (id) => {
@@ -86,14 +92,11 @@ export default function Experimenti() {
         try {
             const response = await fetch(`/vatroslav/api/experiment/delete/${id}`, {
                 method: "DELETE",
-                headers: {
-                    Authorization: `${token}`,
-                },
+                headers: {Authorization: `${token}`},
             });
-            if (!response.ok) {
-                throw new Error("Greška prilikom brisanja eksperimenta!");
-            }
-            setExperiments((prev) => prev.filter((comp) => comp.id !== id));
+
+            if (!response.ok) throw new Error("Greška prilikom brisanja eksperimenta!");
+            setExperiments(prev => prev.filter(c => c.id !== id));
         } catch (err) {
             alert(err.message);
         }
@@ -107,37 +110,55 @@ export default function Experimenti() {
                     Lista Eksperimenata
                 </header>
 
-                <div className="pt-20">
+                <div className="pt-20 w-[80vw]">
                     {loading && <p>Učitavanje podataka...</p>}
                     {error && <p className="text-red-500">{error}</p>}
-                    {!loading && !error && experiments.length === 0 && (
-                        <p>Nema dostupnih eksperimenata.</p>
-                    )}
-                    {!loading && !error && experiments.map((component) => (
-                        <div
-                            key={component.id}
-                            className="flex items-center justify-between bg-pink-200 p-5 mb-4 rounded-lg shadow-lg"
-                            style={{width: "80vw"}}
-                        >
-                            <Link to={`/experimentiprimjer/${component.id}`} className="text-blue-500">
-                                {component.name}
-                            </Link>
-                            <div className="flex gap-2">
-                                <Link
-                                    to={`/experimenti/edit/${component.id}`}
-                                    className="bg-yellow-500 text-white px-3 py-1 rounded"
-                                >
-                                    Edit
+                    {!loading && !error && experiments.length === 0 && <p>Nema dostupnih eksperimenata.</p>}
+
+                    {!loading && !error && experiments.map(exp => {
+                        const isAdmin = role === "ROLE_ADMIN";
+
+                        return (
+                            <div
+                                key={exp.id}
+                                className="flex items-center justify-between bg-pink-200 p-5 mb-4 rounded-lg shadow-lg"
+                            >
+                                <Link to={`/experimentiprimjer/${exp.id}`} className="text-blue-500">
+                                    {exp.name}
                                 </Link>
-                                <button
-                                    className="bg-red-500 text-white px-3 py-1 rounded"
-                                    onClick={() => handleDeleteExperiment(component.id)}
-                                >
-                                    Delete
-                                </button>
+
+                                <div className="flex gap-2">
+                                    {isAdmin ? (
+                                        <>
+                                            <Link
+                                                to={`/experimenti/edit/${exp.id}`}
+                                                className="bg-yellow-500 text-white px-3 py-1 rounded"
+                                            >
+                                                Edit
+                                            </Link>
+                                            <button
+                                                className="bg-red-500 text-white px-3 py-1 rounded"
+                                                onClick={() => handleDeleteExperiment(exp.id)}
+                                            >
+                                                Delete
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button
+                                                className="bg-yellow-500 text-white px-3 py-1 rounded opacity-50 cursor-not-allowed">
+                                                Edit
+                                            </button>
+                                            <button
+                                                className="bg-red-500 text-white px-3 py-1 rounded opacity-50 cursor-not-allowed">
+                                                Delete
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         </div>

@@ -8,6 +8,7 @@ import com.inventar.backend.domain.*;
 import com.inventar.backend.service.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -100,6 +101,7 @@ public class KomponentaController {
 
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteComponent(@PathVariable Long id) {
         Komponenta komponenta = komponentaServiceJPA.findById(id);

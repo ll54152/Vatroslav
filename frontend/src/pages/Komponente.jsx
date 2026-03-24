@@ -6,6 +6,7 @@ export default function Komponente() {
     const [components, setComponents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [role, setRole] = useState(null);
     const navigate = useNavigate();
 
     const isTokenValid = () => {
@@ -15,7 +16,7 @@ export default function Komponente() {
             const decoded = jwtDecode(token);
             const currentTime = Date.now() / 1000;
             return decoded.exp > currentTime;
-        } catch (error) {
+        } catch {
             return false;
         }
     };
@@ -26,29 +27,39 @@ export default function Komponente() {
         try {
             const response = await fetch("/vatroslav/api/auth/verify", {
                 method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `${token}`,
-                },
+                headers: {"Content-Type": "application/json", Authorization: `${token}`},
             });
             return response.ok;
-        } catch (error) {
+        } catch {
             return false;
+        }
+    };
+
+    const getUserRole = () => {
+        const token = localStorage.getItem("jwt");
+        if (!token) return null;
+        try {
+            const decoded = jwtDecode(token);
+            return decoded.role;
+        } catch {
+            return null;
         }
     };
 
     useEffect(() => {
         const fetchComponents = async () => {
-            const token = localStorage.getItem("jwt");
-
             const isValid = isTokenValid();
             const isVerified = await verifyToken();
+
             if (!isValid || !isVerified) {
                 localStorage.removeItem("jwt");
                 navigate("/login");
                 return;
             }
 
+            setRole(getUserRole());
+
+            const token = localStorage.getItem("jwt");
             try {
                 const response = await fetch("/vatroslav/api/component/getAll", {
                     headers: {
@@ -56,8 +67,13 @@ export default function Komponente() {
                     },
                 });
                 if (!response.ok) {
-                    throw new Error("Greška prilikom dohvaćanja podataka!");
+                    if (response.status === 403) setError("Nemate ovlasti za pregled komponenti.");
+                    else if (response.status === 401) setError("Niste prijavljeni. Molimo prijavite se.");
+                    else setError("Greška prilikom dohvaćanja podataka!");
+                    setLoading(false);
+                    return;
                 }
+
                 const data = await response.json();
                 setComponents(data);
             } catch (err) {
@@ -102,23 +118,39 @@ export default function Komponente() {
                     {!loading && !error && components.length === 0 && (
                         <p>Nema dostupnih komponenti.</p>
                     )}
-                    {!loading && !error && components.map((component) => (
-                        <div
-                            key={component.id}
-                            className="flex items-center justify-between bg-pink-200 p-5 mb-4 rounded-lg shadow-lg"
-                            style={{width: "80vw"}}
-                        >
-                            <Link to={`/komponenteprimjer/${component.id}`} className="text-blue-500">
-                                {component.name}
-                            </Link>
-                            <button
-                                className="bg-red-500 text-white px-3 py-1 rounded"
-                                onClick={() => handleDeleteComponent(component.id)}
+                    {!loading && !error && components.map((component) => {
+                        const isAdmin = role === "ROLE_ADMIN";
+                        return (
+                            <div
+                                key={component.id}
+                                className="flex items-center justify-between bg-pink-200 p-5 mb-4 rounded-lg shadow-lg"
+                                style={{width: "80vw"}}
                             >
-                                Delete
-                            </button>
-                        </div>
-                    ))}
+                                <Link to={`/komponenteprimjer/${component.id}`} className="text-blue-500">
+                                    {component.name}
+                                </Link>
+                                <div className="flex gap-2">
+                                    {isAdmin ? (
+                                        <>
+                                            <button
+                                                className="bg-red-500 text-white px-3 py-1 rounded"
+                                                onClick={() => handleDeleteComponent(component.id)}
+                                            >
+                                                Delete
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button
+                                                className="bg-red-500 text-white px-3 py-1 rounded opacity-50 cursor-not-allowed">
+                                                Delete
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        )
+                    })}
                 </div>
             </div>
         </div>
