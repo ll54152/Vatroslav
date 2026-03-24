@@ -84,7 +84,7 @@ public class KomponentaController {
     @GetMapping("/getAll")
     public ResponseEntity<List<KomponentaDTO>> getAllComponents() {
         List<KomponentaDTO> komponentaDTOs = komponentaServiceJPA.findAll().stream()
-                .map(komponenta -> new KomponentaDTO(komponenta.getId(), komponenta.getName()))
+                .map(komponenta -> new KomponentaDTO(komponenta.getId(), komponenta.getName(), komponenta.getZpf(), komponenta.getDescription()))
                 .toList();
         return new ResponseEntity<>(komponentaDTOs, HttpStatus.OK);
     }
