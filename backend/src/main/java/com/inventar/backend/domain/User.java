@@ -1,7 +1,12 @@
 package com.inventar.backend.domain;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
@@ -22,6 +27,8 @@ public class User {
 
     private String lastName;
 
+    private String role;
+
     @OneToMany(mappedBy = "user")
     private List<Log> logs;
 
@@ -33,11 +40,12 @@ public class User {
         this.password = password;
     }
 
-    public User(String email, String password, String firstName, String lastName) {
+    public User(String email, String password, String firstName, String lastName, String role) {
         this.email = email;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.role = role;
     }
 
     public User() {
@@ -89,6 +97,14 @@ public class User {
 
     public void setFiles(List<Files> files) {
         this.files = files;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
 

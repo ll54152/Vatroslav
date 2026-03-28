@@ -19,6 +19,8 @@ import java.util.function.Function;
 @Service
 public class JWTService {
 
+    //private static final String SECRET_KEY = "Y3RyeW1hY2hpbmVjb2RlZ2VuZXJhdGVkc2VjcmV0a2V5Zm9yand0dG9rZW5z";
+
     private static String SECRET_KEY = "";
 
     public JWTService() {
@@ -33,16 +35,15 @@ public class JWTService {
 
     }
 
-    public static String generateToken(String email) {
-
+    public static String generateToken(String email, String role) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("role", role);
+
         return Jwts.builder()
-                .claims()
-                .add(claims)
+                .claims(claims)
                 .subject(email)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 60 * 60))
-                .and()
                 .signWith(getKey())
                 .compact();
     }
@@ -70,6 +71,10 @@ public class JWTService {
 
     public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {

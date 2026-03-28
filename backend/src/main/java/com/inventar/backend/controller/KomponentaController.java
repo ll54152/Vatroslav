@@ -8,6 +8,7 @@ import com.inventar.backend.domain.*;
 import com.inventar.backend.service.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -54,7 +55,7 @@ public class KomponentaController {
                 for (Integer id : ids) {
                     Eksperiment eksperiment = eksperimentServiceJPA.findById(Long.valueOf(id));
                     if (eksperiment != null) {
-                        eksperimentsDTO.add(new EksperimentDTO(eksperiment.getId(), eksperiment.getName()));
+                        eksperimentsDTO.add(new EksperimentDTO(eksperiment.getId(), eksperiment.getName(), eksperiment.getDescription()));
                     }
                 }
                 komponentaAddDTO.setEksperiments(eksperimentsDTO);
@@ -83,7 +84,7 @@ public class KomponentaController {
     @GetMapping("/getAll")
     public ResponseEntity<List<KomponentaDTO>> getAllComponents() {
         List<KomponentaDTO> komponentaDTOs = komponentaServiceJPA.findAll().stream()
-                .map(komponenta -> new KomponentaDTO(komponenta.getId(), komponenta.getName()))
+                .map(komponenta -> new KomponentaDTO(komponenta.getId(), komponenta.getName(), komponenta.getZpf(), komponenta.getDescription()))
                 .toList();
         return new ResponseEntity<>(komponentaDTOs, HttpStatus.OK);
     }
@@ -100,6 +101,7 @@ public class KomponentaController {
 
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteComponent(@PathVariable Long id) {
         Komponenta komponenta = komponentaServiceJPA.findById(id);

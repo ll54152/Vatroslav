@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { jwtDecode } from "jwt-decode";
+import React, {useState, useEffect} from "react";
+import {Link, Navigate, useNavigate} from "react-router-dom";
+import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {jwtDecode} from "jwt-decode";
 
 const isTokenValid = (token) => {
     if (!token) return false;
@@ -70,12 +70,12 @@ function Login() {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({email, password}),
             });
 
             if (response.ok) {
-                const token = await response.text(); // JWT token je plain text
-                localStorage.setItem("jwt", token); // Čuvanje tokena
+                const token = await response.text();
+                localStorage.setItem("jwt", token);
                 console.log("Login successful, Token:", token);
                 navigate("/mainpage");
             } else {
