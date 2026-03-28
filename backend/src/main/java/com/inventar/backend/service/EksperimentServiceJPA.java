@@ -46,7 +46,7 @@ public class EksperimentServiceJPA {
         if (eksperimentAddDTO.getKomponente() != null) {
             for (KomponentaDTO komponenta : eksperimentAddDTO.getKomponente()) {
                 if (komponenta.getId() != null) {
-                    Komponenta existingKomponenta = komponentaRepo.findById(Long.valueOf(komponenta.getId())).orElse(null);
+                    Komponenta existingKomponenta = komponentaRepo.findById(komponenta.getId()).orElse(null);
                     if (existingKomponenta != null) {
                         komponente.add(existingKomponenta);
                     }
@@ -57,9 +57,11 @@ public class EksperimentServiceJPA {
 
         Eksperiment eksperiment = new Eksperiment(
                 eksperimentAddDTO.getName(),
+                eksperimentAddDTO.getZpf(),
                 eksperimentAddDTO.getField(),
                 eksperimentAddDTO.getSubject(),
                 eksperimentAddDTO.getDescription(),
+                eksperimentAddDTO.getKeywords(),
                 eksperimentAddDTO.getMaterials()
         );
 
@@ -160,9 +162,11 @@ public class EksperimentServiceJPA {
         EksperimentShowDTO eksperimentShowDTO = new EksperimentShowDTO();
         eksperimentShowDTO.setId(eksperiment.getId());
         eksperimentShowDTO.setName(eksperiment.getName());
+        eksperimentShowDTO.setZpf(eksperiment.getZpf());
         eksperimentShowDTO.setField(eksperiment.getField());
         eksperimentShowDTO.setSubject(eksperiment.getSubject());
         eksperimentShowDTO.setDescription(eksperiment.getDescription());
+        eksperimentShowDTO.setKeywords(eksperiment.getKeywords());
         eksperimentShowDTO.setMaterials(eksperiment.getMaterials());
 
 
@@ -173,6 +177,7 @@ public class EksperimentServiceJPA {
                 komponentaShowDTO.setId(komponenta.getId());
                 komponentaShowDTO.setName(komponenta.getName());
                 komponentaShowDTO.setDescription(komponenta.getDescription());
+                komponentaShowDTO.setKeywords(komponenta.getKeywords());
                 komponentaShowDTO.setZpf(komponenta.getZpf());
                 komponentaShowDTO.setFer(komponenta.getFer());
                 komponentaShowDTO.setQuantity(komponenta.getQuantity());

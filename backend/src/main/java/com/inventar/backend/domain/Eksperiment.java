@@ -12,12 +12,17 @@ public class Eksperiment {
 
     private String name;
 
+    private String zpf;
+
     private String field;
 
     private String subject;
 
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Column(columnDefinition = "TEXT")
+    private String keywords;
 
     @Column(columnDefinition = "TEXT")
     private String materials;
@@ -31,38 +36,42 @@ public class Eksperiment {
     @OneToMany(mappedBy = "eksperiment")
     private List<Log> logs;
 
-    public Eksperiment(String name, String field, String subject, String description, String materials) {
+    public Eksperiment(String name, String zpf, String field, String subject, String description, String keywords, String materials) {
         // Konstruktor koji ne prime logove niti komponente jer se one dodaju naknadno
         this.name = name;
+        this.zpf = zpf;
         this.field = field;
         this.subject = subject;
         this.description = description;
+        this.keywords = keywords;
         this.materials = materials;
     }
 
-    public Eksperiment(String name, String field, String subject, String description, String materials, List<Komponenta> komponente, List<Log> logs) {
+    public Eksperiment(String name, String zpf, String field, String subject, String description, String keywords, String materials, List<Komponenta> komponente, List<Log> logs) {
         this.name = name;
+        this.zpf = zpf;
         this.field = field;
         this.subject = subject;
         this.description = description;
+        this.keywords = keywords;
         this.materials = materials;
         this.komponente = komponente;
         this.logs = logs;
     }
 
 
-
-    public Eksperiment(String name, String field, String subject, String description, String materials, List<Log> logs) {
+    public Eksperiment(String name, String zpf, String field, String subject, String description, String keywords, String materials, List<Log> logs) {
         this.name = name;
+        this.zpf = zpf;
         this.field = field;
         this.subject = subject;
         this.description = description;
+        this.keywords = keywords;
         this.materials = materials;
         this.logs = logs;
     }
 
     public Eksperiment() {
-
     }
 
     public Long getId() {
@@ -135,5 +144,21 @@ public class Eksperiment {
 
     public void setLogs(List<Log> logs) {
         this.logs = logs;
+    }
+
+    public String getZpf() {
+        return zpf;
+    }
+
+    public void setZpf(String zpf) {
+        this.zpf = zpf;
+    }
+
+    public String getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
     }
 }

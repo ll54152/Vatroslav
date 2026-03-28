@@ -23,9 +23,11 @@ public class EksperimentController {
 
     @PostMapping("/add")
     public ResponseEntity<String> addExperiment(@RequestPart("name") String name,
+                                                @RequestPart("zpf") String zpf,
                                                 @RequestPart("field") String field,
                                                 @RequestPart("subject") String subject,
                                                 @RequestPart("description") String description,
+                                                @RequestPart("keywords") String keywords,
                                                 @RequestPart("materials") String materials,
                                                 @RequestPart("komponente") String komponenteJson,
                                                 @RequestPart(value = "files", required = false) MultipartFile[] files,
@@ -33,9 +35,11 @@ public class EksperimentController {
 
         EksperimentAddDTO eksperimentAddDTO = new EksperimentAddDTO();
         eksperimentAddDTO.setName(name);
+        eksperimentAddDTO.setZpf(zpf);
         eksperimentAddDTO.setField(field);
         eksperimentAddDTO.setSubject(subject);
         eksperimentAddDTO.setDescription(description);
+        eksperimentAddDTO.setKeywords(keywords);
         eksperimentAddDTO.setMaterials(materials);
 
 
@@ -85,7 +89,7 @@ public class EksperimentController {
     @GetMapping("/getAll")
     public ResponseEntity<List<EksperimentDTO>> getAllExperiments() {
         List<EksperimentDTO> eksperimentDTOs = eksperimentServiceJPA.findAll().stream()
-                .map(eksperiment -> new EksperimentDTO(eksperiment.getId(), eksperiment.getName(), eksperiment.getDescription()))
+                .map(eksperiment -> new EksperimentDTO(eksperiment.getId(), eksperiment.getName(), eksperiment.getZpf(), eksperiment.getDescription(), eksperiment.getKeywords()))
                 .toList();
         return new ResponseEntity<>(eksperimentDTOs, HttpStatus.OK);
     }
@@ -116,9 +120,11 @@ public class EksperimentController {
     @PutMapping("/update/{id}")
     public ResponseEntity<String> updateExperiment(@PathVariable Long id,
                                                    @RequestPart(value = "name", required = false) String name,
+                                                   @RequestPart(value = "zpf", required = false) String zpf,
                                                    @RequestPart(value = "field", required = false) String field,
                                                    @RequestPart(value = "subject", required = false) String subject,
                                                    @RequestPart(value = "description", required = false) String description,
+                                                   @RequestPart(value = "keywords", required = false) String keywords,
                                                    @RequestPart(value = "materials", required = false) String materials,
                                                    @RequestPart(value = "logovi", required = false) String logs,
                                                    @RequestPart(value = "komponente", required = false) String komponenteJson,
@@ -132,9 +138,11 @@ public class EksperimentController {
 
         EksperimentAddDTO eksperimentAddDTO = new EksperimentAddDTO();
         eksperimentAddDTO.setName(name);
+        eksperimentAddDTO.setZpf(zpf);
         eksperimentAddDTO.setField(field);
         eksperimentAddDTO.setSubject(subject);
         eksperimentAddDTO.setDescription(description);
+        eksperimentAddDTO.setKeywords(keywords);
         eksperimentAddDTO.setMaterials(materials);
 
         List<String> componentList = new ArrayList<>();

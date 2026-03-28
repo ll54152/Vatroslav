@@ -6,9 +6,11 @@ public class EksperimentShowDTO {
 
     private Long id;
     private String name;
+    private String zpf;
     private String field;
     private String subject;
     private String description;
+    private String keywords;
     private String materials;
 
     private List<KomponentaShowDTO> komponente;
@@ -17,12 +19,14 @@ public class EksperimentShowDTO {
 
     private List<FilesShowDTO> files;
 
-    public EksperimentShowDTO(Long id, String name, String field, String subject, String description, String materials, List<KomponentaShowDTO> komponente, List<LogShowDTO> logs, List<FilesShowDTO> files) {
+    public EksperimentShowDTO(Long id, String name, String zpf, String field, String subject, String description, String keywords, String materials, List<KomponentaShowDTO> komponente, List<LogShowDTO> logs, List<FilesShowDTO> files) {
         this.id = id;
         this.name = name;
+        this.zpf = zpf;
         this.field = field;
         this.subject = subject;
         this.description = description;
+        this.keywords = keywords;
         this.materials = materials;
         this.komponente = komponente;
         this.logs = logs;
@@ -102,5 +106,21 @@ public class EksperimentShowDTO {
 
     public void setFiles(List<FilesShowDTO> files) {
         this.files = files;
+    }
+
+    public String getZpf() {
+        return zpf;
+    }
+
+    public void setZpf(String zpf) {
+        this.zpf = zpf;
+    }
+
+    public String getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
     }
 }

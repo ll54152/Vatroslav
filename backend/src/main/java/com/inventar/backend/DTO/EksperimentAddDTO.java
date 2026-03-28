@@ -5,11 +5,15 @@ import java.util.*;
 public class EksperimentAddDTO {
     private String name;
 
+    private String zpf;
+
     private String field;
 
     private String subject;
 
     private String description;
+
+    private String keywords;
 
     private String materials;
 
@@ -20,11 +24,13 @@ public class EksperimentAddDTO {
     public EksperimentAddDTO() {
     }
 
-    public EksperimentAddDTO(String name, String field, String subject, String description, String materials, List<KomponentaDTO> komponente, List<FilesDTO> files) {
+    public EksperimentAddDTO(String name, String zpf, String field, String subject, String description, String keywords, String materials, List<KomponentaDTO> komponente, List<FilesDTO> files) {
         this.name = name;
+        this.zpf = zpf;
         this.field = field;
         this.subject = subject;
         this.description = description;
+        this.keywords = keywords;
         this.materials = materials;
         this.komponente = komponente;
         this.files = files;
@@ -84,5 +90,21 @@ public class EksperimentAddDTO {
 
     public void setFiles(List<FilesDTO> files) {
         this.files = files;
+    }
+
+    public String getZpf() {
+        return zpf;
+    }
+
+    public void setZpf(String zpf) {
+        this.zpf = zpf;
+    }
+
+    public String getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
     }
 }
