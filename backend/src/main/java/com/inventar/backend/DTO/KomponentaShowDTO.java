@@ -18,6 +18,8 @@ public class KomponentaShowDTO {
 
     private String description;
 
+    private String keywords;
+
     private List<EksperimentShowDTO> eksperimenti;
 
     private List<LogShowDTO> logs;
@@ -27,7 +29,7 @@ public class KomponentaShowDTO {
     public KomponentaShowDTO() {
     }
 
-    public KomponentaShowDTO(Long id, String name, String zpf, String fer, int quantity, LocationDTO location, String description, List<EksperimentShowDTO> eksperimenti, List<LogShowDTO> logs, List<FilesShowDTO> files) {
+    public KomponentaShowDTO(Long id, String name, String zpf, String fer, int quantity, LocationDTO location, String description, String keywords, List<EksperimentShowDTO> eksperimenti, List<LogShowDTO> logs, List<FilesShowDTO> files) {
         this.id = id;
         this.name = name;
         this.zpf = zpf;
@@ -35,6 +37,7 @@ public class KomponentaShowDTO {
         this.quantity = quantity;
         this.location = location;
         this.description = description;
+        this.keywords = keywords;
         this.eksperimenti = eksperimenti;
         this.logs = logs;
         this.files = files;
@@ -118,5 +121,13 @@ public class KomponentaShowDTO {
 
     public void setFiles(List<FilesShowDTO> files) {
         this.files = files;
+    }
+
+    public String getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
     }
 }

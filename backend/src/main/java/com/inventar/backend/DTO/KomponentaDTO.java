@@ -6,15 +6,25 @@ public class KomponentaDTO {
     private String name;
     private String ZPF;
     private String description;
+    private String keywords;
 
-    public KomponentaDTO(Long id, String name, String ZPF, String description) {
+    public KomponentaDTO(Long id, String name, String ZPF, String description, String keywords) {
         this.id = id;
         this.name = name;
         this.ZPF = ZPF;
         this.description = description;
+        this.keywords = keywords;
     }
 
     public KomponentaDTO() {
+    }
+
+    public String getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
     }
 
     public Long getId() {

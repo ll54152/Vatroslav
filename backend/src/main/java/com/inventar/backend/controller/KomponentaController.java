@@ -1,6 +1,5 @@
 package com.inventar.backend.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inventar.backend.DTO.*;
@@ -16,7 +15,6 @@ import java.util.*;
 
 
 @RestController
-//@CrossOrigin(origins = "*")
 @RequestMapping("/component")
 public class KomponentaController {
 
@@ -34,6 +32,7 @@ public class KomponentaController {
             @RequestPart("quantity") String quantityStr,
             @RequestPart("locationID") String locationIDStr,
             @RequestPart("description") String description,
+            @RequestPart("keywords") String keywords,
             @RequestPart("eksperimentIDs") String eksperimentIDsJson,
             @RequestPart(value = "files", required = false) MultipartFile[] files) {
 
@@ -41,6 +40,7 @@ public class KomponentaController {
         komponentaAddDTO.setName(name);
         komponentaAddDTO.setZpf(zpf);
         komponentaAddDTO.setFer(fer);
+        komponentaAddDTO.setKeywords(keywords);
         komponentaAddDTO.setQuantity(Integer.parseInt(quantityStr));
         komponentaAddDTO.setLocationID(Integer.parseInt(locationIDStr));
         komponentaAddDTO.setDescription(description);
@@ -84,7 +84,7 @@ public class KomponentaController {
     @GetMapping("/getAll")
     public ResponseEntity<List<KomponentaDTO>> getAllComponents() {
         List<KomponentaDTO> komponentaDTOs = komponentaServiceJPA.findAll().stream()
-                .map(komponenta -> new KomponentaDTO(komponenta.getId(), komponenta.getName(), komponenta.getZpf(), komponenta.getDescription()))
+                .map(komponenta -> new KomponentaDTO(komponenta.getId(), komponenta.getName(), komponenta.getZpf(), komponenta.getDescription(), komponenta.getKeywords()))
                 .toList();
         return new ResponseEntity<>(komponentaDTOs, HttpStatus.OK);
     }

@@ -1,7 +1,5 @@
 package com.inventar.backend.DTO;
 
-import com.inventar.backend.domain.Komponenta;
-
 public class FilesShowDTO {
 
     private Long id;

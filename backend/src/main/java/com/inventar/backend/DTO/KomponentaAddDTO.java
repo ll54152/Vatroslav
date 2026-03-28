@@ -1,6 +1,5 @@
 package com.inventar.backend.DTO;
 
-
 import java.util.List;
 
 public class KomponentaAddDTO {
@@ -16,45 +15,50 @@ public class KomponentaAddDTO {
 
     private String description;
 
+    private String keywords;
+
     private String log;
 
     private List<EksperimentDTO> eksperiments;
 
     private List<FilesDTO> files;
 
-    public KomponentaAddDTO() {
-    }
-
-    public KomponentaAddDTO(String name, String zpf, String fer, int quantity, int locationID, String description, String log, List<EksperimentDTO> eksperiments, List<FilesDTO> files) {
+    public KomponentaAddDTO(String name, String zpf, String fer, int quantity, int locationID, String description, String keywords, String log, List<EksperimentDTO> eksperiments, List<FilesDTO> files) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
         this.quantity = quantity;
         this.locationID = locationID;
         this.description = description;
+        this.keywords = keywords;
         this.log = log;
         this.eksperiments = eksperiments;
         this.files = files;
     }
 
-    public KomponentaAddDTO(String name, String zpf, String fer, int quantity, int locationID, String description, String log, List<EksperimentDTO> eksperiments) {
+    public KomponentaAddDTO() {
+    }
+
+    public KomponentaAddDTO(String name, String zpf, String fer, int quantity, int locationID, String description, String keywords, String log, List<EksperimentDTO> eksperiments) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
         this.quantity = quantity;
         this.locationID = locationID;
         this.description = description;
+        this.keywords = keywords;
         this.log = log;
         this.eksperiments = eksperiments;
     }
 
-    public KomponentaAddDTO(String name, String zpf, String fer, int quantity, int locationID, String description, String log) {
+    public KomponentaAddDTO(String name, String zpf, String fer, int quantity, int locationID, String description,String keywords, String log) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
         this.quantity = quantity;
         this.locationID = locationID;
         this.description = description;
+        this.keywords = keywords;
         this.log = log;
     }
 
@@ -137,5 +141,13 @@ public class KomponentaAddDTO {
 
     public void setFiles(List<FilesDTO> files) {
         this.files = files;
+    }
+
+    public String getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
     }
 }

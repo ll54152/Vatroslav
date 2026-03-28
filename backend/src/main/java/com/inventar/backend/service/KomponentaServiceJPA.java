@@ -65,6 +65,7 @@ public class KomponentaServiceJPA {
                 , komponentaAddDTO.getFer()
                 , komponentaAddDTO.getQuantity()
                 , komponentaAddDTO.getDescription()
+                , komponentaAddDTO.getKeywords()
                 , location
         );
 
@@ -169,6 +170,7 @@ public class KomponentaServiceJPA {
         komponentaShowDTO.setZpf(komponenta.getZpf());
         komponentaShowDTO.setName(komponenta.getName());
         komponentaShowDTO.setDescription(komponenta.getDescription());
+        komponentaShowDTO.setKeywords(komponenta.getKeywords());
         komponentaShowDTO.setQuantity(komponenta.getQuantity());
 
         if (komponenta.getLocation() != null) {

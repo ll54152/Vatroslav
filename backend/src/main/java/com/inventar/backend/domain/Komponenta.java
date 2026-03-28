@@ -25,6 +25,9 @@ public class Komponenta {
     @Column(columnDefinition = "TEXT")
     private String description; //Kratak opis
 
+    @Column(columnDefinition = "TEXT")
+    private String keywords; //Ključne riječi
+
     @OneToMany(mappedBy = "komponenta")
     private List<Log> logs;  //Jedna komponenta može imati više logova
 
@@ -42,7 +45,7 @@ public class Komponenta {
     public Komponenta() {
     }
 
-    public Komponenta(String name, String zpf, String fer, int quantity, Location location, String description, List<Log> logs, List<Eksperiment> eksperimenti) {
+    public Komponenta(String name, String zpf, String fer, int quantity, Location location, String description, String keywords, List<Log> logs, List<Eksperiment> eksperimenti) {
         // Konstruktor sa logovima i eksperimentom ali bez files
         this.name = name;
         this.zpf = zpf;
@@ -50,28 +53,31 @@ public class Komponenta {
         this.quantity = quantity;
         this.location = location;
         this.description = description;
+        this.keywords = keywords;
         this.logs = logs;
         this.eksperimenti = eksperimenti;
     }
 
-    public Komponenta(String name, String zpf, String fer, int quantity, String description, Location location, List<Eksperiment> eksperimenti) {
+    public Komponenta(String name, String zpf, String fer, int quantity, String description, String keywords, Location location, List<Eksperiment> eksperimenti) {
         // Konstruktor sa eksperimentom ali bez logova i files
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
         this.quantity = quantity;
         this.description = description;
+        this.keywords = keywords;
         this.location = location;
         this.eksperimenti = eksperimenti;
     }
 
-    public Komponenta(String name, String zpf, String fer, int quantity, String description, Location location) {
+    public Komponenta(String name, String zpf, String fer, int quantity, String description, String keywords, Location location) {
         // Konstruktor bez eksperimenta i logova i files
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
         this.quantity = quantity;
         this.description = description;
+        this.keywords = keywords;
         this.location = location;
     }
 
@@ -153,5 +159,13 @@ public class Komponenta {
 
     public void setEksperimenti(List<Eksperiment> eksperimenti) {
         this.eksperimenti = eksperimenti;
+    }
+
+    public String getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
     }
 }
