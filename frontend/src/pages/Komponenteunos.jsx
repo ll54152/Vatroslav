@@ -35,6 +35,7 @@ function Komponenteunos() {
     const [newLocationAddress, setNewLocationAddress] = useState("");
     const [newLocationRoom, setNewLocationRoom] = useState("");
     const [showAddLocation, setShowAddLocation] = useState(false);
+    const [locationSearchQuery, setLocationSearchQuery] = useState("");
     const [files, setFiles] = useState([]);
     const [validationMessage, setValidationMessage] = useState("");
     const navigate = useNavigate();
@@ -84,6 +85,34 @@ function Komponenteunos() {
         fetchLocations();
         fetchExperiments();  // Pozivamo funkciju za eksperimente
     }, []);
+
+    const handleDeleteLocation = async (locationId) => {
+        const token = localStorage.getItem("jwt");
+
+        if (!window.confirm("Jesi siguran da želiš obrisati lokaciju?")) return;
+
+        try {
+            const response = await fetch(`/vatroslav/api/location/delete/${locationId}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `${token}`,
+                },
+            });
+
+            if (response.ok) {
+                setLocations(locations.filter(loc => loc.id !== locationId));
+
+                if (location === locationId.toString()) {
+                    setLocation("");
+                }
+            } else {
+                const err = await response.text();
+                alert(`Greška: ${err}`);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
 
     const handleSaveComponent = async () => {
         const token = localStorage.getItem("jwt");
@@ -284,22 +313,69 @@ function Komponenteunos() {
 
                     <div className="w-full max-w-[600px] flex flex-col space-y-1.5">
                         <CardTitle>Gdje se nalazi</CardTitle>
-                        <Select value={location} onValueChange={(value) => setLocation(value)}>
-                            <SelectTrigger id="location">
-                                <SelectValue placeholder="Odaberite lokaciju">
-                                    {location ? locations.find(loc => loc.id === parseInt(location))?.room.adress : "Odaberite lokaciju"}
-                                </SelectValue>
-                            </SelectTrigger>
-                            <SelectContent position="popper">
-                                {locations.map((loc) => (
-                                    loc && loc.id ? (
-                                        <SelectItem key={loc.id} value={loc.id.toString()}>
-                                            {loc.adress} - {loc.room}
-                                        </SelectItem>
-                                    ) : null
-                                ))}
-                            </SelectContent>
-                        </Select>
+                        <Input
+                            placeholder="Pretraži lokacije..."
+                            value={locationSearchQuery}
+                            onChange={(e) => setLocationSearchQuery(e.target.value)}
+                        />
+
+                        {location && (
+                            <p className="text-sm text-green-600">
+                                Odabrano: {
+                                locations.find(loc => loc.id === parseInt(location))?.adress
+                            } - {
+                                locations.find(loc => loc.id === parseInt(location))?.room
+                            }
+                            </p>
+                        )}
+
+                        {/* SHOW ONLY WHEN USER TYPES */}
+                        {locationSearchQuery && (
+                            <div className="border rounded-md max-h-60 overflow-y-auto mt-1">
+                                {locations
+                                    .filter(loc =>
+                                        `${loc.adress} ${loc.room}`
+                                            .toLowerCase()
+                                            .includes(locationSearchQuery.toLowerCase())
+                                    )
+                                    .map((loc) => (
+                                        <div
+                                            key={loc.id}
+                                            className={`flex justify-between items-center px-3 py-2 border-b ${
+                                                location === loc.id.toString() ? "bg-gray-200" : ""
+                                            }`}
+                                        >
+                    <span
+                        className="cursor-pointer"
+                        onClick={() => {
+                            setLocation(loc.id.toString());
+                            setLocationSearchQuery(""); // 🔥 collapse after select
+                        }}
+                    >
+                        {loc.adress} - {loc.room}
+                    </span>
+
+                                            <Button
+                                                type="button"
+                                                onClick={() => handleDeleteLocation(loc.id)}
+                                                className="bg-red-500 text-white hover:bg-red-600"
+                                            >
+                                                Obriši
+                                            </Button>
+                                        </div>
+                                    ))}
+
+                                {locations.filter(loc =>
+                                    `${loc.adress} ${loc.room}`
+                                        .toLowerCase()
+                                        .includes(locationSearchQuery.toLowerCase())
+                                ).length === 0 && (
+                                    <div className="p-2 text-sm text-gray-500">
+                                        Nema rezultata
+                                    </div>
+                                )}
+                            </div>
+                        )}
                         <div className="flex items-center space-x-2">
                             <input
                                 id="addLocationCheckbox"

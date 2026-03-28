@@ -2,11 +2,6 @@ import * as React from "react";
 import {Link, Navigate} from "react-router-dom";
 import {Card, CardContent} from "@/components/ui/card";
 import {
-    Carousel,
-    CarouselContent,
-    CarouselItem
-} from "@/components/ui/carousel";
-import {
     Menubar,
     MenubarMenu,
     MenubarTrigger
