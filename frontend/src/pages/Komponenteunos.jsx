@@ -329,7 +329,6 @@ function Komponenteunos() {
                             </p>
                         )}
 
-                        {/* SHOW ONLY WHEN USER TYPES */}
                         {locationSearchQuery && (
                             <div className="border rounded-md max-h-60 overflow-y-auto mt-1">
                                 {locations
@@ -341,24 +340,27 @@ function Komponenteunos() {
                                     .map((loc) => (
                                         <div
                                             key={loc.id}
-                                            className={`flex justify-between items-center px-3 py-2 border-b ${
-                                                location === loc.id.toString() ? "bg-gray-200" : ""
+                                            className={`flex justify-between items-start px-3 py-2 border-b ${
+                                                location === loc.id.toString() ? "bg-gray-100" : ""
                                             }`}
                                         >
-                    <span
-                        className="cursor-pointer"
-                        onClick={() => {
-                            setLocation(loc.id.toString());
-                            setLocationSearchQuery(""); // 🔥 collapse after select
-                        }}
-                    >
-                        {loc.adress} - {loc.room}
-                    </span>
+                                            {/* Text Column */}
+                                            <div
+                                                className="flex flex-col cursor-pointer gap-0.5 min-w-0"
+                                                onClick={() => {
+                                                    setLocation(loc.id.toString());
+                                                    setLocationSearchQuery(""); // collapse after select
+                                                }}
+                                            >
+                                                <span className="text-sm truncate"><strong>Address:</strong> {loc.adress}</span>
+                                                <span className="text-sm truncate"><strong>Room:</strong> {loc.room}</span>
+                                            </div>
 
+                                            {/* Delete Button */}
                                             <Button
                                                 type="button"
                                                 onClick={() => handleDeleteLocation(loc.id)}
-                                                className="bg-red-500 text-white hover:bg-red-600"
+                                                className="ml-4 flex-shrink-0 mt-0.5 bg-red-500 text-white hover:bg-red-600"
                                             >
                                                 Obriši
                                             </Button>
