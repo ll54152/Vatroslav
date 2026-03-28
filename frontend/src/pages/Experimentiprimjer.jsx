@@ -165,9 +165,9 @@ function Experimentiprimjer() {
                 <CardContent>
                     <div className="grid w-full justify-center gap-4">
                         <div className="flex flex-col space-y-1.5">
-                            <CardTitle>Područje fizike</CardTitle>
+                            <CardTitle>ZPF</CardTitle>
                             <CardDescription className="text-blue-900 text-lg">
-                                {eksperiment.field}
+                                {eksperiment.zpf}
                             </CardDescription>
                         </div>
 
@@ -175,6 +175,13 @@ function Experimentiprimjer() {
                             <CardTitle>Nastavni predmet</CardTitle>
                             <CardDescription className="text-blue-900 text-lg">
                                 {eksperiment.subject}
+                            </CardDescription>
+                        </div>
+
+                        <div className="flex flex-col space-y-1.5">
+                            <CardTitle>Područje fizike</CardTitle>
+                            <CardDescription className="text-blue-900 text-lg">
+                                {eksperiment.field}
                             </CardDescription>
                         </div>
 
@@ -188,9 +195,9 @@ function Experimentiprimjer() {
 
                     <br/>
                     <div className="flex flex-col space-y-1.5">
-                        <CardTitle>Napomene</CardTitle>
+                        <CardTitle>Ključne riječi</CardTitle>
                         <CardDescription className="text-blue-900 text-lg">
-                            {eksperiment.materials}
+                            {eksperiment.keywords}
                         </CardDescription>
                     </div>
 
