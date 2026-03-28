@@ -4,7 +4,7 @@ import java.util.*;
 
 public class KomponentaShowDTO {
 
-    private Integer id;
+    private Long id;
 
     private String name;
 
@@ -27,7 +27,7 @@ public class KomponentaShowDTO {
     public KomponentaShowDTO() {
     }
 
-    public KomponentaShowDTO(Integer id, String name, String zpf, String fer, int quantity, LocationDTO location, String description, List<EksperimentShowDTO> eksperimenti, List<LogShowDTO> logs, List<FilesShowDTO> files) {
+    public KomponentaShowDTO(Long id, String name, String zpf, String fer, int quantity, LocationDTO location, String description, List<EksperimentShowDTO> eksperimenti, List<LogShowDTO> logs, List<FilesShowDTO> files) {
         this.id = id;
         this.name = name;
         this.zpf = zpf;
@@ -48,11 +48,11 @@ public class KomponentaShowDTO {
         this.eksperimenti = eksperimenti;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

@@ -2,12 +2,12 @@ package com.inventar.backend.DTO;
 
 public class KomponentaDTO {
 
-    private Integer id;
+    private Long id;
     private String name;
     private String ZPF;
     private String description;
 
-    public KomponentaDTO(Integer id, String name, String ZPF, String description) {
+    public KomponentaDTO(Long id, String name, String ZPF, String description) {
         this.id = id;
         this.name = name;
         this.ZPF = ZPF;
@@ -17,11 +17,11 @@ public class KomponentaDTO {
     public KomponentaDTO() {
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

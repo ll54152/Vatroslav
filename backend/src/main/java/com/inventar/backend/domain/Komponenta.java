@@ -9,7 +9,7 @@ public class Komponenta {
 
     @Id
     @GeneratedValue
-    private Integer id; //ID
+    private Long id; //ID
 
     private String name;    //Naziv
 
@@ -75,11 +75,11 @@ public class Komponenta {
         this.location = location;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
