@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 //@CrossOrigin(origins = "*")
 @RequestMapping("/user")
@@ -42,8 +44,19 @@ public class UserController {
         } else {
             return new ResponseEntity<>("Greška prilikom registracije korisnika!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
 
+    @PostMapping("/updateUser")
+    public ResponseEntity<String> updateUser(@RequestBody User user) {
+        if (!userServiceJPA.doesUserExists()) {
+            return new ResponseEntity<>("Korisnik ne postoji!", HttpStatus.BAD_REQUEST);
+        }
 
+        if (userServiceJPA.updateUser(user)) {
+            return new ResponseEntity<>("Korisnik ažuriran uspješno!", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Greška prilikom ažuriranja korisnika!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/registerDeprecated")
@@ -68,10 +81,9 @@ public class UserController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
-
+    public ResponseEntity<String> forgotPassword(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
         userServiceJPA.forgotPassword(email);
-
         return ResponseEntity.ok("If account exists, reset email has been sent.");
     }
 

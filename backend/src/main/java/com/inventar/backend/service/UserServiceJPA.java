@@ -3,6 +3,7 @@ package com.inventar.backend.service;
 import com.inventar.backend.domain.*;
 import com.inventar.backend.repo.*;
 import com.inventar.backend.security.JWTService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,6 +34,12 @@ public class UserServiceJPA {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private HttpServletRequest request;
+
+    @Autowired
+    private AuthenticationServiceJPA authenticationServiceJPA;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -134,5 +141,38 @@ public class UserServiceJPA {
         tokenRepo.delete(resetToken);
 
         return true;
+    }
+
+    public boolean updateUser(User user) {
+        Optional<User> optional = userRepo.findByEmail(authenticationServiceJPA.getEmailFromToken(request.getHeader("Authorization")));
+        if (optional.isEmpty()) {
+            return false;
+        }
+
+        User existingUser = optional.get();
+
+        // ToDo: Add ID to User so that I can change email from user
+        //existingUser.setEmail(user.getEmail());
+
+        if (user.getFirstName() != null) {
+            existingUser.setFirstName(user.getFirstName());
+        }
+
+        if (user.getLastName() != null) {
+            existingUser.setLastName(user.getLastName());
+        }
+
+        if (user.getPassword() != null && !user.getPassword().isBlank()) {
+            existingUser.setPassword(
+                    bCryptPasswordEncoder.encode(user.getPassword())
+            );
+        }
+
+        userRepo.save(existingUser);
+        return true;
+    }
+
+    public boolean doesUserExists() {
+        return userRepo.findByEmail(authenticationServiceJPA.getEmailFromToken(request.getHeader("Authorization"))).isPresent();
     }
 }
