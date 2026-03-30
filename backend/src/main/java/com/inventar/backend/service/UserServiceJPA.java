@@ -12,6 +12,10 @@ import org.springframework.security.crypto.bcrypt.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.TransactionSystemException;
 
+import java.security.SecureRandom;
+import java.util.Base64;
+import java.util.Optional;
+
 @Service
 public class UserServiceJPA {
 
@@ -24,6 +28,11 @@ public class UserServiceJPA {
     @Autowired
     private JWTService jwtService;
 
+    @Autowired
+    private PasswordResetTokenRepo tokenRepo;
+
+    @Autowired
+    private EmailService emailService;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -76,5 +85,54 @@ public class UserServiceJPA {
 
     public boolean loginDeprecated(String password, User oldUser) {
         return bCryptPasswordEncoder.matches(password, oldUser.getPassword());
+    }
+
+    public void forgotPassword(String email) {
+        User user = findByEmail(email);
+
+        if (user == null) {
+            return;
+        }
+
+        SecureRandom random = new SecureRandom();
+        byte[] bytes = new byte[32];
+        random.nextBytes(bytes);
+        String token = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+
+        PasswordResetToken resetToken = new PasswordResetToken();
+        resetToken.setToken(token);
+        resetToken.setEmail(email);
+        resetToken.setExpirationTime(System.currentTimeMillis() + 1000 * 60 * 15); // 15 min
+
+        tokenRepo.save(resetToken);
+
+        // Send email
+        emailService.sendResetEmail(email, token);
+    }
+
+    public boolean resetPassword(String token, String newPassword) {
+        Optional<PasswordResetToken> optional = tokenRepo.findByToken(token);
+
+        if (optional.isEmpty()) {
+            return false;
+        }
+
+        PasswordResetToken resetToken = optional.get();
+
+        if (resetToken.getExpirationTime() < System.currentTimeMillis()) {
+            return false;
+        }
+
+        User user = findByEmail(resetToken.getEmail());
+        if (user == null) {
+            return false;
+        }
+
+        user.setPassword(bCryptPasswordEncoder.encode(newPassword));
+        userRepo.save(user);
+
+        tokenRepo.delete(resetToken);
+
+        return true;
     }
 }

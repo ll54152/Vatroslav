@@ -5,10 +5,7 @@ import com.inventar.backend.service.UserServiceJPA;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 //@CrossOrigin(origins = "*")
@@ -68,6 +65,28 @@ public class UserController {
             }
         }
         return new ResponseEntity<>("Invalid credentials", HttpStatus.UNAUTHORIZED);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
+
+        userServiceJPA.forgotPassword(email);
+
+        return ResponseEntity.ok("If account exists, reset email has been sent.");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(
+            @RequestParam String token,
+            @RequestParam String newPassword) {
+
+        boolean success = userServiceJPA.resetPassword(token, newPassword);
+
+        if (success) {
+            return ResponseEntity.ok("Password updated successfully.");
+        } else {
+            return new ResponseEntity<>("Invalid or expired token.", HttpStatus.BAD_REQUEST);
+        }
     }
 
 }
