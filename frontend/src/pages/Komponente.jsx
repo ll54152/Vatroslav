@@ -9,8 +9,8 @@ export default function Komponente() {
     const [error, setError] = useState(null);
     const [role, setRole] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
-    const [showDescriptions, setShowDescriptions] = useState(false);
-    const [showZPF, setShowZPF] = useState(false);
+    const [expandedIds, setExpandedIds] = useState([]);
+
     const navigate = useNavigate();
 
     const isTokenValid = () => {
@@ -30,7 +30,10 @@ export default function Komponente() {
         try {
             const response = await fetch("/vatroslav/api/auth/verify", {
                 method: "GET",
-                headers: {"Content-Type": "application/json", Authorization: `${token}`},
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `${token}`
+                },
             });
             return response.ok;
         } catch {
@@ -63,14 +66,20 @@ export default function Komponente() {
             setRole(getUserRole());
 
             const token = localStorage.getItem("jwt");
+
             try {
                 const response = await fetch("/vatroslav/api/component/getAll", {
                     headers: {Authorization: `${token}`},
                 });
+
                 if (!response.ok) {
-                    if (response.status === 403) setError("Nemate ovlasti za pregled komponenti.");
-                    else if (response.status === 401) setError("Niste prijavljeni. Molimo prijavite se.");
-                    else setError("Greška prilikom dohvaćanja podataka!");
+                    if (response.status === 403)
+                        setError("Nemate ovlasti za pregled komponenti.");
+                    else if (response.status === 401)
+                        setError("Niste prijavljeni.");
+                    else
+                        setError("Greška prilikom dohvaćanja podataka!");
+
                     setLoading(false);
                     return;
                 }
@@ -78,6 +87,7 @@ export default function Komponente() {
                 const data = await response.json();
                 setComponents(data);
                 setFilteredComponents(data);
+
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -88,6 +98,14 @@ export default function Komponente() {
         fetchComponents();
     }, [navigate]);
 
+    const toggleExpand = (id) => {
+        setExpandedIds(prev =>
+            prev.includes(id)
+                ? prev.filter(i => i !== id)
+                : [...prev, id]
+        );
+    };
+
     const handleDeleteComponent = async (id) => {
         const token = localStorage.getItem("jwt");
         try {
@@ -95,16 +113,13 @@ export default function Komponente() {
                 method: "DELETE",
                 headers: {Authorization: `${token}`},
             });
-            if (!response.ok) throw new Error("Greška prilikom brisanja komponente!");
+
+            if (!response.ok) throw new Error("Greška prilikom brisanja!");
+
             const newComponents = components.filter(comp => comp.id !== id);
             setComponents(newComponents);
-            setFilteredComponents(
-                newComponents.filter(comp =>
-                    comp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    comp.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    (comp.zpf && comp.zpf.toLowerCase().includes(searchTerm.toLowerCase()))
-                )
-            );
+            setFilteredComponents(newComponents);
+
         } catch (err) {
             alert(err.message);
         }
@@ -135,62 +150,78 @@ export default function Komponente() {
 
         const filtered = components.filter(comp =>
             comp.name.toLowerCase().includes(term.toLowerCase()) ||
-            (comp.description && comp.description.toLowerCase().includes(term.toLowerCase())) ||
-            (comp.zpf && comp.zpf.toLowerCase().includes(term.toLowerCase()))
+            comp.description?.toLowerCase().includes(term.toLowerCase()) ||
+            comp.zpf?.toLowerCase().includes(term.toLowerCase()) ||
+            comp.keywords?.some(k =>
+                k.toLowerCase().includes(term.toLowerCase())
+            )
         );
+
         setFilteredComponents(filtered);
 
-        setShowDescriptions(filtered.some(comp => comp.description?.toLowerCase().includes(term.toLowerCase())));
-        setShowZPF(filtered.some(comp => comp.zpf?.toLowerCase().includes(term.toLowerCase())));
+        // AUTO EXPAND ako matcha ZPF/opis/keywords
+        const autoExpanded = filtered
+            .filter(comp =>
+                comp.description?.toLowerCase().includes(term.toLowerCase()) ||
+                comp.zpf?.toLowerCase().includes(term.toLowerCase()) ||
+                comp.keywords?.some(k =>
+                    k.toLowerCase().includes(term.toLowerCase())
+                )
+            )
+            .map(comp => comp.id);
+
+        setExpandedIds(autoExpanded);
     };
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center">
-            <div className="w-[80vw]">
-                <header
-                    className="fixed top-0 left-0 w-full bg-pink-500 text-white py-4 text-center text-2xl font-bold z-50">
+            <div className="w-[80vw] text-left">
+
+                <header className="fixed top-0 left-0 w-full bg-pink-500 text-white py-4 text-center text-2xl font-bold z-50">
                     Lista Komponenata
                 </header>
 
-                <div className="pt-24 mb-4 flex justify-between items-center">
+                <div className="pt-24 mb-4">
                     <input
                         type="text"
-                        placeholder="Pretraži po imenu, ZPF ili opisu..."
+                        placeholder="Pretraži po imenu, ZPF, opisu ili ključnoj riječi..."
                         value={searchTerm}
                         onChange={handleSearch}
-                        className="w-full p-2 mb-4 rounded border border-gray-300 bg-white text-black focus:outline-none focus:ring-2 focus:ring-pink-500"
+                        className="w-full p-2 rounded border border-gray-300 bg-white text-black focus:outline-none focus:ring-2 focus:ring-pink-500"
                     />
-                    <div className="ml-4 flex gap-2">
-                        <button
-                            onClick={() => setShowDescriptions(prev => !prev)}
-                            className="px-4 py-2 bg-blue-500 text-white rounded"
-                        >
-                            {showDescriptions ? "Sakrij opise" : "Prikaži opise"}
-                        </button>
-                        <button
-                            onClick={() => setShowZPF(prev => !prev)}
-                            className="px-4 py-2 bg-green-500 text-white rounded"
-                        >
-                            {showZPF ? "Sakrij ZPF" : "Prikaži ZPF"}
-                        </button>
-                    </div>
                 </div>
 
-                {loading && <p>Učitavanje podataka...</p>}
+                {loading && <p>Učitavanje...</p>}
                 {error && <p className="text-red-500">{error}</p>}
-                {!loading && !error && filteredComponents.length === 0 && <p>Nema dostupnih komponenti.</p>}
+                {!loading && !error && filteredComponents.length === 0 && (
+                    <p>Nema rezultata.</p>
+                )}
 
                 {!loading && !error && filteredComponents.map(comp => {
+                    const isExpanded = expandedIds.includes(comp.id);
                     const isAdmin = role === "ROLE_ADMIN";
 
                     return (
-                        <div key={comp.id} className="flex flex-col bg-pink-200 p-5 mb-4 rounded-lg shadow-lg">
-                            <div className="flex justify-between items-center w-full">
-                                <Link to={`/komponenteprimjer/${comp.id}`} className="text-blue-500">
+                        <div key={comp.id}
+                             className="flex flex-col bg-pink-200 p-5 mb-4 rounded-lg shadow-lg">
+
+                            {/* NAZIV */}
+                            <div className="flex justify-between items-start w-full">
+                                <Link
+                                    to={`/komponenteprimjer/${comp.id}`}
+                                    className="text-blue-600 text-lg font-semibold"
+                                >
                                     <HighlightedText text={comp.name} highlight={searchTerm}/>
                                 </Link>
 
                                 <div className="flex gap-2">
+                                    <button
+                                        onClick={() => toggleExpand(comp.id)}
+                                        className="px-2 py-1 bg-gray-300 rounded text-sm"
+                                    >
+                                        {isExpanded ? "▲" : "▼"}
+                                    </button>
+
                                     {isAdmin ? (
                                         <button
                                             className="bg-red-500 text-white px-3 py-1 rounded"
@@ -199,28 +230,54 @@ export default function Komponente() {
                                             Delete
                                         </button>
                                     ) : (
-                                        <button
-                                            className="bg-red-500 text-white px-3 py-1 rounded opacity-50 cursor-not-allowed"
-                                        >
+                                        <button className="bg-red-500 text-white px-3 py-1 rounded opacity-50 cursor-not-allowed">
                                             Delete
                                         </button>
                                     )}
                                 </div>
                             </div>
 
-                            {showZPF && comp.zpf && (
-                                <p className="mt-2">
-                                    <strong>ZPF: </strong>
-                                    <HighlightedText text={comp.zpf} highlight={searchTerm}/>
-                                </p>
+                            {/* ZPF + OPIS */}
+                            <div className="mt-2 text-sm text-gray-700 font-light">
+                                {comp.zpf && (
+                                    <span>
+                                        <HighlightedText text={comp.zpf} highlight={searchTerm}/>
+                                    </span>
+                                )}
+
+                                {comp.description && (
+                                    <span>
+                                        {"  -  "}
+                                        <HighlightedText text={comp.description} highlight={searchTerm}/>
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* KEYWORDS (COLLAPSABLE TAGS) */}
+                            {isExpanded && (
+                                (() => {
+                                    const keywordsArray = Array.isArray(comp.keywords)
+                                        ? comp.keywords
+                                        : typeof comp.keywords === "string"
+                                            ? comp.keywords.split(";").map(k => k.trim()).filter(k => k)
+                                            : [];
+
+                                    return (
+                                        <div className="mt-3 flex flex-wrap gap-2">
+                                            {keywordsArray.length > 0 ? (
+                                                keywordsArray.map((k, i) => (
+                                                    <span key={i} className="bg-gray-300 px-2 py-1 rounded-full text-xs">
+                            <HighlightedText text={k} highlight={searchTerm}/>
+                        </span>
+                                                ))
+                                            ) : (
+                                                <span className="text-gray-500 italic text-xs">Nema ključnih riječi</span>
+                                            )}
+                                        </div>
+                                    );
+                                })()
                             )}
 
-                            {showDescriptions && comp.description && (
-                                <p className="mt-2">
-                                    <strong>Opis: </strong>
-                                    <HighlightedText text={comp.description} highlight={searchTerm}/>
-                                </p>
-                            )}
                         </div>
                     );
                 })}
