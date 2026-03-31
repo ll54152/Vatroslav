@@ -1,16 +1,17 @@
 package com.inventar.backend.controller;
 
+import com.inventar.backend.DTO.UserShowDTO;
 import com.inventar.backend.domain.User;
 import com.inventar.backend.service.UserServiceJPA;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @RestController
-//@CrossOrigin(origins = "*")
 @RequestMapping("/user")
 public class UserController {
 
@@ -46,7 +47,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/updateUser")
+    @PutMapping("/updateUser")
     public ResponseEntity<String> updateUser(@RequestBody User user) {
         if (!userServiceJPA.doesUserExists()) {
             return new ResponseEntity<>("Korisnik ne postoji!", HttpStatus.BAD_REQUEST);
@@ -57,6 +58,16 @@ public class UserController {
         } else {
             return new ResponseEntity<>("Greška prilikom ažuriranja korisnika!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/aboutMe")
+    public ResponseEntity<UserShowDTO> getCurrentUser(Authentication authentication) {
+
+        String email = authentication.getName();
+        User user = userServiceJPA.findByEmail(email);
+        UserShowDTO userShowDTO = new UserShowDTO(user.getEmail(), user.getFirstName(), user.getLastName());
+
+        return ResponseEntity.ok(userShowDTO);
     }
 
     @PostMapping("/registerDeprecated")

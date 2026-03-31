@@ -12,6 +12,7 @@ import Komponenteunos from './pages/Komponenteunos';
 import Komponente from './pages/Komponente';
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import AccountManagement from "./pages/AccountManagement";
 
 function App() {
     return (
@@ -30,6 +31,7 @@ function App() {
             <Route path="/Komponente" element={<Komponente/>}/>
             <Route path="/forgot-password" element={<ForgotPassword/>}/>
             <Route path="/reset-password" element={<ResetPassword/>}/>
+            <Route path="/account" element={<AccountManagement/>}/>
 
         </Routes>
     );

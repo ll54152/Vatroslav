@@ -12,7 +12,6 @@ export default function MainPage() {
     const [isAuthenticated, setIsAuthenticated] = React.useState(null);
     const [role, setRole] = React.useState(null);
 
-    // 🔹 provjera isteka tokena (frontend)
     const isTokenValid = () => {
         const token = localStorage.getItem("jwt");
         if (!token) return false;
@@ -26,7 +25,6 @@ export default function MainPage() {
         }
     };
 
-    // 🔹 backend provjera
     const verifyToken = async () => {
         const token = localStorage.getItem("jwt");
         if (!token) return false;
@@ -46,7 +44,6 @@ export default function MainPage() {
         }
     };
 
-    // 🔹 dohvat role
     const getUserRole = () => {
         const token = localStorage.getItem("jwt");
         if (!token) return null;
@@ -77,7 +74,6 @@ export default function MainPage() {
         init();
     }, []);
 
-    // 🔴 redirect ako nije auth
     if (isAuthenticated === false) {
         return <Navigate to="/login"/>;
     }
@@ -92,6 +88,7 @@ export default function MainPage() {
         {path: "/komponente", label: "Komponente"},
         {path: "/experimentunos", label: "Dodaj eksperiment"},
         {path: "/komponenteunos", label: "Dodaj komponentu"},
+        {path: "/account", label: "Račun"},
         {path: "/signup", label: "Dodaj korisnika", adminOnly: true},
     ];
 
