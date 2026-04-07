@@ -26,6 +26,7 @@ function Komponenteunos() {
 
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
+    const [keywords, setKeywords] = useState("");
 
     const [quantity, setQuantity] = useState("");
     const [description, setDescription] = useState("");
@@ -126,6 +127,7 @@ function Komponenteunos() {
         formToSend.append("log", notes);
         formToSend.append("fer", status);
         formToSend.append("eksperimentIDs", JSON.stringify(selectedExperiments.map(e => e.id)));
+        formToSend.append("keywords", keywords);
 
         files.forEach((file) => {
             formToSend.append("files", file);
@@ -201,12 +203,10 @@ function Komponenteunos() {
     };
 
     return (
-        <Card
-            className=""
-        >
+        <Card className="w-full max-w-6xl mx-auto px-6">
             <CardHeader className="flex flex-col items-center">
                 <CardTitle className="text-4xl font-bold mb-4">Naziv komponente</CardTitle>
-                <div className="w-full max-w-[600px]">
+                <div className="w-full max-w-4xl flex flex-col space-y-1.5">
                     <Input
                         id="nazivkomponente"
                         placeholder="Unesite naziv komponente"
@@ -217,8 +217,8 @@ function Komponenteunos() {
             </CardHeader>
 
             <CardContent>
-                <form className="flex flex-col items-center gap-4">
-                    <div className="w-full max-w-[600px] flex flex-col space-y-1.5">
+                <form className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-6xl mx-auto">
+                    <div className="w-full max-w-4xl flex flex-col space-y-1.5">
                         <CardTitle>Interna oznaka (ZPF)</CardTitle>
                         <Input
                             id="intozn-letters"
@@ -254,7 +254,7 @@ function Komponenteunos() {
                         )}
                     </div>
 
-                    <div className="flex flex-col space-y-1.5">
+                    <div className="w-full max-w-4xl flex flex-col space-y-1.5">
                         <CardTitle>Eksperimenti</CardTitle>
                         <Input
                             placeholder="Pretraži eksperimente"
@@ -275,7 +275,7 @@ function Komponenteunos() {
 
                         {/* Rezultati pretrage */}
                         {experimentSearchResults.map((exp) => (
-                            <div key={exp.id} className="flex justify-between items-center border-b py-1">
+                            <div key={exp.id} className="w-full max-w-4xl flex flex-col space-y-1.5">
                                 <span>{exp.name}</span>
                                 <Button
                                     type="button"
@@ -311,7 +311,7 @@ function Komponenteunos() {
                         </div>
                     </div>
 
-                    <div className="w-full max-w-[600px] flex flex-col space-y-1.5">
+                    <div className="w-full max-w-4xl flex flex-col space-y-1.5">
                         <CardTitle>Gdje se nalazi</CardTitle>
                         <Input
                             placeholder="Pretraži lokacije..."
@@ -378,7 +378,7 @@ function Komponenteunos() {
                                 )}
                             </div>
                         )}
-                        <div className="flex items-center space-x-2">
+                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
                             <input
                                 id="addLocationCheckbox"
                                 type="checkbox"
@@ -391,7 +391,7 @@ function Komponenteunos() {
                     </div>
 
                     {showAddLocation && (
-                        <div className="w-full max-w-[600px] flex flex-col space-y-1.5">
+                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
                             <CardTitle>Dodaj novu lokaciju</CardTitle>
                             <Input
                                 id="newLocationAddress"
@@ -411,7 +411,7 @@ function Komponenteunos() {
                         </div>
                     )}
 
-                    <div className="w-full max-w-[600px] flex flex-col space-y-1.5">
+                    <div className="w-full max-w-4xl flex flex-col space-y-1.5">
                         <CardTitle>Količina</CardTitle>
                         <Input
                             id="kolicina"
@@ -421,7 +421,7 @@ function Komponenteunos() {
                         />
                     </div>
 
-                    <div className="w-full max-w-[600px] flex flex-col space-y-1.5">
+                    <div className="w-full max-w-4xl flex flex-col space-y-1.5">
                         <CardTitle>Kratak opis</CardTitle>
                         <Input
                             id="opis"
@@ -431,7 +431,17 @@ function Komponenteunos() {
                         />
                     </div>
 
-                    <div className="flex flex-col space-y-1.5">
+                    <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                        <CardTitle>Ključne riječi</CardTitle>
+                        <Input
+                            id="keywords"
+                            placeholder="Unesite ključne riječi odvojene točkom-zarezom (;)"
+                            value={keywords}
+                            onChange={(e) => setKeywords(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="w-full max-w-4xl flex flex-col space-y-1.5">
                         <CardTitle>Dokumentacija</CardTitle>
                         <input
                             type="file"
@@ -441,7 +451,7 @@ function Komponenteunos() {
                         />
                     </div>
 
-                    <div className="w-full max-w-[600px] flex flex-col space-y-1.5">
+                    <div className="w-full max-w-4xl flex flex-col space-y-1.5">
                         <CardTitle>Status</CardTitle>
                         <Select value={status} onValueChange={setStatus}>
                             <SelectTrigger id="framework">
