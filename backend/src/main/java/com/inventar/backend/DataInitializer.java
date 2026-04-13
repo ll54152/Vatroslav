@@ -31,7 +31,6 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-
         User existingAdmin = userServiceJPA.findByEmail(adminEmail);
 
         if (existingAdmin == null) {

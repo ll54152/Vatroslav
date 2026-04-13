@@ -1,35 +1,35 @@
 package com.inventar.backend.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
-import java.util.*;
+import java.util.List;
 
 @Entity
 public class Location {
-
     @Id
     @GeneratedValue
     private Long id;
 
-    private String adress;
+    private String address;
 
     private String room;
     @OneToMany(mappedBy = "location")
-    private List<Komponenta> komponenta;
+    private List<Component> componentList;
 
     public Location() {
     }
 
-    public Location(String adress, String room, List<Komponenta> komponenta) {
-        // Konstruktor s komponentom
-        this.adress = adress;
+    public Location(String address, String room, List<Component> componentList) {
+        this.address = address;
         this.room = room;
-        this.komponenta = komponenta;
+        this.componentList = componentList;
     }
 
-    public Location(String adress, String room) {
-        // Konstruktor be komponente
-        this.adress = adress;
+    public Location(String address, String room) {
+        this.address = address;
         this.room = room;
     }
 
@@ -41,14 +41,6 @@ public class Location {
         this.id = id;
     }
 
-    public String getAdress() {
-        return adress;
-    }
-
-    public void setAdress(String adress) {
-        this.adress = adress;
-    }
-
     public String getRoom() {
         return room;
     }
@@ -57,11 +49,19 @@ public class Location {
         this.room = room;
     }
 
-    public List<Komponenta> getKomponenta() {
-        return komponenta;
+    public List<Component> getComponentList() {
+        return componentList;
     }
 
-    public void setKomponenta(List<Komponenta> komponenta) {
-        this.komponenta = komponenta;
+    public void setComponentList(List<Component> componentList) {
+        this.componentList = componentList;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

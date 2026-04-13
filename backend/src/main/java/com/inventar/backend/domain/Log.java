@@ -1,23 +1,27 @@
 package com.inventar.backend.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Column;
+import jakarta.persistence.JoinColumn;
 
-import java.time.*;
+import java.time.LocalDateTime;
 
 @Entity
 public class Log {
-
     @Id
     @GeneratedValue
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "komponenta_id")
-    private Komponenta komponenta;
+    @JoinColumn(name = "component_id")
+    private Component component;
 
     @ManyToOne
-    @JoinColumn(name = "eksperiment_id")
-    private Eksperiment eksperiment;
+    @JoinColumn(name = "experiment_id")
+    private Experiment experiment;
 
     @Column(columnDefinition = "TEXT")
     private String note;
@@ -37,17 +41,15 @@ public class Log {
         this.timestamp = timestamp;
     }
 
-    public Log(Eksperiment eksperiment, String note, LocalDateTime timestamp, User user) {
-        // Konstruktor za eksperiment
-        this.eksperiment = eksperiment;
+    public Log(Experiment experiment, String note, LocalDateTime timestamp, User user) {
+        this.experiment = experiment;
         this.note = note;
         this.timestamp = timestamp;
         this.user = user;
     }
 
-    public Log(Komponenta komponenta, String note, LocalDateTime timestamp, User user) {
-        // Konstruktor za komponentu
-        this.komponenta = komponenta;
+    public Log(Component component, String note, LocalDateTime timestamp, User user) {
+        this.component = component;
         this.note = note;
         this.timestamp = timestamp;
         this.user = user;
@@ -61,20 +63,20 @@ public class Log {
         this.id = id;
     }
 
-    public Komponenta getKomponenta() {
-        return komponenta;
+    public Component getComponent() {
+        return component;
     }
 
-    public void setKomponenta(Komponenta komponenta) {
-        this.komponenta = komponenta;
+    public void setComponent(Component component) {
+        this.component = component;
     }
 
-    public Eksperiment getEksperiment() {
-        return eksperiment;
+    public Experiment getExperiment() {
+        return experiment;
     }
 
-    public void setEksperiment(Eksperiment eksperiment) {
-        this.eksperiment = eksperiment;
+    public void setExperiment(Experiment experiment) {
+        this.experiment = experiment;
     }
 
     public String getNote() {
