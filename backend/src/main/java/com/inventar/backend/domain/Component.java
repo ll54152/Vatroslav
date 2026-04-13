@@ -39,7 +39,7 @@ public class Component {
     private List<Log> logList;
 
     @OneToMany(mappedBy = "component")
-    private List<File> filesList;
+    private List<File> fileList;
 
     @ManyToMany
     @JoinTable(
@@ -157,19 +157,19 @@ public class Component {
         this.logList = logList;
     }
 
-    public List<File> getFilesList() {
-        return filesList;
-    }
-
-    public void setFilesList(List<File> filesList) {
-        this.filesList = filesList;
-    }
-
     public List<Experiment> getExperimentList() {
         return experimentList;
     }
 
     public void setExperimentList(List<Experiment> experimentList) {
         this.experimentList = experimentList;
+    }
+
+    public List<File> getFileList() {
+        return fileList;
+    }
+
+    public void setFileList(List<File> fileList) {
+        this.fileList = fileList;
     }
 }

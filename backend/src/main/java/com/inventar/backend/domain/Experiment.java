@@ -35,7 +35,7 @@ public class Experiment {
     @OneToMany(mappedBy = "experiment")
     private List<File> fileList;
 
-    @ManyToMany(mappedBy = "experiments")
+    @ManyToMany(mappedBy = "experimentList")
     private List<Component> componentList;
 
     @OneToMany(mappedBy = "experiment")
