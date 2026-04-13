@@ -197,13 +197,13 @@ export default function EksperimentEdit() {
                     <CardTitle className="text-left text-[20px]">Nastavni predmet</CardTitle>
                     <Input id="subject" placeholder="Nastavni predmet" value={formData.subject}
                            onChange={handleInputChange}/>
-                            <br></br>
-                     <CardTitle className="text-left text-[20px]">Opis</CardTitle>
+                    <br></br>
+                    <CardTitle className="text-left text-[20px]">Opis</CardTitle>
                     <Textarea id="description" placeholder="Opis" value={formData.description}
                               onChange={handleInputChange}/>
-                              <br></br>
-                     <CardTitle className="text-left text-[20px]">Potrošni materijal</CardTitle>
-                    <Textarea id="materials" placeholder="Potrošni materijal" value={formData.materials}
+                    <br></br>
+                    <CardTitle className="text-left text-[20px]">Pribor i potrošni materijal</CardTitle>
+                    <Textarea id="materials" placeholder="Pribor i potrošni materijal" value={formData.materials}
                               onChange={handleInputChange}/>
 
                     {/* Komponente */}

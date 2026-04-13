@@ -7,12 +7,12 @@ import {
     MenubarTrigger
 } from "@/components/ui/menubar";
 import {jwtDecode} from "jwt-decode";
+import {Button} from "@/components/ui/button.jsx";
 
 export default function MainPage() {
     const [isAuthenticated, setIsAuthenticated] = React.useState(null);
     const [role, setRole] = React.useState(null);
 
-    // 🔹 provjera isteka tokena (frontend)
     const isTokenValid = () => {
         const token = localStorage.getItem("jwt");
         if (!token) return false;
@@ -26,7 +26,6 @@ export default function MainPage() {
         }
     };
 
-    // 🔹 backend provjera
     const verifyToken = async () => {
         const token = localStorage.getItem("jwt");
         if (!token) return false;
@@ -46,7 +45,6 @@ export default function MainPage() {
         }
     };
 
-    // 🔹 dohvat role
     const getUserRole = () => {
         const token = localStorage.getItem("jwt");
         if (!token) return null;
@@ -77,7 +75,6 @@ export default function MainPage() {
         init();
     }, []);
 
-    // 🔴 redirect ako nije auth
     if (isAuthenticated === false) {
         return <Navigate to="/login"/>;
     }
@@ -92,6 +89,7 @@ export default function MainPage() {
         {path: "/komponente", label: "Komponente"},
         {path: "/experimentunos", label: "Dodaj eksperiment"},
         {path: "/komponenteunos", label: "Dodaj komponentu"},
+        {path: "/account", label: "Račun"},
         {path: "/signup", label: "Dodaj korisnika", adminOnly: true},
     ];
 
@@ -99,7 +97,7 @@ export default function MainPage() {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center">
             <div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 w-[65vw]">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
                     {items.map((item, index) => {
                         const isDisabled = item.adminOnly && role !== "ROLE_ADMIN";
 
@@ -108,14 +106,14 @@ export default function MainPage() {
                                 {isDisabled ? (
                                     <Card className="opacity-50 cursor-not-allowed">
                                         <CardContent className="flex aspect-square items-center justify-center p-6">
-                                            <span className="text-3xl font-bold">{item.label}</span>
+                                            <span className="text-2xl font-bold">{item.label}</span>
                                         </CardContent>
                                     </Card>
                                 ) : (
                                     <Link to={item.path}>
                                         <Card className="hover:bg-pink-500 hover:text-white transition duration-300">
                                             <CardContent className="flex aspect-square items-center justify-center p-6">
-                                                <span className="text-3xl font-bold">{item.label}</span>
+                                                <span className="text-2xl font-bold">{item.label}</span>
                                             </CardContent>
                                         </Card>
                                     </Link>
@@ -125,21 +123,18 @@ export default function MainPage() {
                     })}
                 </div>
 
-                {/* 🔴 logout */}
-                <Menubar>
-                    <MenubarMenu>
-                        <Link to="/home">
-                            <MenubarTrigger
-                                className="w-40 hover:bg-red-500"
-                                onClick={() => {
-                                    localStorage.removeItem("jwt");
-                                }}
-                            >
-                                Odjava
-                            </MenubarTrigger>
-                        </Link>
-                    </MenubarMenu>
-                </Menubar>
+                <div className="w-full flex justify-center mt-8">
+                    <Button
+                        variant="destructive"
+                        className="px-8 py-2 text-lg"
+                        onClick={() => {
+                            localStorage.removeItem("jwt");
+                            window.location.href = "/login";
+                        }}
+                    >
+                        Odjava
+                    </Button>
+                </div>
             </div>
         </div>
     );

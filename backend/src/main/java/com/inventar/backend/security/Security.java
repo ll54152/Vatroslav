@@ -37,6 +37,8 @@ public class Security {
             "/user/login",
             //"/user/register",
             "/auth/verify",
+            "/user/forgot-password",
+            "/user/reset-password",
     };
 
     @Bean

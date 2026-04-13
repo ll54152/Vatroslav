@@ -123,10 +123,17 @@ function Login() {
                                 />
                             </div>
                         </div>
-                        <CardFooter className="flex justify-between">
-                            <Button type="submit" className="m-5 bg-pink-500 text-white">Prijavi se</Button>
-                            <Link to="/home">
-                                <Button className="m-5 bg-pink-500 text-white">Nazad</Button>
+                        <CardFooter className="flex flex-col items-start gap-2">
+                            <div className="flex gap-2">
+                                <Button type="submit" className="m-5 bg-pink-500 text-white">Prijavi se</Button>
+                                <Link to="/home">
+                                    <Button className="m-5 bg-pink-500 text-white">Nazad</Button>
+                                </Link>
+                            </div>
+                            <Link to="/forgot-password">
+                                <Button variant="link" className="m-10 bg-pink-500 text-white">
+                                    Zaboravili ste lozinku?
+                                </Button>
                             </Link>
                         </CardFooter>
                     </form>

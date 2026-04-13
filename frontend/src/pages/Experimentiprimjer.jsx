@@ -239,7 +239,7 @@ function Experimentiprimjer() {
                     <Tabs defaultValue="komponente" className="w-full">
                         <TabsList className="grid w-full grid-cols-2">
                             <TabsTrigger value="komponente">Komponente</TabsTrigger>
-                            <TabsTrigger value="materijal">Potrošni materijal</TabsTrigger>
+                            <TabsTrigger value="materijal">Pribor i potrošni materijal</TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="komponente">

@@ -3,6 +3,7 @@ package com.inventar.backend.service;
 import com.inventar.backend.domain.*;
 import com.inventar.backend.repo.*;
 import com.inventar.backend.security.JWTService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,6 +12,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.TransactionSystemException;
+
+import java.security.SecureRandom;
+import java.util.Base64;
+import java.util.Optional;
 
 @Service
 public class UserServiceJPA {
@@ -24,6 +29,17 @@ public class UserServiceJPA {
     @Autowired
     private JWTService jwtService;
 
+    @Autowired
+    private PasswordResetTokenRepo tokenRepo;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private HttpServletRequest request;
+
+    @Autowired
+    private AuthenticationServiceJPA authenticationServiceJPA;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -76,5 +92,87 @@ public class UserServiceJPA {
 
     public boolean loginDeprecated(String password, User oldUser) {
         return bCryptPasswordEncoder.matches(password, oldUser.getPassword());
+    }
+
+    public void forgotPassword(String email) {
+        User user = findByEmail(email);
+
+        if (user == null) {
+            return;
+        }
+
+        SecureRandom random = new SecureRandom();
+        byte[] bytes = new byte[32];
+        random.nextBytes(bytes);
+        String token = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+
+        PasswordResetToken resetToken = new PasswordResetToken();
+        resetToken.setToken(token);
+        resetToken.setEmail(email);
+        resetToken.setExpirationTime(System.currentTimeMillis() + 1000 * 60 * 15); // 15 min
+
+        tokenRepo.save(resetToken);
+
+        // Send email
+        emailService.sendResetEmail(email, token);
+    }
+
+    public boolean resetPassword(String token, String newPassword) {
+        Optional<PasswordResetToken> optional = tokenRepo.findByToken(token);
+
+        if (optional.isEmpty()) {
+            return false;
+        }
+
+        PasswordResetToken resetToken = optional.get();
+
+        if (resetToken.getExpirationTime() < System.currentTimeMillis()) {
+            return false;
+        }
+
+        User user = findByEmail(resetToken.getEmail());
+        if (user == null) {
+            return false;
+        }
+
+        user.setPassword(bCryptPasswordEncoder.encode(newPassword));
+        userRepo.save(user);
+
+        tokenRepo.delete(resetToken);
+
+        return true;
+    }
+
+    public boolean updateUser(User user) {
+        Optional<User> optional = userRepo.findByEmail(authenticationServiceJPA.getEmailFromToken(request.getHeader("Authorization")));
+        if (optional.isEmpty()) {
+            return false;
+        }
+
+        User existingUser = optional.get();
+
+        // ToDo: Add ID to User so that I can change email from user
+        //existingUser.setEmail(user.getEmail());
+
+        if (user.getFirstName() != null) {
+            existingUser.setFirstName(user.getFirstName());
+        }
+
+        if (user.getLastName() != null) {
+            existingUser.setLastName(user.getLastName());
+        }
+
+        if (user.getPassword() != null && !user.getPassword().isBlank()) {
+            existingUser.setPassword(
+                    bCryptPasswordEncoder.encode(user.getPassword())
+            );
+        }
+
+        userRepo.save(existingUser);
+        return true;
+    }
+
+    public boolean doesUserExists() {
+        return userRepo.findByEmail(authenticationServiceJPA.getEmailFromToken(request.getHeader("Authorization"))).isPresent();
     }
 }
