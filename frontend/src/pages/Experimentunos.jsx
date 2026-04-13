@@ -197,8 +197,8 @@ function Experimentunos() {
                             },
                             {
                                 id: "materials",
-                                label: "Potrošni materijal",
-                                placeholder: "Unesite napomene",
+                                label: "Pribor i potrošni materijal",
+                                placeholder: "Unesite pribor i potrošni materijal",
                                 value: formData.materials
                             },
                             {
