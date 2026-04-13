@@ -24,12 +24,16 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody User user) {
         User oldUser = userServiceJPA.findByEmail(user.getEmail());
-        user.setRole(oldUser.getRole());
-        String token = userServiceJPA.verifyLogin(user);
-        if (token != null) {
-            return new ResponseEntity<>("Bearer" + token, HttpStatus.OK);
+        if (oldUser == null) {
+            return new ResponseEntity<>("Pogrešni podatci", HttpStatus.UNAUTHORIZED);
+        } else {
+            user.setRole(oldUser.getRole());
+            String token = userServiceJPA.verifyLogin(user);
+            if (token != null) {
+                return new ResponseEntity<>("Bearer" + token, HttpStatus.OK);
+            }
+            return new ResponseEntity<>("Pogrešni podatci", HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity<>("Pogrešni podatci", HttpStatus.UNAUTHORIZED);
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
