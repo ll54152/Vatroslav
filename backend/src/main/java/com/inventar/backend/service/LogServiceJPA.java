@@ -1,11 +1,16 @@
 package com.inventar.backend.service;
 
 import com.inventar.backend.DTO.LogAddDTO;
-import com.inventar.backend.domain.*;
-import com.inventar.backend.repo.*;
+import com.inventar.backend.domain.Experiment;
+import com.inventar.backend.domain.Log;
+import com.inventar.backend.domain.Component;
+import com.inventar.backend.repo.ComponentRepo;
+import com.inventar.backend.repo.ExperimentRepo;
+import com.inventar.backend.repo.LogRepo;
+import com.inventar.backend.repo.UserRepo;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.stereotype.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,27 +19,25 @@ import java.util.Optional;
 @Service
 public class LogServiceJPA {
 
-    @Autowired
     private AuthenticationServiceJPA authenticationServiceJPA;
-
-    @Autowired
     private LogRepo logRepo;
-
-    @Autowired
     private UserRepo userRepo;
+    private HttpServletRequest httpServletRequest;
+    private ExperimentRepo experimentRepo;
+    private ComponentRepo componentRepo;
 
     @Autowired
-    private HttpServletRequest request;
-
-    @Autowired
-    private EksperimentRepo eksperimentRepo;
-
-    @Autowired
-    private KomponentaRepo komponentaRepo;
+    public LogServiceJPA(AuthenticationServiceJPA authenticationServiceJPA, LogRepo logRepo, UserRepo userRepo, HttpServletRequest httpServletRequest, ExperimentRepo experimentRepo, ComponentRepo componentRepo) {
+        this.authenticationServiceJPA = authenticationServiceJPA;
+        this.logRepo = logRepo;
+        this.userRepo = userRepo;
+        this.httpServletRequest = httpServletRequest;
+        this.experimentRepo = experimentRepo;
+        this.componentRepo = componentRepo;
+    }
 
     public Log save(LogAddDTO logAddDTO) {
-
-        String email = authenticationServiceJPA.getEmailFromToken(request.getHeader("Authorization"));
+        String email = authenticationServiceJPA.getEmailFromToken(httpServletRequest.getHeader("Authorization"));
 
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
@@ -42,11 +45,11 @@ public class LogServiceJPA {
         log.setNote(logAddDTO.getNote());
 
         if (logAddDTO.getEntityType().equals("eksperiment")) {
-            Optional<Eksperiment> eksperiment = eksperimentRepo.findById(logAddDTO.getEntityId());
-            log.setEksperiment(eksperiment.get());
+            Optional<Experiment> experiment = experimentRepo.findById(logAddDTO.getEntityId());
+            log.setExperiment(experiment.get());
         } else if (logAddDTO.getEntityType().equals("komponenta")) {
-            Optional<Komponenta> komponenta = komponentaRepo.findById(logAddDTO.getEntityId());
-            log.setKomponenta(komponenta.get());
+            Optional<Component> component = componentRepo.findById(logAddDTO.getEntityId());
+            log.setComponent(component.get());
         }
 
         return logRepo.save(log);
@@ -60,17 +63,17 @@ public class LogServiceJPA {
         return logRepo.findById(id).orElse(null);
     }
 
-    public List<Log> findByEksperimentId(Long eksperimentId) {
+    public List<Log> findByExperimentId(Long experimentId) {
         List<Log> logs = logRepo.findAll();
         return logs.stream()
-                .filter(log -> log.getEksperiment().getId().equals(eksperimentId))
+                .filter(log -> log.getExperiment().getId().equals(experimentId))
                 .toList();
     }
 
-    public List<Log> findByKomponentaId(int komponentaId) {
+    public List<Log> findByComponentId(Long componentId) {
         List<Log> logs = logRepo.findAll();
         return logs.stream()
-                .filter(log -> log.getKomponenta().getId().equals(komponentaId))
+                .filter(log -> log.getComponent().getId().equals(componentId))
                 .toList();
     }
 

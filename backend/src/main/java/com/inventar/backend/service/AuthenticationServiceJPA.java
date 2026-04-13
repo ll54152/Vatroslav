@@ -7,11 +7,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthenticationServiceJPA {
 
+    private final JWTService jwtService;
+
     @Autowired
-    private JWTService jwtService;
+    public AuthenticationServiceJPA(JWTService jwtService) {
+        this.jwtService = jwtService;
+    }
 
     public boolean verifyToken(String authHeader) {
-
         if (authHeader == null || !authHeader.startsWith("Bearer")) {
             return false;
         }
@@ -30,5 +33,4 @@ public class AuthenticationServiceJPA {
 
         return jwtService.extractEmail(token);
     }
-
 }

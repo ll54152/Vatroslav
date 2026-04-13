@@ -1,16 +1,18 @@
 package com.inventar.backend.service;
 
-import com.inventar.backend.domain.*;
-import com.inventar.backend.repo.*;
+import com.inventar.backend.domain.User;
+import com.inventar.backend.domain.PasswordResetToken;
+import com.inventar.backend.repo.PasswordResetTokenRepo;
+import com.inventar.backend.repo.UserRepo;
 import com.inventar.backend.security.JWTService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.bcrypt.*;
-import org.springframework.stereotype.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionSystemException;
 
 import java.security.SecureRandom;
@@ -20,32 +22,25 @@ import java.util.Optional;
 @Service
 public class UserServiceJPA {
 
-    @Autowired
     private UserRepo userRepo;
-
-    @Autowired
-    AuthenticationManager authManager;
-
-    @Autowired
+    private AuthenticationManager authenticationManager;
     private JWTService jwtService;
-
-    @Autowired
-    private PasswordResetTokenRepo tokenRepo;
-
-    @Autowired
+    private PasswordResetTokenRepo passwordResetTokenRepo;
     private EmailService emailService;
-
-    @Autowired
-    private HttpServletRequest request;
-
-    @Autowired
+    private HttpServletRequest httpServletRequest;
     private AuthenticationServiceJPA authenticationServiceJPA;
-
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public UserServiceJPA(BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserServiceJPA(BCryptPasswordEncoder bCryptPasswordEncoder, AuthenticationServiceJPA authenticationServiceJPA, HttpServletRequest httpServletRequest, EmailService emailService, PasswordResetTokenRepo passwordResetTokenRepo, JWTService jwtService, AuthenticationManager authenticationManager, UserRepo userRepo) {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.authenticationServiceJPA = authenticationServiceJPA;
+        this.httpServletRequest = httpServletRequest;
+        this.emailService = emailService;
+        this.passwordResetTokenRepo = passwordResetTokenRepo;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
+        this.userRepo = userRepo;
     }
 
     public boolean register(User user) {
@@ -53,11 +48,7 @@ public class UserServiceJPA {
 
         try {
             User newUser = userRepo.save(user);
-            if (newUser != null) {
-                return true;
-            } else {
-                return false;
-            }
+            return true;
         } catch (TransactionSystemException e) {
             e.printStackTrace();
         }
@@ -74,9 +65,8 @@ public class UserServiceJPA {
     }
 
     public String verifyLogin(User user) {
-
         try {
-            Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
 
             if (authentication.isAuthenticated()) {
                 return jwtService.generateToken(user.getEmail(), user.getRole());
@@ -87,7 +77,6 @@ public class UserServiceJPA {
         } catch (AuthenticationException e) {
             return null;
         }
-
     }
 
     public boolean loginDeprecated(String password, User oldUser) {
@@ -111,14 +100,13 @@ public class UserServiceJPA {
         resetToken.setEmail(email);
         resetToken.setExpirationTime(System.currentTimeMillis() + 1000 * 60 * 15); // 15 min
 
-        tokenRepo.save(resetToken);
+        passwordResetTokenRepo.save(resetToken);
 
-        // Send email
         emailService.sendResetEmail(email, token);
     }
 
     public boolean resetPassword(String token, String newPassword) {
-        Optional<PasswordResetToken> optional = tokenRepo.findByToken(token);
+        Optional<PasswordResetToken> optional = passwordResetTokenRepo.findByToken(token);
 
         if (optional.isEmpty()) {
             return false;
@@ -138,13 +126,13 @@ public class UserServiceJPA {
         user.setPassword(bCryptPasswordEncoder.encode(newPassword));
         userRepo.save(user);
 
-        tokenRepo.delete(resetToken);
+        passwordResetTokenRepo.delete(resetToken);
 
         return true;
     }
 
     public boolean updateUser(User user) {
-        Optional<User> optional = userRepo.findByEmail(authenticationServiceJPA.getEmailFromToken(request.getHeader("Authorization")));
+        Optional<User> optional = userRepo.findByEmail(authenticationServiceJPA.getEmailFromToken(httpServletRequest.getHeader("Authorization")));
         if (optional.isEmpty()) {
             return false;
         }
@@ -173,6 +161,6 @@ public class UserServiceJPA {
     }
 
     public boolean doesUserExists() {
-        return userRepo.findByEmail(authenticationServiceJPA.getEmailFromToken(request.getHeader("Authorization"))).isPresent();
+        return userRepo.findByEmail(authenticationServiceJPA.getEmailFromToken(httpServletRequest.getHeader("Authorization"))).isPresent();
     }
 }

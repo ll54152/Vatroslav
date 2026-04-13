@@ -2,6 +2,7 @@ package com.inventar.backend.service;
 
 import com.inventar.backend.domain.User;
 import com.inventar.backend.repo.UserRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,6 +13,7 @@ public class UserDetailsServiceJPA implements UserDetailsService {
 
     private final UserRepo userRepo;
 
+    @Autowired
     public UserDetailsServiceJPA(UserRepo userRepo) {
         this.userRepo = userRepo;
     }
