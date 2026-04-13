@@ -1,20 +1,20 @@
 package com.inventar.backend.DTO;
 
-public class FilesShowDTO {
+public class FileShowDTO {
 
     private Long id;
     private String name;
     private String fileCategory;
     private String fileByte;
 
-    public FilesShowDTO(Long id, String name, String fileCategory, String fileByte) {
+    public FileShowDTO(Long id, String name, String fileCategory, String fileByte) {
         this.id = id;
         this.name = name;
         this.fileCategory = fileCategory;
         this.fileByte = fileByte;
     }
 
-    public FilesShowDTO() {
+    public FileShowDTO() {
     }
 
     public Long getId() {

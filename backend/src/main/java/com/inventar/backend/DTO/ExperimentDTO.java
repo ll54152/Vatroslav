@@ -1,17 +1,14 @@
 package com.inventar.backend.DTO;
 
-public class EksperimentDTO {
+public class ExperimentDTO {
+
     private Long id;
-
     private String name;
-
     private String zpf;
-
     private String description;
-
     private String keywords;
 
-    public EksperimentDTO(Long id, String name, String zpf, String description, String keywords) {
+    public ExperimentDTO(Long id, String name, String zpf, String description, String keywords) {
         this.id = id;
         this.name = name;
         this.zpf = zpf;
@@ -19,7 +16,7 @@ public class EksperimentDTO {
         this.keywords = keywords;
     }
 
-    public EksperimentDTO() {
+    public ExperimentDTO() {
     }
 
     public Long getId() {

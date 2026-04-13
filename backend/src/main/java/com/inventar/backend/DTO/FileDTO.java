@@ -2,7 +2,7 @@ package com.inventar.backend.DTO;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public class FilesDTO {
+public class FileDTO {
 
     private String name;
     private MultipartFile data;
@@ -10,15 +10,15 @@ public class FilesDTO {
     private String fileCategory;
     private Long entityId;
 
-    public FilesDTO() {
+    public FileDTO() {
     }
 
-    public FilesDTO(String name, MultipartFile data) {
+    public FileDTO(String name, MultipartFile data) {
         this.name = name;
         this.data = data;
     }
 
-    public FilesDTO(String name, MultipartFile data, String entityType, String fileCategory, Long entityId) {
+    public FileDTO(String name, MultipartFile data, String entityType, String fileCategory, Long entityId) {
         this.name = name;
         this.data = data;
         this.entityType = entityType;

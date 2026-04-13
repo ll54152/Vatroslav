@@ -1,12 +1,9 @@
 package com.inventar.backend.DTO;
 
-
 public class LogAddDTO {
 
     private String note;
-
     private String entityType;
-
     private Long entityId;
 
     public LogAddDTO() {

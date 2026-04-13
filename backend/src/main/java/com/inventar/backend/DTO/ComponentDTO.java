@@ -1,6 +1,6 @@
 package com.inventar.backend.DTO;
 
-public class KomponentaDTO {
+public class ComponentDTO {
 
     private Long id;
     private String name;
@@ -8,7 +8,7 @@ public class KomponentaDTO {
     private String description;
     private String keywords;
 
-    public KomponentaDTO(Long id, String name, String ZPF, String description, String keywords) {
+    public ComponentDTO(Long id, String name, String ZPF, String description, String keywords) {
         this.id = id;
         this.name = name;
         this.ZPF = ZPF;
@@ -16,7 +16,7 @@ public class KomponentaDTO {
         this.keywords = keywords;
     }
 
-    public KomponentaDTO() {
+    public ComponentDTO() {
     }
 
     public String getKeywords() {

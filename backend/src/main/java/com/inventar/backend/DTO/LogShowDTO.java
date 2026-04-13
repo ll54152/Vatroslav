@@ -1,35 +1,22 @@
 package com.inventar.backend.DTO;
 
-import com.inventar.backend.domain.User;
-
 import java.time.LocalDateTime;
 
 public class LogShowDTO {
 
     private Long id;
-
     private String note;
-
     private LocalDateTime timestamp;
+    private UserShowDTO userShowDTO;
 
-    private UserShowDTO user;
-
-    public LogShowDTO(Long id, String note, LocalDateTime timestamp, UserShowDTO user) {
+    public LogShowDTO(Long id, String note, LocalDateTime timestamp, UserShowDTO userShowDTO) {
         this.id = id;
         this.note = note;
         this.timestamp = timestamp;
-        this.user = user;
+        this.userShowDTO = userShowDTO;
     }
 
     public LogShowDTO() {
-    }
-
-    public UserShowDTO getUser() {
-        return user;
-    }
-
-    public void setUser(UserShowDTO user) {
-        this.user = user;
     }
 
     public Long getId() {
@@ -54,5 +41,13 @@ public class LogShowDTO {
 
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public UserShowDTO getUserShowDTO() {
+        return userShowDTO;
+    }
+
+    public void setUserShowDTO(UserShowDTO userShowDTO) {
+        this.userShowDTO = userShowDTO;
     }
 }

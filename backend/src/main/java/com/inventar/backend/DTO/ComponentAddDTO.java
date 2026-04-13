@@ -2,28 +2,20 @@ package com.inventar.backend.DTO;
 
 import java.util.List;
 
-public class KomponentaAddDTO {
+public class ComponentAddDTO {
+
     private String name;
-
     private String zpf;
-
     private String fer;
-
     private int quantity;
-
-    private int locationID;
-
+    private Long locationID;
     private String description;
-
     private String keywords;
-
     private String log;
+    private List<ExperimentDTO> experimentDTOList;
+    private List<FileDTO> fileDTOList;
 
-    private List<EksperimentDTO> eksperiments;
-
-    private List<FilesDTO> files;
-
-    public KomponentaAddDTO(String name, String zpf, String fer, int quantity, int locationID, String description, String keywords, String log, List<EksperimentDTO> eksperiments, List<FilesDTO> files) {
+    public ComponentAddDTO(String name, String zpf, String fer, int quantity, Long locationID, String description, String keywords, String log, List<ExperimentDTO> experimentDTOList, List<FileDTO> fileDTOList) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
@@ -32,14 +24,14 @@ public class KomponentaAddDTO {
         this.description = description;
         this.keywords = keywords;
         this.log = log;
-        this.eksperiments = eksperiments;
-        this.files = files;
+        this.experimentDTOList = experimentDTOList;
+        this.fileDTOList = fileDTOList;
     }
 
-    public KomponentaAddDTO() {
+    public ComponentAddDTO() {
     }
 
-    public KomponentaAddDTO(String name, String zpf, String fer, int quantity, int locationID, String description, String keywords, String log, List<EksperimentDTO> eksperiments) {
+    public ComponentAddDTO(String name, String zpf, String fer, int quantity, Long locationID, String description, String keywords, String log, List<ExperimentDTO> experimentDTOList) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
@@ -48,10 +40,10 @@ public class KomponentaAddDTO {
         this.description = description;
         this.keywords = keywords;
         this.log = log;
-        this.eksperiments = eksperiments;
+        this.experimentDTOList = experimentDTOList;
     }
 
-    public KomponentaAddDTO(String name, String zpf, String fer, int quantity, int locationID, String description,String keywords, String log) {
+    public ComponentAddDTO(String name, String zpf, String fer, int quantity, Long locationID, String description, String keywords, String log) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
@@ -62,7 +54,7 @@ public class KomponentaAddDTO {
         this.log = log;
     }
 
-    public KomponentaAddDTO(String name, String zpf, String fer, int quantity, int locationID, String description) {
+    public ComponentAddDTO(String name, String zpf, String fer, int quantity, Long locationID, String description) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
@@ -103,11 +95,11 @@ public class KomponentaAddDTO {
         this.quantity = quantity;
     }
 
-    public int getLocationID() {
+    public Long getLocationID() {
         return locationID;
     }
 
-    public void setLocationID(int locationID) {
+    public void setLocationID(Long locationID) {
         this.locationID = locationID;
     }
 
@@ -119,6 +111,14 @@ public class KomponentaAddDTO {
         this.description = description;
     }
 
+    public String getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
+    }
+
     public String getLog() {
         return log;
     }
@@ -127,27 +127,19 @@ public class KomponentaAddDTO {
         this.log = log;
     }
 
-    public List<EksperimentDTO> getEksperiments() {
-        return eksperiments;
+    public List<ExperimentDTO> getExperimentDTOList() {
+        return experimentDTOList;
     }
 
-    public void setEksperiments(List<EksperimentDTO> eksperiments) {
-        this.eksperiments = eksperiments;
+    public void setExperimentDTOList(List<ExperimentDTO> experimentDTOList) {
+        this.experimentDTOList = experimentDTOList;
     }
 
-    public List<FilesDTO> getFiles() {
-        return files;
+    public List<FileDTO> getFileDTOList() {
+        return fileDTOList;
     }
 
-    public void setFiles(List<FilesDTO> files) {
-        this.files = files;
-    }
-
-    public String getKeywords() {
-        return keywords;
-    }
-
-    public void setKeywords(String keywords) {
-        this.keywords = keywords;
+    public void setFileDTOList(List<FileDTO> fileDTOList) {
+        this.fileDTOList = fileDTOList;
     }
 }
