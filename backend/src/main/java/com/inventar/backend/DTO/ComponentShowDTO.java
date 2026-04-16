@@ -11,15 +11,15 @@ public class ComponentShowDTO {
     private int quantity;
     private LocationDTO locationDTO;
     private String description;
-    private String keywords;
+    private List<String> keywords;
     private List<ExperimentShowDTO> experimentShowDTOList;
-    private List<LogShowDTO> logShowDTOListw;
+    private List<LogShowDTO> logShowDTOList;
     private List<FileShowDTO> fileShowDTOList;
 
     public ComponentShowDTO() {
     }
 
-    public ComponentShowDTO(Long id, String name, String zpf, String fer, int quantity, LocationDTO locationDTO, String description, String keywords, List<ExperimentShowDTO> experimentShowDTOList, List<LogShowDTO> logShowDTOListw, List<FileShowDTO> fileShowDTOList) {
+    public ComponentShowDTO(Long id, String name, String zpf, String fer, int quantity, LocationDTO locationDTO, String description, List<String> keywords, List<ExperimentShowDTO> experimentShowDTOList, List<LogShowDTO> logShowDTOList, List<FileShowDTO> fileShowDTOList) {
         this.id = id;
         this.name = name;
         this.zpf = zpf;
@@ -29,7 +29,7 @@ public class ComponentShowDTO {
         this.description = description;
         this.keywords = keywords;
         this.experimentShowDTOList = experimentShowDTOList;
-        this.logShowDTOListw = logShowDTOListw;
+        this.logShowDTOList = logShowDTOList;
         this.fileShowDTOList = fileShowDTOList;
     }
 
@@ -89,11 +89,11 @@ public class ComponentShowDTO {
         this.description = description;
     }
 
-    public String getKeywords() {
+    public List<String> getKeywords() {
         return keywords;
     }
 
-    public void setKeywords(String keywords) {
+    public void setKeywords(List<String> keywords) {
         this.keywords = keywords;
     }
 
@@ -105,12 +105,12 @@ public class ComponentShowDTO {
         this.experimentShowDTOList = experimentShowDTOList;
     }
 
-    public List<LogShowDTO> getLogShowDTOListw() {
-        return logShowDTOListw;
+    public List<LogShowDTO> getLogShowDTOList() {
+        return logShowDTOList;
     }
 
-    public void setLogShowDTOListw(List<LogShowDTO> logShowDTOListw) {
-        this.logShowDTOListw = logShowDTOListw;
+    public void setLogShowDTOList(List<LogShowDTO> logShowDTOList) {
+        this.logShowDTOList = logShowDTOList;
     }
 
     public List<FileShowDTO> getFileShowDTOList() {

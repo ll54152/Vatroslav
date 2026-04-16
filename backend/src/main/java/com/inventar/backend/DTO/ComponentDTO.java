@@ -1,14 +1,16 @@
 package com.inventar.backend.DTO;
 
+import java.util.List;
+
 public class ComponentDTO {
 
     private Long id;
     private String name;
     private String ZPF;
     private String description;
-    private String keywords;
+    private List<String> keywords;
 
-    public ComponentDTO(Long id, String name, String ZPF, String description, String keywords) {
+    public ComponentDTO(Long id, String name, String ZPF, String description, List<String> keywords) {
         this.id = id;
         this.name = name;
         this.ZPF = ZPF;
@@ -19,11 +21,11 @@ public class ComponentDTO {
     public ComponentDTO() {
     }
 
-    public String getKeywords() {
+    public List<String> getKeywords() {
         return keywords;
     }
 
-    public void setKeywords(String keywords) {
+    public void setKeywords(List<String> keywords) {
         this.keywords = keywords;
     }
 

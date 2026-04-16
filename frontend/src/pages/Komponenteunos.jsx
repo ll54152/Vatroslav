@@ -119,15 +119,24 @@ function Komponenteunos() {
         const token = localStorage.getItem("jwt");
 
         const formToSend = new FormData();
-        formToSend.append("name", componentName);
-        formToSend.append("zpf", internalCode + optionalNumbers);
-        formToSend.append("locationID", location);
-        formToSend.append("quantity", quantity);
-        formToSend.append("description", description);
-        formToSend.append("log", notes);
-        formToSend.append("fer", status);
-        formToSend.append("eksperimentIDs", JSON.stringify(selectedExperiments.map(e => e.id)));
-        formToSend.append("keywords", keywords);
+
+        const requestData = {
+            name: componentName,
+            fer: status,
+            zpf: internalCode + optionalNumbers,
+            quantity: Number(quantity),
+            locationID: Number(location),
+            description: description,
+            keywords: keywords
+                ? keywords.split(",").map(k => k.trim())
+                : [],
+            experimentIds: selectedExperiments.map(e => e.id),
+        };
+
+        formToSend.append(
+            "data",
+            new Blob([JSON.stringify(requestData)], { type: "application/json" })
+        );
 
         files.forEach((file) => {
             formToSend.append("files", file);

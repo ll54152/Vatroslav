@@ -1,5 +1,6 @@
 package com.inventar.backend.service;
 
+import com.inventar.backend.DTO.UserShowDTO;
 import com.inventar.backend.domain.User;
 import com.inventar.backend.domain.PasswordResetToken;
 import com.inventar.backend.repo.PasswordResetTokenRepo;
@@ -22,13 +23,13 @@ import java.util.Optional;
 @Service
 public class UserServiceJPA {
 
-    private UserRepo userRepo;
-    private AuthenticationManager authenticationManager;
-    private JWTService jwtService;
-    private PasswordResetTokenRepo passwordResetTokenRepo;
-    private EmailService emailService;
-    private HttpServletRequest httpServletRequest;
-    private AuthenticationServiceJPA authenticationServiceJPA;
+    private final UserRepo userRepo;
+    private final AuthenticationManager authenticationManager;
+    private final JWTService jwtService;
+    private final PasswordResetTokenRepo passwordResetTokenRepo;
+    private final EmailService emailService;
+    private final HttpServletRequest httpServletRequest;
+    private final AuthenticationServiceJPA authenticationServiceJPA;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
@@ -162,5 +163,22 @@ public class UserServiceJPA {
 
     public boolean doesUserExists() {
         return userRepo.findByEmail(authenticationServiceJPA.getEmailFromToken(httpServletRequest.getHeader("Authorization"))).isPresent();
+    }
+
+    public User getAuthenticatedUser() {
+        String email = authenticationServiceJPA.getEmailFromToken(httpServletRequest.getHeader("Authorization"));
+        return userRepo.findByEmail(email).orElse(null);
+    }
+
+    public UserShowDTO mapUserToDTO(User user) {
+        if (user == null) {
+            return null;
+        } else {
+            UserShowDTO userShowDTO = new UserShowDTO();
+            userShowDTO.setEmail(user.getEmail());
+            userShowDTO.setFirstName(user.getFirstName());
+            userShowDTO.setLastName(user.getLastName());
+            return userShowDTO;
+        }
     }
 }

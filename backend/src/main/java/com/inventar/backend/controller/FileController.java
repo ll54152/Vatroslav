@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequestMapping("/files")
 public class FileController {
 
-    private FileServiceJPA fileServiceJPA;
+    private final FileServiceJPA fileServiceJPA;
 
     @Autowired
     public FileController(FileServiceJPA fileServiceJPA) {
@@ -26,7 +26,7 @@ public class FileController {
     public ResponseEntity<File> uploadFile(FileDTO fileDTO) {
 
         if (fileDTO.getEntityType().equals("eksperiment")) {
-            File newFile = fileServiceJPA.uploadEksperimentFile(fileDTO);
+            File newFile = fileServiceJPA.uploadExperimentFile(fileDTO);
 
             if (newFile != null) {
                 return ResponseEntity.ok(newFile);

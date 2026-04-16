@@ -9,6 +9,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
+import jakarta.persistence.ElementCollection;
 
 import java.util.List;
 
@@ -32,8 +33,8 @@ public class Component {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(columnDefinition = "TEXT")
-    private String keywords;
+    @ElementCollection
+    private List<String> keywords;
 
     @OneToMany(mappedBy = "component")
     private List<Log> logList;
@@ -52,7 +53,7 @@ public class Component {
     public Component() {
     }
 
-    public Component(String name, String zpf, String fer, int quantity, Location location, String description, String keywords, List<Log> logList, List<Experiment> experimentList) {
+    public Component(String name, String zpf, String fer, int quantity, Location location, String description, List<String> keywords, List<Log> logList, List<Experiment> experimentList) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
@@ -64,7 +65,7 @@ public class Component {
         this.experimentList = experimentList;
     }
 
-    public Component(String name, String zpf, String fer, int quantity, String description, String keywords, Location location, List<Experiment> experimentList) {
+    public Component(String name, String zpf, String fer, int quantity, String description, List<String> keywords, Location location, List<Experiment> experimentList) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
@@ -75,7 +76,7 @@ public class Component {
         this.experimentList = experimentList;
     }
 
-    public Component(String name, String zpf, String fer, int quantity, String description, String keywords, Location location) {
+    public Component(String name, String zpf, String fer, int quantity, String description, List<String> keywords, Location location) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
@@ -141,11 +142,11 @@ public class Component {
         this.description = description;
     }
 
-    public String getKeywords() {
+    public List<String> getKeywords() {
         return keywords;
     }
 
-    public void setKeywords(String keywords) {
+    public void setKeywords(List<String> keywords) {
         this.keywords = keywords;
     }
 

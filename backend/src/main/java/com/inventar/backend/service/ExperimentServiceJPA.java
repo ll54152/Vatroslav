@@ -125,14 +125,6 @@ public class ExperimentServiceJPA {
     }
 
 
-    public List<Experiment> findAll() {
-        return experimentRepo.findAll();
-    }
-
-    public Experiment findById(Long id) {
-        return experimentRepo.findById(id).orElse(null);
-    }
-
     public void deleteById(Long id) {
         Experiment experiment = experimentRepo.findById(id).orElse(null);
 
@@ -376,5 +368,52 @@ public class ExperimentServiceJPA {
         experimentRepo.save(experiment);
 
         return "Upješno ažuriran eksperiment";
+    }
+
+    public List<ExperimentShowDTO> mapExperimentsToDTOs(List<Experiment> experimentList) {
+        if (experimentList == null) {
+            return List.of();
+        } else {
+            List<ExperimentShowDTO> experimentShowDTOList = new ArrayList<>();
+
+            for (Experiment experiment : experimentList){
+                ExperimentShowDTO experimentShowDTO = new ExperimentShowDTO();
+                experimentShowDTO.setId(experiment.getId());
+                experimentShowDTO.setName(experiment.getName());
+                experimentShowDTO.setZpf(experiment.getZpf());
+                experimentShowDTO.setSubject(experiment.getSubject());
+                experimentShowDTO.setField(experiment.getField());
+                experimentShowDTO.setDescription(experiment.getDescription());
+                experimentShowDTO.setKeywords(experiment.getKeywords());
+                experimentShowDTO.setMaterials(experiment.getMaterials());
+
+                experimentShowDTOList.add(experimentShowDTO);
+            }
+
+            return experimentShowDTOList;
+        }
+    }
+
+    public List<Experiment> findAll() {
+        return experimentRepo.findAll();
+    }
+
+    public Experiment findById(Long id) {
+        return experimentRepo.findById(id).orElse(null);
+    }
+
+    public List<Experiment> findAllbyIds(List<Long> experimentIds) {
+        List<Experiment> experimentList = new ArrayList<>();
+        for (Long experimentId : experimentIds) {
+            Experiment experiment = experimentRepo.findById(experimentId).orElse(null);
+            if (experiment != null) {
+                experimentList.add(experiment);
+            }
+        }
+        return experimentList;
+    }
+
+    public void quickUpdate(Experiment experiment){
+        experimentRepo.save(experiment);
     }
 }
