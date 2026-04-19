@@ -3,8 +3,11 @@ package com.inventar.backend.service;
 import com.inventar.backend.DTO.FileDTO;
 import com.inventar.backend.DTO.FileShowDTO;
 import com.inventar.backend.domain.Component;
+import com.inventar.backend.domain.Experiment;
 import com.inventar.backend.domain.File;
 import com.inventar.backend.domain.User;
+import com.inventar.backend.repo.ComponentRepo;
+import com.inventar.backend.repo.ExperimentRepo;
 import com.inventar.backend.repo.FileRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,17 +22,18 @@ import java.util.List;
 public class FileServiceJPA {
 
     private final FileRepo fileRepo;
-    private final ExperimentServiceJPA experimentServiceJPA;
+    private final ExperimentRepo experimentRepo;
+    private final ComponentRepo componentRepo;
+
     private final LogServiceJPA logServiceJPA;
-    private final ComponentServiceJPA componentServiceJPA;
     private final UserServiceJPA userServiceJPA;
 
     @Autowired
-    public FileServiceJPA(FileRepo fileRepo, ExperimentServiceJPA experimentServiceJPA, LogServiceJPA logServiceJPA, ComponentServiceJPA componentServiceJPA, UserServiceJPA userServiceJPA) {
+    public FileServiceJPA(FileRepo fileRepo, ExperimentRepo experimentRepo, LogServiceJPA logServiceJPA, ComponentRepo componentRepo, UserServiceJPA userServiceJPA) {
         this.fileRepo = fileRepo;
-        this.experimentServiceJPA = experimentServiceJPA;
+        this.experimentRepo = experimentRepo;
         this.logServiceJPA = logServiceJPA;
-        this.componentServiceJPA = componentServiceJPA;
+        this.componentRepo = componentRepo;
         this.userServiceJPA = userServiceJPA;
     }
 
@@ -60,7 +64,7 @@ public class FileServiceJPA {
                 userServiceJPA.getAuthenticatedUser()
         );
 
-        file.setExperiment(experimentServiceJPA.findById(fileDTO.getEntityId()));
+        file.setExperiment(experimentRepo.findById(fileDTO.getEntityId()).orElseThrow(() -> new RuntimeException("Experiment not found")));
         return fileRepo.save(file);
     }
 
@@ -75,7 +79,7 @@ public class FileServiceJPA {
                 userServiceJPA.getAuthenticatedUser()
         );
 
-        file.setComponent(componentServiceJPA.findById(fileDTO.getEntityId()));
+        file.setComponent(componentRepo.findById(fileDTO.getEntityId()).orElseThrow(() -> new RuntimeException("Location not found")));
 
         return fileRepo.save(file);
     }
@@ -103,6 +107,43 @@ public class FileServiceJPA {
         }
     }
 
+    public void handleExperimentFiles(Experiment experiment, MultipartFile[] files, MultipartFile profileImage, User user) {
+        List<MultipartFile> multipartFiles = new ArrayList<>();
+
+        if (files != null) {
+            multipartFiles.addAll(List.of(files));
+        }
+
+        if (profileImage != null) {
+            multipartFiles.add(profileImage);
+        }
+
+        for (MultipartFile fileData : multipartFiles) {
+            try {
+                File file = new File();
+                file.setName(fileData.getOriginalFilename());
+                file.setExperiment(experiment);
+                file.setFileType(fileData.getContentType());
+
+                file.setFileCategory(
+                        fileData.equals(profileImage) ? "profileImage" : "general"
+                );
+
+
+                file.setUser(user);
+                file.setFileByte(fileData.getBytes());
+
+                fileRepo.save(file);
+
+                logServiceJPA.fileExperimentCreation(experiment, file, user);
+
+            } catch (Exception e) {
+                throw new RuntimeException("File upload failed", e);
+            }
+        }
+
+    }
+
     public File findById(Long fileId) {
         return fileRepo.findById(fileId).orElse(null);
     }
@@ -115,9 +156,7 @@ public class FileServiceJPA {
     }
 
     public void deleteFiles(List<File> fileList) {
-        if (fileList == null || fileList.isEmpty()) {
-            return;
-        } else {
+        if (fileList != null && !fileList.isEmpty()) {
             fileRepo.deleteAll(fileList);
         }
     }

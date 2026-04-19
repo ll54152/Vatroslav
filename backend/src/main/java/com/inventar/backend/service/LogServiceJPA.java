@@ -7,6 +7,8 @@ import com.inventar.backend.domain.Experiment;
 import com.inventar.backend.domain.File;
 import com.inventar.backend.domain.Log;
 import com.inventar.backend.domain.User;
+import com.inventar.backend.repo.ComponentRepo;
+import com.inventar.backend.repo.ExperimentRepo;
 import com.inventar.backend.repo.LogRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,15 +21,16 @@ import java.util.List;
 public class LogServiceJPA {
 
     private final UserServiceJPA userServiceJPA;
-    private final ComponentServiceJPA componentServiceJPA;
-    private final ExperimentServiceJPA experimentServiceJPA;
+
+    private final ComponentRepo componentRepo;
+    private final ExperimentRepo experimentRepo;
     private final LogRepo logRepo;
 
     @Autowired
-    public LogServiceJPA(UserServiceJPA userServiceJPA, ComponentServiceJPA componentServiceJPA, ExperimentServiceJPA experimentServiceJPA, LogRepo logRepo) {
+    public LogServiceJPA(UserServiceJPA userServiceJPA, ComponentRepo componentRepo, ExperimentRepo experimentRepo, LogRepo logRepo) {
         this.userServiceJPA = userServiceJPA;
-        this.componentServiceJPA = componentServiceJPA;
-        this.experimentServiceJPA = experimentServiceJPA;
+        this.componentRepo = componentRepo;
+        this.experimentRepo = experimentRepo;
         this.logRepo = logRepo;
     }
 
@@ -52,7 +55,7 @@ public class LogServiceJPA {
         componentLog.setTimestamp(LocalDateTime.now());
         componentLog.setUser(user);
         componentLog.setComponent(component);
-        componentLog.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio komponentu '" + component.getName() + "' iz eksperimenta '" + experiment.getName() + "'");
+        componentLog.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio eksperiment '" + experiment.getName() + "' iz komponente '" + component.getName() + "'");
         logRepo.save(componentLog);
 
         Log experimentLog = new Log();
@@ -90,6 +93,33 @@ public class LogServiceJPA {
         logRepo.save(log);
     }
 
+    public void experimentCreation(Experiment experiment, User user) {
+        Log log = new Log();
+        log.setTimestamp(LocalDateTime.now());
+        log.setUser(user);
+        log.setExperiment(experiment);
+        log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao eksperiment '" + experiment.getName() + "' u bazu podataka");
+        logRepo.save(log);
+    }
+
+    public void experimentDeletion(Experiment experiment, User user) {
+        Log log = new Log();
+        log.setTimestamp(LocalDateTime.now());
+        log.setUser(user);
+        log.setExperiment(experiment);
+        log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio eksperiment '" + experiment.getName() + "' iz baze podataka");
+        logRepo.save(log);
+    }
+
+    public void fileExperimentCreation(Experiment experiment, File file, User user) {
+        Log log = new Log();
+        log.setTimestamp(LocalDateTime.now());
+        log.setUser(user);
+        log.setExperiment(experiment);
+        log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao datoteku '" + file.getName() + "' u eksperiment '" + experiment.getName() + "'");
+        logRepo.save(log);
+    }
+
     public Log save(LogAddDTO logAddDTO) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
@@ -97,24 +127,12 @@ public class LogServiceJPA {
         log.setNote(logAddDTO.getNote());
 
         if (logAddDTO.getEntityType().equals("eksperiment")) {
-            log.setExperiment(experimentServiceJPA.findById(logAddDTO.getEntityId()));
+            log.setExperiment(experimentRepo.findById(logAddDTO.getEntityId()).orElseThrow(() -> new RuntimeException("Experiment not found")));
         } else if (logAddDTO.getEntityType().equals("komponenta")) {
-            log.setComponent(componentServiceJPA.findById(logAddDTO.getEntityId()));
+            log.setComponent(componentRepo.findById(logAddDTO.getEntityId()).orElseThrow(() -> new RuntimeException("Component not found")));
         }
 
         return logRepo.save(log);
-    }
-
-    public List<Log> findAll() {
-        return logRepo.findAll();
-    }
-
-    public Log findById(Long id) {
-        return logRepo.findById(id).orElse(null);
-    }
-
-    public void quickSave(Log log) {
-        logRepo.save(log);
     }
 
     public List<Log> findByExperimentId(Long experimentId) {
@@ -156,10 +174,20 @@ public class LogServiceJPA {
     }
 
     public void deleteLogs(List<Log> logList) {
-        if (logList == null || logList.isEmpty()) {
-            return;
-        } else {
+        if (logList != null && !logList.isEmpty()) {
             logRepo.deleteAll(logList);
         }
+    }
+
+    public List<Log> findAll() {
+        return logRepo.findAll();
+    }
+
+    public Log findById(Long id) {
+        return logRepo.findById(id).orElse(null);
+    }
+
+    public void quickSave(Log log) {
+        logRepo.save(log);
     }
 }

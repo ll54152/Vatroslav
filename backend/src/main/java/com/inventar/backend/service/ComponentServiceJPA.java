@@ -6,29 +6,42 @@ import com.inventar.backend.domain.Component;
 import com.inventar.backend.domain.Experiment;
 import com.inventar.backend.domain.User;
 import com.inventar.backend.domain.Location;
+import com.inventar.backend.mapper.ExperimentMapper;
+import com.inventar.backend.mapper.LocationMapper;
 import com.inventar.backend.repo.ComponentRepo;
+import com.inventar.backend.repo.ExperimentRepo;
+import com.inventar.backend.repo.LocationRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ComponentServiceJPA {
 
     private final ComponentRepo componentRepo;
-    private final ExperimentServiceJPA experimentServiceJPA;
+
+    private final ExperimentRepo experimentRepo;
+    private final ExperimentMapper experimentMapper;
+
     private final UserServiceJPA userServiceJPA;
-    private final LocationServiceJPA locationServiceJPA;
+
+    private final LocationMapper locationMapper;
+    private final LocationRepo locationRepo;
+
     private final LogServiceJPA logServiceJPA;
     private final FileServiceJPA fileServiceJPA;
 
     @Autowired
-    public ComponentServiceJPA(ComponentRepo componentRepo, ExperimentServiceJPA experimentServiceJPA, UserServiceJPA userServiceJPA, LocationServiceJPA locationServiceJPA, LogServiceJPA logServiceJPA, FileServiceJPA fileServiceJPA) {
+    public ComponentServiceJPA(ComponentRepo componentRepo, ExperimentRepo experimentRepo, ExperimentMapper experimentMapper, UserServiceJPA userServiceJPA, LocationMapper locationMapper, LocationRepo locationRepo, LogServiceJPA logServiceJPA, FileServiceJPA fileServiceJPA) {
         this.componentRepo = componentRepo;
-        this.experimentServiceJPA = experimentServiceJPA;
+        this.experimentRepo = experimentRepo;
+        this.experimentMapper = experimentMapper;
         this.userServiceJPA = userServiceJPA;
-        this.locationServiceJPA = locationServiceJPA;
+        this.locationMapper = locationMapper;
+        this.locationRepo = locationRepo;
         this.logServiceJPA = logServiceJPA;
         this.fileServiceJPA = fileServiceJPA;
     }
@@ -36,11 +49,11 @@ public class ComponentServiceJPA {
     public Component save(ComponentAddDTO componentAddDTO, MultipartFile[] files) {
         User user = userServiceJPA.getAuthenticatedUser();
 
-        Location location = locationServiceJPA.findById(componentAddDTO.getLocationID());
+        Location location = locationRepo.findById(componentAddDTO.getLocationID()).orElseThrow(() -> new RuntimeException("Location not found"));
 
-        List<Experiment> experimentList = experimentServiceJPA.findAllbyIds(componentAddDTO.getExperimentIds());
+        List<Experiment> experimentList = experimentRepo.findAllById(componentAddDTO.getExperimentIds());
 
-        Component component = mapToEntity(componentAddDTO, location, experimentList);
+        Component component = mapDTOtoEntity(componentAddDTO, location, experimentList);
 
         componentRepo.save(component);
 
@@ -50,49 +63,6 @@ public class ComponentServiceJPA {
 
         linkExperimentsWithComponent(component, experimentList, user);
 
-        return component;
-    }
-
-    private void linkExperimentsWithComponent(Component component, List<Experiment> experimentList, User user) {
-        if (experimentList == null) {
-            return;
-        } else {
-            for (Experiment experiment : experimentList) {
-                experiment.getComponentList().add(component);
-
-                logServiceJPA.linkComponentAndExperiment(component, experiment, user);
-
-                experimentServiceJPA.quickUpdate(experiment);
-            }
-        }
-    }
-
-    private void unlinkExperimentsFromComponent(Component component, User user) {
-        if (component.getExperimentList() == null) {
-            return;
-        } else {
-            for (Experiment experiment : component.getExperimentList()) {
-                experiment.getComponentList().remove(component);
-
-                logServiceJPA.unlinkComponentFromExperiment(component, experiment, user);
-            }
-        }
-    }
-
-    private Component mapToEntity(ComponentAddDTO componentAddDTO, Location location, List<Experiment> experimentList) {
-        Component component = new Component(
-                componentAddDTO.getName(),
-                componentAddDTO.getZpf(),
-                componentAddDTO.getFer(),
-                componentAddDTO.getQuantity(),
-                componentAddDTO.getDescription(),
-                componentAddDTO.getKeywords(),
-                location
-        );
-
-        if (!experimentList.isEmpty()) {
-            component.setExperimentList(experimentList);
-        }
         return component;
     }
 
@@ -125,12 +95,88 @@ public class ComponentServiceJPA {
             componentShowDTO.setKeywords(component.getKeywords());
             componentShowDTO.setQuantity(component.getQuantity());
 
-            componentShowDTO.setLocationDTO(locationServiceJPA.mapLocationToDTO(component.getLocation()));
-            componentShowDTO.setExperimentShowDTOList(experimentServiceJPA.mapExperimentsToDTOs(component.getExperimentList()));
+            componentShowDTO.setLocationDTO(locationMapper.mapLocationToDTO(component.getLocation()));
+            componentShowDTO.setExperimentShowDTOList(experimentMapper.mapExperimentsToDTOs(component.getExperimentList()));
             componentShowDTO.setLogShowDTOList(logServiceJPA.mapLogsToDTOs(component.getLogList()));
             componentShowDTO.setFileShowDTOList(fileServiceJPA.mapFilesToDTOs(component.getFileList()));
 
             return componentShowDTO;
+        }
+    }
+
+    public List<ComponentShowDTO> mapComponentsToDTOs(List<Component> componentList) {
+        if (componentList == null) {
+            return List.of();
+        } else {
+            List<ComponentShowDTO> componentShowDTOList = new ArrayList<>();
+
+            for (Component component : componentList) {
+                ComponentShowDTO componentShowDTO = new ComponentShowDTO();
+                componentShowDTO.setId(component.getId());
+                componentShowDTO.setName(component.getName());
+                componentShowDTO.setZpf(component.getZpf());
+                componentShowDTO.setFer(component.getFer());
+                componentShowDTO.setDescription(component.getDescription());
+                componentShowDTO.setKeywords(component.getKeywords());
+                componentShowDTO.setQuantity(component.getQuantity());
+
+                componentShowDTOList.add(componentShowDTO);
+            }
+
+            return componentShowDTOList;
+        }
+    }
+
+    private void linkExperimentsWithComponent(Component component, List<Experiment> experimentList, User user) {
+        if (experimentList != null) {
+            for (Experiment experiment : experimentList) {
+                experiment.getComponentList().add(component);
+
+                experimentRepo.save(experiment);
+
+                logServiceJPA.linkComponentAndExperiment(component, experiment, user);
+            }
+        }
+    }
+
+    private void unlinkExperimentsFromComponent(Component component, User user) {
+        if (component.getExperimentList() != null) {
+            for (Experiment experiment : component.getExperimentList()) {
+                experiment.getComponentList().remove(component);
+
+                experimentRepo.save(experiment);
+
+                logServiceJPA.unlinkComponentFromExperiment(component, experiment, user);
+            }
+        }
+    }
+
+    private Component mapDTOtoEntity(ComponentAddDTO componentAddDTO, Location location, List<Experiment> experimentList) {
+        Component component = new Component(
+                componentAddDTO.getName(),
+                componentAddDTO.getZpf(),
+                componentAddDTO.getFer(),
+                componentAddDTO.getQuantity(),
+                componentAddDTO.getDescription(),
+                componentAddDTO.getKeywords(),
+                location
+        );
+
+        if (experimentList != null && !experimentList.isEmpty()) {
+            component.setExperimentList(experimentList);
+        }
+        return component;
+    }
+
+    public List<Component> findAllByIds(List<Long> componentIds) {
+        if (componentIds == null) {
+            return null;
+        } else {
+            List<Component> componentList = new ArrayList<>();
+            for (Long id : componentIds) {
+                componentRepo.findById(id).ifPresent(componentList::add);
+            }
+            return componentList;
         }
     }
 
@@ -144,5 +190,9 @@ public class ComponentServiceJPA {
 
     public List<Component> findAll() {
         return componentRepo.findAll();
+    }
+
+    public void quickSave(Component component) {
+        componentRepo.save(component);
     }
 }

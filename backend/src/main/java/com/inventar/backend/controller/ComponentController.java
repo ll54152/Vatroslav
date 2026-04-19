@@ -32,7 +32,8 @@ public class ComponentController {
     }
 
     @PostMapping(value = "/add")
-    public ResponseEntity<String> addComponent(@RequestPart("data") ComponentAddDTO componentAddDTO, @RequestPart(value = "files", required = false) MultipartFile[] files) {
+    public ResponseEntity<String> addComponent(@RequestPart("data") ComponentAddDTO componentAddDTO,
+                                               @RequestPart(value = "files", required = false) MultipartFile[] files) {
         componentServiceJPA.save(componentAddDTO, files);
         return ResponseEntity.status(HttpStatus.CREATED).body("Komponenta dodata uspešno");
     }
@@ -61,7 +62,7 @@ public class ComponentController {
         Component component = componentServiceJPA.findById(id);
         if (component != null) {
             componentServiceJPA.deleteById(id);
-            return new ResponseEntity<>("Komponenta obrisana uspešno", HttpStatus.OK);
+            return new ResponseEntity<>("Komponenta obrisana uspješno", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Komponenta nije pronađena", HttpStatus.NOT_FOUND);
         }

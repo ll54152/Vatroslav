@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/log")
 public class LogController {
 
-    private LogServiceJPA logServiceJPA;
+    private final LogServiceJPA logServiceJPA;
 
     @Autowired
     public LogController(LogServiceJPA logServiceJPA) {
