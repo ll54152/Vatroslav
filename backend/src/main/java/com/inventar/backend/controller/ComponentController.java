@@ -35,7 +35,7 @@ public class ComponentController {
     public ResponseEntity<String> addComponent(@RequestPart("data") ComponentAddDTO componentAddDTO,
                                                @RequestPart(value = "files", required = false) MultipartFile[] files) {
         componentServiceJPA.save(componentAddDTO, files);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Komponenta dodata uspešno");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Komponenta dodata uspješno");
     }
 
     @GetMapping("/getAll")

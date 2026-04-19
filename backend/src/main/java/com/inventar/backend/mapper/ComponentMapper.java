@@ -21,6 +21,8 @@ public class ComponentMapper {
                 componentShowDTO.setName(component.getName());
                 componentShowDTO.setZpf(component.getZpf());
                 componentShowDTO.setFer(component.getFer());
+                componentShowDTO.setFerStatus(component.getFerStatus());
+                componentShowDTO.setDeprecatedInventoryMarks(component.getDeprecatedInventoryMarks());
                 componentShowDTO.setDescription(component.getDescription());
                 componentShowDTO.setKeywords(component.getKeywords());
                 componentShowDTO.setQuantity(component.getQuantity());

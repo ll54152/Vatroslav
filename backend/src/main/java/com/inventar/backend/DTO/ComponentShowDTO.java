@@ -1,5 +1,7 @@
 package com.inventar.backend.DTO;
 
+import com.inventar.backend.enums.FerStatus;
+
 import java.util.List;
 
 public class ComponentShowDTO {
@@ -8,6 +10,8 @@ public class ComponentShowDTO {
     private String name;
     private String zpf;
     private String fer;
+    private FerStatus ferStatus;
+    private String deprecatedInventoryMarks;
     private int quantity;
     private LocationDTO locationDTO;
     private String description;
@@ -19,11 +23,13 @@ public class ComponentShowDTO {
     public ComponentShowDTO() {
     }
 
-    public ComponentShowDTO(Long id, String name, String zpf, String fer, int quantity, LocationDTO locationDTO, String description, List<String> keywords, List<ExperimentShowDTO> experimentShowDTOList, List<LogShowDTO> logShowDTOList, List<FileShowDTO> fileShowDTOList) {
+    public ComponentShowDTO(Long id, String name, String zpf, String fer, FerStatus ferStatus, String deprecatedInventoryMarks, int quantity, LocationDTO locationDTO, String description, List<String> keywords, List<ExperimentShowDTO> experimentShowDTOList, List<LogShowDTO> logShowDTOList, List<FileShowDTO> fileShowDTOList) {
         this.id = id;
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
+        this.ferStatus = ferStatus;
+        this.deprecatedInventoryMarks = deprecatedInventoryMarks;
         this.quantity = quantity;
         this.locationDTO = locationDTO;
         this.description = description;
@@ -119,5 +125,21 @@ public class ComponentShowDTO {
 
     public void setFileShowDTOList(List<FileShowDTO> fileShowDTOList) {
         this.fileShowDTOList = fileShowDTOList;
+    }
+
+    public FerStatus getFerStatus() {
+        return ferStatus;
+    }
+
+    public void setFerStatus(FerStatus ferStatus) {
+        this.ferStatus = ferStatus;
+    }
+
+    public String getDeprecatedInventoryMarks() {
+        return deprecatedInventoryMarks;
+    }
+
+    public void setDeprecatedInventoryMarks(String deprecatedInventoryMarks) {
+        this.deprecatedInventoryMarks = deprecatedInventoryMarks;
     }
 }

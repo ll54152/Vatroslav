@@ -1,5 +1,6 @@
 package com.inventar.backend.domain;
 
+import com.inventar.backend.enums.FerStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,6 +25,10 @@ public class Component {
     private String zpf;
 
     private String fer;
+
+    private FerStatus ferStatus;
+
+    private String deprecatedInventoryMarks;
 
     private int quantity;
 
@@ -53,10 +58,12 @@ public class Component {
     public Component() {
     }
 
-    public Component(String name, String zpf, String fer, int quantity, Location location, String description, List<String> keywords, List<Log> logList, List<Experiment> experimentList) {
+    public Component(String name, String zpf, String fer, FerStatus ferStatus, String deprecatedInventoryMarks, int quantity, Location location, String description, List<String> keywords, List<Log> logList, List<Experiment> experimentList) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
+        this.ferStatus = ferStatus;
+        this.deprecatedInventoryMarks = deprecatedInventoryMarks;
         this.quantity = quantity;
         this.location = location;
         this.description = description;
@@ -65,10 +72,12 @@ public class Component {
         this.experimentList = experimentList;
     }
 
-    public Component(String name, String zpf, String fer, int quantity, String description, List<String> keywords, Location location, List<Experiment> experimentList) {
+    public Component(String name, String zpf, String fer, FerStatus ferStatus, String deprecatedInventoryMarks, int quantity, String description, List<String> keywords, Location location, List<Experiment> experimentList) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
+        this.ferStatus = ferStatus;
+        this.deprecatedInventoryMarks = deprecatedInventoryMarks;
         this.quantity = quantity;
         this.description = description;
         this.keywords = keywords;
@@ -76,10 +85,12 @@ public class Component {
         this.experimentList = experimentList;
     }
 
-    public Component(String name, String zpf, String fer, int quantity, String description, List<String> keywords, Location location) {
+    public Component(String name, String zpf, String fer, FerStatus ferStatus, String deprecatedInventoryMarks, int quantity, String description, List<String> keywords, Location location) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
+        this.ferStatus = ferStatus;
+        this.deprecatedInventoryMarks = deprecatedInventoryMarks;
         this.quantity = quantity;
         this.description = description;
         this.keywords = keywords;
@@ -172,5 +183,21 @@ public class Component {
 
     public void setFileList(List<File> fileList) {
         this.fileList = fileList;
+    }
+
+    public String getDeprecatedInventoryMarks() {
+        return deprecatedInventoryMarks;
+    }
+
+    public void setDeprecatedInventoryMarks(String deprecatedInventoryMarks) {
+        this.deprecatedInventoryMarks = deprecatedInventoryMarks;
+    }
+
+    public FerStatus getFerStatus() {
+        return ferStatus;
+    }
+
+    public void setFerStatus(FerStatus ferStatus) {
+        this.ferStatus = ferStatus;
     }
 }

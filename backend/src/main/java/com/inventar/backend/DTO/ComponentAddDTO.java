@@ -1,5 +1,7 @@
 package com.inventar.backend.DTO;
 
+import com.inventar.backend.enums.FerStatus;
+
 import java.util.List;
 
 public class ComponentAddDTO {
@@ -7,6 +9,8 @@ public class ComponentAddDTO {
     private String name;
     private String zpf;
     private String fer;
+    private FerStatus ferStatus;
+    private String deprecatedInventoryMarks;
     private int quantity;
     private Long locationID;
     private String description;
@@ -15,10 +19,12 @@ public class ComponentAddDTO {
     private List<Long> experimentIds;
     private List<FileDTO> fileDTOList;
 
-    public ComponentAddDTO(String name, String zpf, String fer, int quantity, Long locationID, String description, List<String> keywords, String log, List<Long> experimentIds, List<FileDTO> fileDTOList) {
+    public ComponentAddDTO(String name, String zpf, String fer, FerStatus ferStatus, String deprecatedInventoryMarks, int quantity, Long locationID, String description, List<String> keywords, String log, List<Long> experimentIds, List<FileDTO> fileDTOList) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
+        this.ferStatus = ferStatus;
+        this.deprecatedInventoryMarks = deprecatedInventoryMarks;
         this.quantity = quantity;
         this.locationID = locationID;
         this.description = description;
@@ -31,10 +37,12 @@ public class ComponentAddDTO {
     public ComponentAddDTO() {
     }
 
-    public ComponentAddDTO(String name, String zpf, String fer, int quantity, Long locationID, String description, List<String> keywords, String log, List<Long> experimentIds) {
+    public ComponentAddDTO(String name, String zpf, String fer, FerStatus ferStatus, String deprecatedInventoryMarks, int quantity, Long locationID, String description, List<String> keywords, String log, List<Long> experimentIds) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
+        this.ferStatus = ferStatus;
+        this.deprecatedInventoryMarks = deprecatedInventoryMarks;
         this.quantity = quantity;
         this.locationID = locationID;
         this.description = description;
@@ -43,10 +51,12 @@ public class ComponentAddDTO {
         this.experimentIds = experimentIds;
     }
 
-    public ComponentAddDTO(String name, String zpf, String fer, int quantity, Long locationID, String description, List<String> keywords, String log) {
+    public ComponentAddDTO(String name, String zpf, String fer, FerStatus ferStatus, String deprecatedInventoryMarks, int quantity, Long locationID, String description, List<String> keywords, String log) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
+        this.ferStatus = ferStatus;
+        this.deprecatedInventoryMarks = deprecatedInventoryMarks;
         this.quantity = quantity;
         this.locationID = locationID;
         this.description = description;
@@ -54,10 +64,12 @@ public class ComponentAddDTO {
         this.log = log;
     }
 
-    public ComponentAddDTO(String name, String zpf, String fer, int quantity, Long locationID, String description) {
+    public ComponentAddDTO(String name, String zpf, String fer, FerStatus ferStatus, String deprecatedInventoryMarks, int quantity, Long locationID, String description) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
+        this.ferStatus = ferStatus;
+        this.deprecatedInventoryMarks = deprecatedInventoryMarks;
         this.quantity = quantity;
         this.locationID = locationID;
         this.description = description;
@@ -141,5 +153,21 @@ public class ComponentAddDTO {
 
     public void setExperimentIds(List<Long> experimentIds) {
         this.experimentIds = experimentIds;
+    }
+
+    public FerStatus getFerStatus() {
+        return ferStatus;
+    }
+
+    public void setFerStatus(FerStatus ferStatus) {
+        this.ferStatus = ferStatus;
+    }
+
+    public String getDeprecatedInventoryMarks() {
+        return deprecatedInventoryMarks;
+    }
+
+    public void setDeprecatedInventoryMarks(String deprecatedInventoryMarks) {
+        this.deprecatedInventoryMarks = deprecatedInventoryMarks;
     }
 }

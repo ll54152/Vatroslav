@@ -28,6 +28,10 @@ function Komponenteunos() {
     const [searchResults, setSearchResults] = useState([]);
     const [keywords, setKeywords] = useState("");
 
+    const [ferStatus, setFerStatus] = useState("CATALOGED");
+    const [fer, setFer] = useState("");
+    const [deprecatedMarks, setDeprecatedMarks] = useState("");
+
     const [quantity, setQuantity] = useState("");
     const [description, setDescription] = useState("");
     const [notes, setNotes] = useState("");
@@ -122,7 +126,9 @@ function Komponenteunos() {
 
         const requestData = {
             name: componentName,
-            fer: status,
+            fer: fer,
+            ferStatus: ferStatus,
+            deprecatedInventoryMarks: deprecatedMarks,
             zpf: internalCode + optionalNumbers,
             quantity: Number(quantity),
             locationID: Number(location),
@@ -441,6 +447,15 @@ function Komponenteunos() {
                     </div>
 
                     <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                        <CardTitle>Zastarjele inventarne oznake</CardTitle>
+                        <Input
+                            placeholder="Unesite stare oznake (ako postoje)"
+                            value={deprecatedMarks}
+                            onChange={(e) => setDeprecatedMarks(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="w-full max-w-4xl flex flex-col space-y-1.5">
                         <CardTitle>Ključne riječi</CardTitle>
                         <Input
                             id="keywords"
@@ -460,16 +475,25 @@ function Komponenteunos() {
                         />
                     </div>
 
+                    <div className="w-full flex flex-col space-y-2">
+                        <CardTitle>FER Inventarna oznaka</CardTitle>
+                        <Input
+                            placeholder="Unesite code2"
+                            value={fer}
+                            onChange={(e) => setFer(e.target.value)}
+                        />
+                    </div>
+
                     <div className="w-full max-w-4xl flex flex-col space-y-1.5">
-                        <CardTitle>Status</CardTitle>
-                        <Select value={status} onValueChange={setStatus}>
-                            <SelectTrigger id="framework">
-                                <SelectValue placeholder="Status"/>
+                        <CardTitle>Status FER inventarne oznake</CardTitle>
+                        <Select value={ferStatus} onValueChange={setFerStatus}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Odaberi status" />
                             </SelectTrigger>
-                            <SelectContent position="popper">
-                                <SelectItem value="active">Active</SelectItem>
-                                <SelectItem value="inactive">Inactive</SelectItem>
-                                <SelectItem value="unknown">Unknown</SelectItem>
+                            <SelectContent>
+                                <SelectItem value="CATALOGED">Cataloged</SelectItem>
+                                <SelectItem value="UNCATALOGED">Uncataloged</SelectItem>
+                                <SelectItem value="UNKNOWN">Unknown</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
