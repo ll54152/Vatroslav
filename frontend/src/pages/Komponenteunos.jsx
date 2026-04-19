@@ -141,7 +141,7 @@ function Komponenteunos() {
 
         formToSend.append(
             "data",
-            new Blob([JSON.stringify(requestData)], { type: "application/json" })
+            new Blob([JSON.stringify(requestData)], {type: "application/json"})
         );
 
         files.forEach((file) => {
@@ -232,270 +232,231 @@ function Komponenteunos() {
             </CardHeader>
 
             <CardContent>
-                <form className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-6xl mx-auto">
-                    <div className="w-full max-w-4xl flex flex-col space-y-1.5">
-                        <CardTitle>Interna oznaka (ZPF)</CardTitle>
-                        <Input
-                            id="intozn-letters"
-                            placeholder="Unesite 5 velikih slova (obavezno)"
-                            value={internalCode}
-                            onChange={(e) => {
-                                const value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 5);
-                                setInternalCode(value);
-                                // Live validation for letters
-                                if (value.length === 5 && /^[A-Z]{5}$/.test(value)) {
-                                    setValidationMessage("Ispravno (slova)");
-                                } else {
-                                    setValidationMessage("Neispravno: Točno 5 velikih slova!");
-                                }
-                            }}
-                        />
-                        <Input
-                            id="intozn-numbers"
-                            placeholder="Unesite 2 broja (opcionalno)"
-                            value={optionalNumbers}
-                            onChange={(e) => {
-                                const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 2);
-                                setOptionalNumbers(value);
-                                if (value.length === 0 || (value.length === 2 && /^[0-9]{2}$/.test(value))) {
-                                } else {
-                                }
-                            }}
-                        />
-                        {validationMessage && (
-                            <p className={`text-sm ${validationMessage === "Ispravno (slova)" ? "text-green-600" : "text-red-600"}`}>
-                                {validationMessage}
-                            </p>
-                        )}
+                <form className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full max-w-6xl mx-auto">
+                    {/* First Column: Code Information */}
+                    <div className="flex flex-col space-y-6">
+                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                            <CardTitle>Interna oznaka (ZPF)</CardTitle>
+                            <Input
+                                id="intozn-letters"
+                                placeholder="Unesite 5 velikih slova (obavezno)"
+                                value={internalCode}
+                                onChange={(e) => {
+                                    const value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 5);
+                                    setInternalCode(value);
+                                    if (value.length === 5 && /^[A-Z]{5}$/.test(value)) {
+                                        setValidationMessage("Ispravno (slova)");
+                                    } else {
+                                        setValidationMessage("Neispravno: Točno 5 velikih slova!");
+                                    }
+                                }}
+                            />
+                            <Input
+                                id="intozn-numbers"
+                                placeholder="Unesite 2 broja (opcionalno)"
+                                value={optionalNumbers}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 2);
+                                    setOptionalNumbers(value);
+                                }}
+                            />
+                            {validationMessage && (
+                                <p className={`text-sm ${validationMessage === "Ispravno (slova)" ? "text-green-600" : "text-red-600"}`}>
+                                    {validationMessage}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                            <CardTitle>FER Inventarna oznaka</CardTitle>
+                            <Input
+                                placeholder="Unesite FER"
+                                value={fer}
+                                onChange={(e) => setFer(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                            <CardTitle>Status FER inventarne oznake</CardTitle>
+                            <Select value={fer} onValueChange={setFerStatus}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Odaberi status"/>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="CATALOGED">Cataloged</SelectItem>
+                                    <SelectItem value="UNCATALOGED">Uncataloged</SelectItem>
+                                    <SelectItem value="UNKNOWN">Unknown</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                            <CardTitle>Zastarjele inventarne oznake</CardTitle>
+                            <Input
+                                placeholder="Unesite stare oznake (ako postoje)"
+                                value={deprecatedMarks}
+                                onChange={(e) => setDeprecatedMarks(e.target.value)}
+                            />
+                        </div>
+
                     </div>
 
-                    <div className="w-full max-w-4xl flex flex-col space-y-1.5">
-                        <CardTitle>Eksperimenti</CardTitle>
-                        <Input
-                            placeholder="Pretraži eksperimente"
-                            value={experimentSearchQuery}
-                            onChange={(e) => {
-                                const query = e.target.value.toLowerCase();
-                                setExperimentSearchQuery(query);
-                                if (!query) {
-                                    setExperimentSearchResults([]);
-                                    return;
-                                }
-                                const filtered = experiments.filter((exp) =>
-                                    exp.name.toLowerCase().includes(query)
-                                );
-                                setExperimentSearchResults(filtered);
-                            }}
-                        />
-
-                        {/* Rezultati pretrage */}
-                        {experimentSearchResults.map((exp) => (
-                            <div key={exp.id} className="w-full max-w-4xl flex flex-col space-y-1.5">
-                                <span>{exp.name}</span>
-                                <Button
-                                    type="button"
-                                    onClick={() => {
-                                        if (!selectedExperiments.some(e => e.id === exp.id)) {
-                                            setSelectedExperiments([...selectedExperiments, exp]);
-                                        }
-                                    }}
-                                    className="bg-blue-500 text-white hover:bg-blue-600"
-                                >
-                                    Dodaj
-                                </Button>
-                            </div>
-                        ))}
-
-                        {/* Odabrani eksperimenti */}
-                        <div className="mt-2">
-                            <h4 className="text-sm font-medium">Odabrani eksperimenti:</h4>
-                            {selectedExperiments.map((exp, index) => (
-                                <div key={exp.id} className="flex justify-between items-center border-b py-1">
+                    {/* Second Column: Location & Experiment Information */}
+                    <div className="flex flex-col space-y-6">
+                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                            <CardTitle>Eksperimenti</CardTitle>
+                            <Input
+                                placeholder="Pretraži eksperimente"
+                                value={experimentSearchQuery}
+                                onChange={(e) => {
+                                    const query = e.target.value.toLowerCase();
+                                    setExperimentSearchQuery(query);
+                                    if (!query) {
+                                        setExperimentSearchResults([]);
+                                        return;
+                                    }
+                                    const filtered = experiments.filter((exp) =>
+                                        exp.name.toLowerCase().includes(query)
+                                    );
+                                    setExperimentSearchResults(filtered);
+                                }}
+                            />
+                            {/* Search Results */}
+                            {experimentSearchResults.map((exp) => (
+                                <div key={exp.id} className="w-full max-w-4xl flex flex-col space-y-1.5">
                                     <span>{exp.name}</span>
                                     <Button
                                         type="button"
-                                        onClick={() =>
-                                            setSelectedExperiments(selectedExperiments.filter((_, i) => i !== index))
-                                        }
-                                        className="bg-red-500 text-white hover:bg-red-600"
+                                        onClick={() => {
+                                            if (!selectedExperiments.some(e => e.id === exp.id)) {
+                                                setSelectedExperiments([...selectedExperiments, exp]);
+                                            }
+                                        }}
+                                        className="bg-blue-500 text-white hover:bg-blue-600"
                                     >
-                                        Ukloni
+                                        Dodaj
                                     </Button>
                                 </div>
                             ))}
-                        </div>
-                    </div>
-
-                    <div className="w-full max-w-4xl flex flex-col space-y-1.5">
-                        <CardTitle>Gdje se nalazi</CardTitle>
-                        <Input
-                            placeholder="Pretraži lokacije..."
-                            value={locationSearchQuery}
-                            onChange={(e) => setLocationSearchQuery(e.target.value)}
-                        />
-
-                        {location && (
-                            <p className="text-sm text-green-600">
-                                Odabrano: {
-                                locations.find(loc => loc.id === parseInt(location))?.adress
-                            } - {
-                                locations.find(loc => loc.id === parseInt(location))?.room
-                            }
-                            </p>
-                        )}
-
-                        {locationSearchQuery && (
-                            <div className="border rounded-md max-h-60 overflow-y-auto mt-1">
-                                {locations
-                                    .filter(loc =>
-                                        `${loc.adress} ${loc.room}`
-                                            .toLowerCase()
-                                            .includes(locationSearchQuery.toLowerCase())
-                                    )
-                                    .map((loc) => (
-                                        <div
-                                            key={loc.id}
-                                            className={`flex justify-between items-start px-3 py-2 border-b ${
-                                                location === loc.id.toString() ? "bg-gray-100" : ""
-                                            }`}
+                            {/* Selected Experiments */}
+                            <div className="mt-2">
+                                <h4 className="text-sm font-medium">Odabrani eksperimenti:</h4>
+                                {selectedExperiments.map((exp, index) => (
+                                    <div key={exp.id} className="flex justify-between items-center border-b py-1">
+                                        <span>{exp.name}</span>
+                                        <Button
+                                            type="button"
+                                            onClick={() =>
+                                                setSelectedExperiments(selectedExperiments.filter((_, i) => i !== index))
+                                            }
+                                            className="bg-red-500 text-white hover:bg-red-600"
                                         >
-                                            {/* Text Column */}
-                                            <div
-                                                className="flex flex-col cursor-pointer gap-0.5 min-w-0"
-                                                onClick={() => {
-                                                    setLocation(loc.id.toString());
-                                                    setLocationSearchQuery(""); // collapse after select
-                                                }}
-                                            >
-                                                <span className="text-sm truncate"><strong>Address:</strong> {loc.adress}</span>
-                                                <span className="text-sm truncate"><strong>Room:</strong> {loc.room}</span>
-                                            </div>
-
-                                            {/* Delete Button */}
-                                            <Button
-                                                type="button"
-                                                onClick={() => handleDeleteLocation(loc.id)}
-                                                className="ml-4 flex-shrink-0 mt-0.5 bg-red-500 text-white hover:bg-red-600"
-                                            >
-                                                Obriši
-                                            </Button>
-                                        </div>
-                                    ))}
-
-                                {locations.filter(loc =>
-                                    `${loc.adress} ${loc.room}`
-                                        .toLowerCase()
-                                        .includes(locationSearchQuery.toLowerCase())
-                                ).length === 0 && (
-                                    <div className="p-2 text-sm text-gray-500">
-                                        Nema rezultata
+                                            Ukloni
+                                        </Button>
                                     </div>
-                                )}
+                                ))}
                             </div>
-                        )}
+                        </div>
+
                         <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                            <CardTitle>Gdje se nalazi</CardTitle>
+                            <Input
+                                placeholder="Pretraži lokacije..."
+                                value={locationSearchQuery}
+                                onChange={(e) => setLocationSearchQuery(e.target.value)}
+                            />
+                            {location && (
+                                <p className="text-sm text-green-600">
+                                    Odabrano: {
+                                    locations.find(loc => loc.id === parseInt(location))?.adress
+                                } - {
+                                    locations.find(loc => loc.id === parseInt(location))?.room
+                                }
+                                </p>
+                            )}
+                            {locationSearchQuery && (
+                                <div className="border rounded-md max-h-60 overflow-y-auto mt-1">
+                                    {locations
+                                        .filter(loc =>
+                                            `${loc.adress} ${loc.room}`
+                                                .toLowerCase()
+                                                .includes(locationSearchQuery.toLowerCase())
+                                        )
+                                        .map((loc) => (
+                                            <div
+                                                key={loc.id}
+                                                className={`flex justify-between items-start px-3 py-2 border-b ${
+                                                    location === loc.id.toString() ? "bg-gray-100" : ""
+                                                }`}
+                                            >
+                                                <div
+                                                    className="flex flex-col cursor-pointer gap-0.5 min-w-0"
+                                                    onClick={() => {
+                                                        setLocation(loc.id.toString());
+                                                        setLocationSearchQuery(""); // collapse after select
+                                                    }}
+                                                >
+                                                    <span
+                                                        className="text-sm truncate"><strong>Address:</strong> {loc.adress}</span>
+                                                    <span className="text-sm truncate"><strong>Room:</strong> {loc.room}</span>
+                                                </div>
+                                                <Button
+                                                    type="button"
+                                                    onClick={() => handleDeleteLocation(loc.id)}
+                                                    className="ml-4 flex-shrink-0 mt-0.5 bg-red-500 text-white hover:bg-red-600"
+                                                >
+                                                    Obriši
+                                                </Button>
+                                            </div>
+                                        ))}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                            <CardTitle>Dokumentacija</CardTitle>
                             <input
-                                id="addLocationCheckbox"
-                                type="checkbox"
-                                checked={showAddLocation}
-                                onChange={(e) => setShowAddLocation(e.target.checked)}
-                                className="mr-2"
+                                type="file"
+                                id="files"
+                                multiple
+                                onChange={(e) => setFiles(Array.from(e.target.files))}
                             />
-                            <label htmlFor="addLocationCheckbox">Dodaj novu lokaciju</label>
                         </div>
+
                     </div>
 
-                    {showAddLocation && (
+                    {/* Third Column: Quantity, Description, and Keywords */}
+                    <div className="flex flex-col space-y-6">
                         <div className="w-full max-w-4xl flex flex-col space-y-1.5">
-                            <CardTitle>Dodaj novu lokaciju</CardTitle>
+                            <CardTitle>Količina</CardTitle>
                             <Input
-                                id="newLocationAddress"
-                                placeholder="Unesite adresu"
-                                value={newLocationAddress}
-                                onChange={(e) => setNewLocationAddress(e.target.value)}
+                                id="kolicina"
+                                placeholder="Unesite količinu"
+                                value={quantity}
+                                onChange={(e) => setQuantity(e.target.value)}
                             />
-                            <Input
-                                id="newLocationRoom"
-                                placeholder="Unesite dvoranu"
-                                value={newLocationRoom}
-                                onChange={(e) => setNewLocationRoom(e.target.value)}
-                            />
-                            <Button className="bg-pink-500 text-white" onClick={handleAddLocation}>
-                                Dodaj lokaciju
-                            </Button>
                         </div>
-                    )}
 
-                    <div className="w-full max-w-4xl flex flex-col space-y-1.5">
-                        <CardTitle>Količina</CardTitle>
-                        <Input
-                            id="kolicina"
-                            placeholder="Unesite količinu"
-                            value={quantity}
-                            onChange={(e) => setQuantity(e.target.value)}
-                        />
-                    </div>
+                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                            <CardTitle>Kratak opis</CardTitle>
+                            <Input
+                                id="opis"
+                                placeholder="Unesite kratak opis"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                            />
+                        </div>
 
-                    <div className="w-full max-w-4xl flex flex-col space-y-1.5">
-                        <CardTitle>Kratak opis</CardTitle>
-                        <Input
-                            id="opis"
-                            placeholder="Unesite kratak opis"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                        />
-                    </div>
+                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                            <CardTitle>Ključne riječi</CardTitle>
+                            <Input
+                                id="keywords"
+                                placeholder="Unesite ključne riječi odvojene točkom-zarezom (;)"
+                                value={keywords}
+                                onChange={(e) => setKeywords(e.target.value)}
+                            />
+                        </div>
 
-                    <div className="w-full max-w-4xl flex flex-col space-y-1.5">
-                        <CardTitle>Zastarjele inventarne oznake</CardTitle>
-                        <Input
-                            placeholder="Unesite stare oznake (ako postoje)"
-                            value={deprecatedMarks}
-                            onChange={(e) => setDeprecatedMarks(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="w-full max-w-4xl flex flex-col space-y-1.5">
-                        <CardTitle>Ključne riječi</CardTitle>
-                        <Input
-                            id="keywords"
-                            placeholder="Unesite ključne riječi odvojene točkom-zarezom (;)"
-                            value={keywords}
-                            onChange={(e) => setKeywords(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="w-full max-w-4xl flex flex-col space-y-1.5">
-                        <CardTitle>Dokumentacija</CardTitle>
-                        <input
-                            type="file"
-                            id="files"
-                            multiple
-                            onChange={(e) => setFiles(Array.from(e.target.files))}
-                        />
-                    </div>
-
-                    <div className="w-full flex flex-col space-y-2">
-                        <CardTitle>FER Inventarna oznaka</CardTitle>
-                        <Input
-                            placeholder="Unesite code2"
-                            value={fer}
-                            onChange={(e) => setFer(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="w-full max-w-4xl flex flex-col space-y-1.5">
-                        <CardTitle>Status FER inventarne oznake</CardTitle>
-                        <Select value={ferStatus} onValueChange={setFerStatus}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Odaberi status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="CATALOGED">Cataloged</SelectItem>
-                                <SelectItem value="UNCATALOGED">Uncataloged</SelectItem>
-                                <SelectItem value="UNKNOWN">Unknown</SelectItem>
-                            </SelectContent>
-                        </Select>
                     </div>
                 </form>
             </CardContent>
