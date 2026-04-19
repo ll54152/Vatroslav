@@ -1,6 +1,5 @@
 package com.inventar.backend.service;
 
-import com.inventar.backend.DTO.ComponentDTO;
 import com.inventar.backend.DTO.ComponentShowDTO;
 import com.inventar.backend.DTO.ExperimentAddDTO;
 import com.inventar.backend.DTO.ExperimentShowDTO;
@@ -13,17 +12,21 @@ import com.inventar.backend.domain.Experiment;
 import com.inventar.backend.domain.File;
 import com.inventar.backend.domain.Log;
 import com.inventar.backend.domain.User;
+import com.inventar.backend.mapper.ComponentMapper;
 import com.inventar.backend.repo.ComponentRepo;
 import com.inventar.backend.repo.ExperimentRepo;
 import com.inventar.backend.repo.FileRepo;
 import com.inventar.backend.repo.LogRepo;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -31,101 +34,71 @@ public class ExperimentServiceJPA {
 
     private ExperimentRepo experimentRepo;
     private ComponentRepo componentRepo;
+    private ComponentServiceJPA componentServiceJPA;
+    private LogServiceJPA logServiceJPA;
+    private FileServiceJPA fileServiceJPA;
     private AuthenticationServiceJPA authenticationServiceJPA;
     private HttpServletRequest httpServletRequest;
-    private UserServiceJPA userServiceJPA;
+    private final UserServiceJPA userServiceJPA;
     private LogRepo logRepo;
     private FileRepo fileRepo;
 
+    private ComponentMapper componentMapper;
+
+
     @Autowired
-    public ExperimentServiceJPA(ExperimentRepo experimentRepo, ComponentRepo componentRepo, AuthenticationServiceJPA authenticationServiceJPA, HttpServletRequest httpServletRequest, UserServiceJPA userServiceJPA, LogRepo logRepo, FileRepo fileRepo) {
+    public ExperimentServiceJPA(UserServiceJPA userServiceJPA, ExperimentRepo experimentRepo, ComponentRepo componentRepo, ComponentServiceJPA componentServiceJPA, LogServiceJPA logServiceJPA, FileServiceJPA fileServiceJPA, AuthenticationServiceJPA authenticationServiceJPA, HttpServletRequest httpServletRequest, LogRepo logRepo, FileRepo fileRepo, ComponentMapper componentMapper) {
+        this.userServiceJPA = userServiceJPA;
         this.experimentRepo = experimentRepo;
         this.componentRepo = componentRepo;
+        this.componentServiceJPA = componentServiceJPA;
+        this.logServiceJPA = logServiceJPA;
+        this.fileServiceJPA = fileServiceJPA;
         this.authenticationServiceJPA = authenticationServiceJPA;
         this.httpServletRequest = httpServletRequest;
-        this.userServiceJPA = userServiceJPA;
         this.logRepo = logRepo;
         this.fileRepo = fileRepo;
+        this.componentMapper = componentMapper;
     }
 
-    public Experiment save(ExperimentAddDTO experimentAddDTO) {
+    @Transactional
+    public Experiment save(ExperimentAddDTO experimentAddDTO, MultipartFile[] files, MultipartFile profileImage) {
+        User user = userServiceJPA.getAuthenticatedUser();
 
-        String email = authenticationServiceJPA.getEmailFromToken(httpServletRequest.getHeader("Authorization"));
-        User user = userServiceJPA.findByEmail(email);
-        String note = "Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao eksperiment '" + experimentAddDTO.getName() + "' u bazu podataka";
+        List<Component> componentList = componentServiceJPA.findAllByIds(experimentAddDTO.getComponentIds());
 
-        LocalDateTime timestamp = LocalDateTime.now();
-
-        List<Component> componentList = new ArrayList<>();
-        if (experimentAddDTO.getComponentDTOList() != null) {
-            for (ComponentDTO componentDTO : experimentAddDTO.getComponentDTOList()) {
-                if (componentDTO.getId() != null) {
-                    Component existingComponent = componentRepo.findById(componentDTO.getId()).orElse(null);
-                    if (existingComponent != null) {
-                        componentList.add(existingComponent);
-                    }
-
-                }
-            }
-        }
-
-        Experiment experiment = new Experiment(
-                experimentAddDTO.getName(),
-                experimentAddDTO.getZpf(),
-                experimentAddDTO.getField(),
-                experimentAddDTO.getSubject(),
-                experimentAddDTO.getDescription(),
-                experimentAddDTO.getKeywords(),
-                experimentAddDTO.getMaterials()
-        );
-
-        if (!componentList.isEmpty()) {
-            experiment.setComponentList(componentList);
-        }
+        Experiment experiment = mapDTOtoEntity(experimentAddDTO, componentList);
 
         experimentRepo.save(experiment);
 
-        logRepo.save(new Log(experiment, note, timestamp, user));
+        logServiceJPA.experimentCreation(experiment, user);
 
-        if (experimentAddDTO.getFileDTOList() != null) {
-            for (FileDTO fileDTO : experimentAddDTO.getFileDTOList()) {
-                File file = new File();
-                file.setName(fileDTO.getName());
-                file.setExperiment(experiment);
-                file.setFileCategory(fileDTO.getFileCategory());
-                file.setFileType(fileDTO.getData().getContentType());
-                file.setUser(user);
-                try {
-                    file.setFileByte(fileDTO.getData().getBytes());
-                    fileRepo.save(file);
+        fileServiceJPA.handleExperimentFiles(experiment, files, profileImage, user);
 
-                    String noteFile = "Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao datoteku '" + file.getName() + "' u eksperiment '" + experiment.getName() + "'";
-                    logRepo.save(new Log(experiment, noteFile, timestamp, user));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-
-        for (Component component : componentList) {
-            List<Experiment> experimentList = component.getExperimentList();
-            experimentList.add(experiment);
-            component.setExperimentList(experimentList);
-
-            String componentNote = "Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je povezao komponentu '" + component.getName() + "' sa eksperimentom '" + experiment.getName() + "'";
-            logRepo.save(new Log(component, componentNote, timestamp, user));
-            logRepo.save(new Log(experiment, componentNote, timestamp, user));
-
-            componentRepo.save(component);
-        }
-
+        linkComponentsWithExperiment(experiment, componentList, user);
 
         return experiment;
     }
 
-
+    @Transactional
     public void deleteById(Long id) {
+        Experiment experiment = experimentRepo.findById(id).orElseThrow(() -> new RuntimeException("Experiment not found"));
+
+        User user = userServiceJPA.getAuthenticatedUser();
+
+        unlinkComponentsFromExperiment(experiment, user);
+
+        logServiceJPA.deleteLogs(experiment.getLogList());
+
+        fileServiceJPA.deleteFiles(experiment.getFileList());
+
+        logServiceJPA.experimentDeletion(experiment, user);
+
+        experimentRepo.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteByIdOld(Long id) {
         Experiment experiment = experimentRepo.findById(id).orElse(null);
 
         if (experiment != null) {
@@ -165,6 +138,28 @@ public class ExperimentServiceJPA {
     }
 
     public ExperimentShowDTO getShowDTO(Experiment experiment) {
+        if (experiment == null) {
+            return null;
+        } else {
+            ExperimentShowDTO experimentShowDTO = new ExperimentShowDTO();
+            experimentShowDTO.setId(experiment.getId());
+            experimentShowDTO.setName(experiment.getName());
+            experimentShowDTO.setZpf(experiment.getZpf());
+            experimentShowDTO.setField(experiment.getField());
+            experimentShowDTO.setSubject(experiment.getSubject());
+            experimentShowDTO.setDescription(experiment.getDescription());
+            experimentShowDTO.setKeywords(experiment.getKeywords());
+            experimentShowDTO.setMaterials(experiment.getMaterials());
+
+            experimentShowDTO.setComponentShowDTOList(componentMapper.mapComponentsToDTOs(experiment.getComponentList()));
+            experimentShowDTO.setLogShowDTOList(logServiceJPA.mapLogsToDTOs(experiment.getLogList()));
+            experimentShowDTO.setFileShowDTOList(fileServiceJPA.mapFilesToDTOs(experiment.getFileList()));
+
+            return experimentShowDTO;
+        }
+    }
+
+    public ExperimentShowDTO getShowDTOOld(Experiment experiment) {
         ExperimentShowDTO experimentShowDTO = new ExperimentShowDTO();
         experimentShowDTO.setId(experiment.getId());
         experimentShowDTO.setName(experiment.getName());
@@ -370,28 +365,46 @@ public class ExperimentServiceJPA {
         return "Upješno ažuriran eksperiment";
     }
 
-    public List<ExperimentShowDTO> mapExperimentsToDTOs(List<Experiment> experimentList) {
-        if (experimentList == null) {
-            return List.of();
-        } else {
-            List<ExperimentShowDTO> experimentShowDTOList = new ArrayList<>();
+    private void linkComponentsWithExperiment(Experiment experiment, List<Component> componentList, User user) {
+        if (componentList != null) {
+            for (Component component : componentList) {
+                component.getExperimentList().add(experiment);
 
-            for (Experiment experiment : experimentList){
-                ExperimentShowDTO experimentShowDTO = new ExperimentShowDTO();
-                experimentShowDTO.setId(experiment.getId());
-                experimentShowDTO.setName(experiment.getName());
-                experimentShowDTO.setZpf(experiment.getZpf());
-                experimentShowDTO.setSubject(experiment.getSubject());
-                experimentShowDTO.setField(experiment.getField());
-                experimentShowDTO.setDescription(experiment.getDescription());
-                experimentShowDTO.setKeywords(experiment.getKeywords());
-                experimentShowDTO.setMaterials(experiment.getMaterials());
+                componentServiceJPA.quickSave(component);
 
-                experimentShowDTOList.add(experimentShowDTO);
+                logServiceJPA.linkComponentAndExperiment(component, experiment, user);
             }
-
-            return experimentShowDTOList;
         }
+    }
+
+    private void unlinkComponentsFromExperiment(Experiment experiment, User user) {
+        if (experiment.getComponentList() != null) {
+            for (Component component : experiment.getComponentList()) {
+                component.getExperimentList().remove(experiment);
+
+                componentServiceJPA.quickSave(component);
+
+                logServiceJPA.unlinkComponentFromExperiment(component, experiment, user);
+            }
+        }
+    }
+
+    private Experiment mapDTOtoEntity(ExperimentAddDTO experimentAddDTO, List<Component> componentList) {
+        Experiment experiment = new Experiment(
+                experimentAddDTO.getName(),
+                experimentAddDTO.getZpf(),
+                experimentAddDTO.getField(),
+                experimentAddDTO.getSubject(),
+                experimentAddDTO.getDescription(),
+                Collections.singletonList(experimentAddDTO.getKeywords()).toString(),
+                experimentAddDTO.getMaterials()
+        );
+
+        if (componentList != null && !componentList.isEmpty()) {
+            experiment.setComponentList(componentList);
+        }
+
+        return experiment;
     }
 
     public List<Experiment> findAll() {
@@ -402,18 +415,19 @@ public class ExperimentServiceJPA {
         return experimentRepo.findById(id).orElse(null);
     }
 
-    public List<Experiment> findAllbyIds(List<Long> experimentIds) {
-        List<Experiment> experimentList = new ArrayList<>();
-        for (Long experimentId : experimentIds) {
-            Experiment experiment = experimentRepo.findById(experimentId).orElse(null);
-            if (experiment != null) {
-                experimentList.add(experiment);
+    public List<Experiment> findAllByIds(List<Long> experimentIds) {
+        if (experimentIds == null) {
+            return List.of();
+        } else {
+            List<Experiment> experimentList = new ArrayList<>();
+            for (Long experimentId : experimentIds) {
+                experimentRepo.findById(experimentId).ifPresent(experimentList::add);
             }
+            return experimentList;
         }
-        return experimentList;
     }
 
-    public void quickUpdate(Experiment experiment){
+    public void quickSave(Experiment experiment) {
         experimentRepo.save(experiment);
     }
 }

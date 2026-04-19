@@ -73,33 +73,36 @@ function Experimentunos() {
         const token = localStorage.getItem("jwt");
 
         const formToSend = new FormData();
-        formToSend.append("name", formData.name);
-        formToSend.append("field", formData.field);
-        formToSend.append("subject", formData.subject);
-        formToSend.append("description", formData.description);
-        formToSend.append("materials", formData.materials);
-        formToSend.append("komponente", JSON.stringify(komponente));
-        formToSend.append("keywords", formData.keywords);
-        formToSend.append("zpf", internalCode + optionalNumbers);
 
-        files.forEach((file) => {
-            formToSend.append("files", file);
-        });
+        const requestData = {
+            name: formData.name,
+            zpf: internalCode + optionalNumbers,
+            field: formData.field,
+            subject: formData.subject,
+            description: formData.description,
+            materials: formData.materials,
+            keywords: formData.keywords
+                ? formData.keywords.split(";").map(k => k.trim())
+                : [],
+            componentIds: komponente.map(c => c.id),
+        };
+
+        formToSend.append(
+            "data",
+            new Blob([JSON.stringify(requestData)], {type: "application/json"})
+        );
+
+        files.forEach(file => formToSend.append("files", file));
 
         if (profileImage) {
-            formToSend.append("profileImage", profileImage);  // Or append to "files" with a category
+            formToSend.append("profileImage", profileImage);
         }
-
-        // Append other files
-        otherFiles.forEach((file) => {
-            formToSend.append("files", file);
-        });
 
         try {
             const response = await fetch("/vatroslav/api/experiment/add", {
                 method: "POST",
                 headers: {
-                    Authorization: `${token}`,
+                    Authorization: token,
                 },
                 body: formToSend,
             });
@@ -108,12 +111,12 @@ function Experimentunos() {
                 navigate("/experimenti/");
             } else {
                 const text = await response.text();
-                console.error("Greška:", text);
-                alert("Greška pri slanju eksperimenta.");
+                alert(`Greška: ${text}`);
             }
+
         } catch (error) {
-            console.error("Greška:", error);
-            alert("Došlo je do greške prilikom slanja.");
+            console.error(error);
+            alert("Došlo je do greške.");
         }
     };
 

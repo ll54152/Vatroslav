@@ -9,15 +9,15 @@ public class ExperimentAddDTO {
     private String subject;
     private String field;
     private String description;
-    private String keywords;
+    private List<String> keywords;
     private String materials;
-    private List<ComponentDTO> componentDTOList;
+    private List<Long> componentIds;
     private List<FileDTO> fileDTOList;
 
     public ExperimentAddDTO() {
     }
 
-    public ExperimentAddDTO(String name, String zpf, String subject, String field, String description, String keywords, String materials, List<ComponentDTO> componentDTOList, List<FileDTO> fileDTOList) {
+    public ExperimentAddDTO(String name, String zpf, String subject, String field, String description, List<String> keywords, String materials, List<Long> componentIds, List<FileDTO> fileDTOList) {
         this.name = name;
         this.zpf = zpf;
         this.subject = subject;
@@ -25,7 +25,7 @@ public class ExperimentAddDTO {
         this.description = description;
         this.keywords = keywords;
         this.materials = materials;
-        this.componentDTOList = componentDTOList;
+        this.componentIds = componentIds;
         this.fileDTOList = fileDTOList;
     }
 
@@ -69,11 +69,11 @@ public class ExperimentAddDTO {
         this.description = description;
     }
 
-    public String getKeywords() {
+    public List<String> getKeywords() {
         return keywords;
     }
 
-    public void setKeywords(String keywords) {
+    public void setKeywords(List<String> keywords) {
         this.keywords = keywords;
     }
 
@@ -93,11 +93,11 @@ public class ExperimentAddDTO {
         this.fileDTOList = fileDTOList;
     }
 
-    public List<ComponentDTO> getComponentDTOList() {
-        return componentDTOList;
+    public List<Long> getComponentIds() {
+        return componentIds;
     }
 
-    public void setComponentDTOList(List<ComponentDTO> componentDTOList) {
-        this.componentDTOList = componentDTOList;
+    public void setComponentIds(List<Long> componentIds) {
+        this.componentIds = componentIds;
     }
 }

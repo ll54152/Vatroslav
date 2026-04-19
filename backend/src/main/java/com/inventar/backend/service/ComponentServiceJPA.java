@@ -104,29 +104,6 @@ public class ComponentServiceJPA {
         }
     }
 
-    public List<ComponentShowDTO> mapComponentsToDTOs(List<Component> componentList) {
-        if (componentList == null) {
-            return List.of();
-        } else {
-            List<ComponentShowDTO> componentShowDTOList = new ArrayList<>();
-
-            for (Component component : componentList) {
-                ComponentShowDTO componentShowDTO = new ComponentShowDTO();
-                componentShowDTO.setId(component.getId());
-                componentShowDTO.setName(component.getName());
-                componentShowDTO.setZpf(component.getZpf());
-                componentShowDTO.setFer(component.getFer());
-                componentShowDTO.setDescription(component.getDescription());
-                componentShowDTO.setKeywords(component.getKeywords());
-                componentShowDTO.setQuantity(component.getQuantity());
-
-                componentShowDTOList.add(componentShowDTO);
-            }
-
-            return componentShowDTOList;
-        }
-    }
-
     private void linkExperimentsWithComponent(Component component, List<Experiment> experimentList, User user) {
         if (experimentList != null) {
             for (Experiment experiment : experimentList) {

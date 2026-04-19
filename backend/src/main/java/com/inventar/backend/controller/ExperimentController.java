@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +31,7 @@ import java.util.Arrays;
 @RequestMapping("/experiment")
 public class ExperimentController {
 
-    private ExperimentServiceJPA experimentServiceJPA;
+    private final ExperimentServiceJPA experimentServiceJPA;
 
     @Autowired
     public ExperimentController(ExperimentServiceJPA experimentServiceJPA) {
@@ -38,69 +39,15 @@ public class ExperimentController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<String> addExperiment(@RequestPart("name") String name,
-                                                @RequestPart("zpf") String zpf,
-                                                @RequestPart("field") String field,
-                                                @RequestPart("subject") String subject,
-                                                @RequestPart("description") String description,
-                                                @RequestPart("keywords") String keywords,
-                                                @RequestPart("materials") String materials,
-                                                @RequestPart("komponente") String componentJSON,
-                                                @RequestPart(value = "files", required = false) MultipartFile[] files,
-                                                @RequestPart(value = "profileImage", required = false) MultipartFile[] profileImage) {
+    public ResponseEntity<String> addExperiment(
+            @RequestPart("data") ExperimentAddDTO experimentAddDTO,
+            @RequestPart(value = "files", required = false) MultipartFile[] files,
+            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
 
-        ExperimentAddDTO experimentAddDTO = new ExperimentAddDTO();
-        experimentAddDTO.setName(name);
-        experimentAddDTO.setZpf(zpf);
-        experimentAddDTO.setField(field);
-        experimentAddDTO.setSubject(subject);
-        experimentAddDTO.setDescription(description);
-        experimentAddDTO.setKeywords(keywords);
-        experimentAddDTO.setMaterials(materials);
+        experimentServiceJPA.save(experimentAddDTO, files, profileImage);
 
-
-        if (componentJSON != null && !componentJSON.isEmpty()) {
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                experimentAddDTO.setComponentDTOList(Arrays.asList(objectMapper.readValue(componentJSON, ComponentDTO[].class)));
-            } catch (Exception e) {
-                return new ResponseEntity<>("Greška prilikom parsiranja JSON-a", HttpStatus.BAD_REQUEST);
-            }
-        }
-
-        List<FileDTO> fileDTOList = new ArrayList<>();
-
-        if (files != null) {
-            for (MultipartFile file : files) {
-                FileDTO fileDTO = new FileDTO();
-                fileDTO.setName(file.getOriginalFilename());
-                fileDTO.setEntityType("eksperiment");
-                fileDTO.setData(file);
-                fileDTO.setFileCategory("general");
-                fileDTOList.add(fileDTO);
-            }
-        }
-
-        if (profileImage != null) {
-            for (MultipartFile file : profileImage) {
-                FileDTO fileDTO = new FileDTO();
-                fileDTO.setName(file.getOriginalFilename());
-                fileDTO.setEntityType("eksperiment");
-                fileDTO.setData(file);
-                fileDTO.setFileCategory("profileImage");
-                fileDTOList.add(fileDTO);
-            }
-        }
-
-        if (!fileDTOList.isEmpty()) {
-            experimentAddDTO.setFileDTOList(fileDTOList);
-        }
-
-
-        experimentServiceJPA.save(experimentAddDTO);
-        return new ResponseEntity<>("Eksperiment dodan uspješno", HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Eksperiment dodan uspješno");
     }
-
 
     @GetMapping("/getAll")
     public ResponseEntity<List<ExperimentDTO>> getAllExperiments() {
@@ -126,7 +73,7 @@ public class ExperimentController {
         Experiment experiment = experimentServiceJPA.findById(id);
         if (experiment != null) {
             experimentServiceJPA.deleteById(id);
-            return new ResponseEntity<>("Eksperiment obrisan uspešno", HttpStatus.OK);
+            return new ResponseEntity<>("Eksperiment obrisan uspješno", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Eksperiment nije pronađen", HttpStatus.NOT_FOUND);
         }
@@ -158,7 +105,7 @@ public class ExperimentController {
         experimentAddDTO.setField(field);
         experimentAddDTO.setSubject(subject);
         experimentAddDTO.setDescription(description);
-        experimentAddDTO.setKeywords(keywords);
+        experimentAddDTO.setKeywords(Collections.singletonList(keywords));
         experimentAddDTO.setMaterials(materials);
 
         List<String> componentList = new ArrayList<>();
