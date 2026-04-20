@@ -12,9 +12,47 @@ export default function KomponentePrimjerView() {
     const [newLog, setNewLog] = useState("");
     const [addingLog, setAddingLog] = useState(false);
     const [logs, setLogs] = useState([]);
+    const [error, setError] = useState(null);
+
+    const isTokenValid = () => {
+        const token = localStorage.getItem("jwt");
+        if (!token) return false;
+        try {
+            const decoded = JSON.parse(atob(token.split(".")[1]));
+            const currentTime = Date.now() / 1000;
+            return decoded.exp > currentTime;
+        } catch (error) {
+            return false;
+        }
+    };
+
+    const verifyToken = async () => {
+        const token = localStorage.getItem("jwt");
+        if (!token) return false;
+        try {
+            const response = await fetch("/vatroslav/api/auth/verify", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `${token}`,
+                },
+            });
+            return response.ok;
+        } catch (error) {
+            return false;
+        }
+    };
 
     useEffect(() => {
         const load = async () => {
+            const isValid = isTokenValid();
+            const isVerified = await verifyToken();
+            if (!isValid || !isVerified) {
+                localStorage.removeItem("jwt");
+                navigate("/login");
+                return;
+            }
+
             const token = localStorage.getItem("jwt");
 
             const res = await fetch(`/vatroslav/api/component/get/${id}`, {
@@ -28,24 +66,25 @@ export default function KomponentePrimjerView() {
         };
 
         load();
-    }, [id]);
+    }, [id, navigate]);
 
     if (loading) return <div className="p-6">Učitavanje...</div>;
+    if (error) return <p className="text-red-500">{error}</p>;
     if (!component) return <div className="p-6">Nema podataka</div>;
+
+    const EmptyValue = ({text = "N/A"}) => (
+        <span className="text-gray-400 italic">{text}</span>
+    );
 
     const profileImage = component.fileShowDTOList?.find(f => f.fileCategory === "profileImage");
     const galleryImages = component.fileShowDTOList?.filter(f => f.fileCategory === "otherImage") || [];
     const generalFiles = component.fileShowDTOList?.filter(f => f.fileCategory === "general") || [];
 
-    const EmptyValue = ({ text = "N/A" }) => (
-        <span className="text-gray-400 italic">{text}</span>
-    );
-
     const fetchLogsAgain = async () => {
         const token = localStorage.getItem("jwt");
 
         const res = await fetch(`/vatroslav/api/component/get/${id}`, {
-            headers: { Authorization: token },
+            headers: {Authorization: token},
         });
 
         const data = await res.json();
@@ -116,7 +155,6 @@ export default function KomponentePrimjerView() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 <div className="flex flex-col gap-6">
-
                     <Card>
                         <CardHeader><CardTitle>Osnovno</CardTitle></CardHeader>
                         <CardContent className="space-y-2">
@@ -149,7 +187,8 @@ export default function KomponentePrimjerView() {
                                 <b>Status FER inventarne oznake: </b>
                                 {component.ferStatus || <EmptyValue text="Nema statusa FER inventarne oznake"/>}
                             </div>
-                            <div><b>FER Inventarna oznaka: </b> {component.fer || "N/A"}</div>
+                            <div><b>FER Inventarna oznaka: </b> {component.fer || <EmptyValue text="Nema lokacije"/>}
+                            </div>
                             <div><b>Zastarjele inventarne oznake: </b>
                                 {component.deprecatedInventoryMarks?.length ? (
                                     component.deprecatedInventoryMarks.map((k, i) => (
@@ -159,13 +198,10 @@ export default function KomponentePrimjerView() {
                             </div>
                         </CardContent>
                     </Card>
-
                 </div>
 
 
                 <div className="flex flex-col gap-6">
-
-
                     <Card>
                         <CardHeader><CardTitle>Eksperimenti</CardTitle></CardHeader>
                         <CardContent>
@@ -179,7 +215,7 @@ export default function KomponentePrimjerView() {
                                         {exp.name} - {exp.zpf}
                                     </div>
                                 ))
-                            ) : "Nema"}
+                            ) : <EmptyValue text="Nema povezanih eksperimenata"/>}
                         </CardContent>
                     </Card>
 
@@ -190,7 +226,6 @@ export default function KomponentePrimjerView() {
 
                         <CardContent className="space-y-4">
 
-                            {/* INPUT AREA */}
                             <div className="flex gap-2">
                                 <input
                                     value={newLog}
@@ -208,7 +243,6 @@ export default function KomponentePrimjerView() {
                                 </button>
                             </div>
 
-                            {/* LOG LIST */}
                             <div className="space-y-3">
                                 {latestLogs.length ? latestLogs.map(log => (
                                     <div key={log.id} className="border-b pb-2 text-sm">
@@ -218,29 +252,27 @@ export default function KomponentePrimjerView() {
                                         </div>
                                     </div>
                                 )) : (
-                                    <EmptyValue text="Nema logova" />
+                                    <EmptyValue text="Nema logova"/>
                                 )}
                             </div>
 
                         </CardContent>
                     </Card>
-
                 </div>
 
                 <div className="flex flex-col gap-6">
-
                     <Card>
                         <CardHeader><CardTitle>Galerija</CardTitle></CardHeader>
                         <CardContent>
                             <div className="grid grid-cols-2 gap-2">
                                 {generalFiles?.length > 0 ? (
-                                galleryImages.map(img => (
-                                    <img
-                                        key={img.id}
-                                        src={`data:image/jpeg;base64,${img.fileByte}`}
-                                        className="h-28 w-full object-cover rounded cursor-pointer hover:scale-105 transition"
-                                        onClick={() => openImage(img)}
-                                    />
+                                    galleryImages.map(img => (
+                                        <img
+                                            key={img.id}
+                                            src={`data:image/jpeg;base64,${img.fileByte}`}
+                                            className="h-28 w-full object-cover rounded cursor-pointer hover:scale-105 transition"
+                                            onClick={() => openImage(img)}
+                                        />
                                     ))
                                 ) : (
                                     <EmptyValue text="Nema fotografija"/>
@@ -271,8 +303,8 @@ export default function KomponentePrimjerView() {
                             )}
                         </CardContent>
                     </Card>
-
                 </div>
+
             </div>
 
             {activeImage && (

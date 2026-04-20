@@ -22,10 +22,13 @@ import {
 function Experimentiprimjer() {
     const {id} = useParams();
     const navigate = useNavigate();
-    const [eksperiment, setEksperiment] = useState(null);
+    const [experiment, setExperiment] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [newLog, setNewLog] = useState("");
+    const [activeImage, setActiveImage] = useState(null);
+    const [addingLog, setAddingLog] = useState(false);
+    const [logs, setLogs] = useState([]);
+    const [error, setError] = useState(null);
 
     const isTokenValid = () => {
         const token = localStorage.getItem("jwt");
@@ -57,7 +60,7 @@ function Experimentiprimjer() {
     };
 
     useEffect(() => {
-        const fetchEksperiment = async () => {
+        const fetchExperiment = async () => {
             const isValid = isTokenValid();
             const isVerified = await verifyToken();
             if (!isValid || !isVerified) {
@@ -67,16 +70,16 @@ function Experimentiprimjer() {
             }
 
             const token = localStorage.getItem("jwt");
+
             try {
                 const response = await fetch(`/vatroslav/api/experiment/get/${id}`, {
                     headers: {
-                        "Content-Type": "application/json",
                         Authorization: `${token}`,
                     },
                 });
                 if (!response.ok) throw new Error("Eksperiment nije pronađen.");
                 const data = await response.json();
-                setEksperiment(data);
+                setExperiment(data);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -84,10 +87,41 @@ function Experimentiprimjer() {
             }
         };
 
-        fetchEksperiment();
+        fetchExperiment();
     }, [id, navigate]);
 
+    if (loading) return <div className="p-6">Učitavanje...</div>;
+    if (error) return <p className="text-red-500">{error}</p>;
+    if (!experiment) return <div className="p-6">Nema podataka</div>;
+
+    const EmptyValue = ({text = "N/A"}) => (
+        <span className="text-gray-400 italic">{text}</span>
+    );
+
+    const profileImage = experiment.fileShowDTOList?.find(f => f.fileCategory === "profileImage");
+    const galleryImages = experiment.fileShowDTOList?.filter(f => f.fileCategory === "otherImage") || [];
+    const generalFiles = experiment.fileShowDTOList?.filter(f => f.fileCategory === "general") || [];
+
+    const fetchLogsAgain = async () => {
+        const token = localStorage.getItem("jwt");
+
+        const res = await fetch(`/vatroslav/api/experiment/get/${id}`, {
+            headers: {Authorization: token},
+        });
+
+        const data = await res.json();
+        setLogs(data.logShowDTOList || []);
+    };
+
+    const latestLogs = logs
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, 3);
+
+    const openImage = (img) => setActiveImage(img);
+
     const handleAddLog = async () => {
+        if (!newLog.trim()) return;
+
         const token = localStorage.getItem("jwt");
 
         const logData = {
@@ -97,6 +131,8 @@ function Experimentiprimjer() {
         };
 
         try {
+            setAddingLog(true);
+
             const response = await fetch(`/vatroslav/api/log/add`, {
                 method: "POST",
                 headers: {
@@ -106,217 +142,190 @@ function Experimentiprimjer() {
                 body: JSON.stringify(logData),
             });
 
-            if (!response.ok) {
-                throw new Error("Neuspješno dodavanje loga.");
+            if (response.ok) {
+                await fetchLogsAgain();
+                setNewLog("");
             }
-
-            const addedLog = await response.text();
-
-            setEksperiment((prev) => ({
-                ...prev,
-                logs: [addedLog, ...(prev.logs || [])],
-            }));
-
-            setNewLog("");
-        } catch (err) {
-            alert(err.message);
-        }
-
-        setNewLog("");
-
-        try {
-            const response = await fetch(`/vatroslav/api/experiment/get/${id}`, {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `${token}`,
-                },
-            });
-            if (!response.ok) throw new Error("Ne mogu dohvatiti eksperiment.");
-            const data = await response.json();
-            setEksperiment(data);
-        } catch (err) {
-            alert(err.message);
+        } finally {
+            setAddingLog(false);
         }
     };
 
-    if (loading) return <p>Učitavanje...</p>;
-    if (error) return <p className="text-red-500">{error}</p>;
-    if (!eksperiment) return null;
-
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center">
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-4xl font-bold grid w-full justify-center gap-4">
-                        {eksperiment.name}
-                    </CardTitle>
-                    {eksperiment.files && eksperiment.files.find(file => file.fileCategory === "profileImage") && (
-                        <div className="flex justify-center mt-4">
-                            <img
-                                src={`data:image/*;base64,${eksperiment.files.find(file => file.fileCategory === "profileImage").fileByte}`}
-                                alt="Profile Image"
-                                className="w-2/4"
-                            />
-                        </div>
-                    )}
-                </CardHeader>
+        <div className="min-h-screen p-6">
 
-                <CardContent>
-                    <div className="grid w-full justify-center gap-4">
-                        <div className="flex flex-col space-y-1.5">
-                            <CardTitle>ZPF</CardTitle>
-                            <CardDescription className="text-blue-900 text-lg">
-                                {eksperiment.zpf}
-                            </CardDescription>
-                        </div>
+            <div className="flex flex-col items-center mb-10">
 
-                        <div className="flex flex-col space-y-1.5">
-                            <CardTitle>Nastavni predmet</CardTitle>
-                            <CardDescription className="text-blue-900 text-lg">
-                                {eksperiment.subject}
-                            </CardDescription>
-                        </div>
-
-                        <div className="flex flex-col space-y-1.5">
-                            <CardTitle>Područje fizike</CardTitle>
-                            <CardDescription className="text-blue-900 text-lg">
-                                {eksperiment.field}
-                            </CardDescription>
-                        </div>
-
-                        <div className="flex flex-col space-y-1.5">
-                            <CardTitle>Kratak opis</CardTitle>
-                            <CardDescription className="text-blue-900 text-lg">
-                                {eksperiment.description}
-                            </CardDescription>
-                        </div>
-                    </div>
-
-                    <br/>
-                    <div className="flex flex-col space-y-1.5">
-                        <CardTitle>Ključne riječi</CardTitle>
-                        <CardDescription className="text-blue-900 text-lg">
-                            {eksperiment.keywords}
-                        </CardDescription>
-                    </div>
-
-                    <br/>
-                    <div className="flex flex-col space-y-1.5 mt-6">
-                        <CardTitle>Dokumentacija</CardTitle>
-                        {eksperiment.files && eksperiment.files.length > 0 ? (
-                            <ul className="list-disc pl-5 text-blue-900 text-lg">
-                                {eksperiment.files.map((file, idx) => {
-                                    const byteCharacters = atob(file.fileByte);
-                                    const byteNumbers = new Array(byteCharacters.length)
-                                        .fill()
-                                        .map((_, i) => byteCharacters.charCodeAt(i));
-                                    const byteArray = new Uint8Array(byteNumbers);
-                                    const blob = new Blob([byteArray]);
-                                    const url = URL.createObjectURL(blob);
-
-                                    return (
-                                        <li key={idx}>
-                                            <a
-                                                href={url}
-                                                download={file.name}
-                                                className="text-blue-600 underline"
-                                            >
-                                                {file.name}
-                                            </a>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        ) : (
-                            <CardDescription className="text-blue-900 text-lg">
-                                Nema dostupne dokumentacije.
-                            </CardDescription>
-                        )}
-                    </div>
-
-                    <br/>
-                    <Tabs defaultValue="komponente" className="w-full">
-                        <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="komponente">Komponente</TabsTrigger>
-                            <TabsTrigger value="materijal">Pribor i potrošni materijal</TabsTrigger>
-                        </TabsList>
-
-                        <TabsContent value="komponente">
-                            <ScrollArea className="h-72 w-full rounded-md border">
-                                <div className="p-4">
-                                    <h4 className="mb-4 text-sm font-medium leading-none">Komponente</h4>
-                                    {eksperiment.komponente?.map((komp) => (
-                                        <React.Fragment key={komp.id}>
-                                            <div
-                                                className="text-sm cursor-pointer text-blue-900 text-lg"
-                                                onClick={() => navigate(`/komponenteprimjer/${komp.id}`)}
-                                            >
-                                                {komp.name}
-                                            </div>
-                                            <Separator className="my-2"/>
-                                        </React.Fragment>
-                                    ))}
-                                </div>
-                            </ScrollArea>
-                        </TabsContent>
-
-                        <TabsContent value="materijal">
-                            <Card>
-                                <CardDescription className="p-4 text-blue-900 text-lg">
-                                    {eksperiment.materials}
-                                </CardDescription>
-                            </Card>
-                        </TabsContent>
-                    </Tabs>
-
-                    <br/>
-                    <div className="flex flex-col space-y-1.5 mt-6">
-                        <CardTitle>Logovi eksperimenta</CardTitle>
-                        {eksperiment.logs && eksperiment.logs.length > 0 ? (
-                            <ScrollArea className="h-60 w-full rounded-md border">
-                                <div className="p-4 space-y-2">
-                                    {eksperiment.logs
-                                        .slice()
-                                        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-                                        .map((log, index) => (
-                                            <div key={index} className="text-sm text-blue-900 text-lg">
-                                                <p>
-                                                    <strong>{new Date(log.timestamp).toLocaleString()}</strong> — {log.note}
-                                                </p>
-                                                <p className="text-xs text-gray-500">
-                                                    Dodao: {log.user?.firstName} {log.user?.lastName}
-                                                </p>
-                                                <Separator className="my-2"/>
-                                            </div>
-                                        ))}
-                                </div>
-                            </ScrollArea>
-                        ) : (
-                            <CardDescription className="text-blue-900 text-lg">
-                                Nema logova za ovaj eksperiment.
-                            </CardDescription>
-                        )}
-
-                        {/* Unos novog loga */}
-                        <div className="mt-4 space-y-2">
-                    <textarea
-                        className="w-full border rounded-md p-2 text-sm"
-                        rows={3}
-                        placeholder="Unesite novi log..."
-                        value={newLog}
-                        onChange={(e) => setNewLog(e.target.value)}
+                {profileImage ? (
+                    <img
+                        src={`data:image/jpeg;base64,${profileImage.fileByte}`}
+                        onClick={() => openImage(profileImage)}
                     />
-                            <Button onClick={handleAddLog} disabled={!newLog.trim()}>
-                                Dodaj log
-                            </Button>
-                        </div>
+                ) : (
+                    <div className="w-56 h-56 bg-gray-200 rounded-3xl flex items-center justify-center">
+                        <EmptyValue text="Nema profilne fotografije"/>
                     </div>
-                </CardContent>
+                )}
 
-                <CardFooter className="flex justify-between"></CardFooter>
-            </Card>
+                <h1 className="text-3xl font-bold mt-4">{experiment.name}</h1>
+                <p className="text-gray-500">
+                    {experiment.zpf}
+                </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <div className="flex flex-col gap-6">
+                    <Card>
+                        <CardHeader><CardTitle>Osnovno</CardTitle></CardHeader>
+                        <CardContent className="space-y-2">
+                            <div><b>Nastavni predmet: </b> {experiment.subject ||
+                                <EmptyValue text="Nema nastavnog predmeta"/>}</div>
+                            <div><b>Područje fizike: </b> {experiment.field ||
+                                <EmptyValue text="Nema područja fizike"/>}</div>
+
+                            <div><b>Ključne riječi: </b>
+                                {experiment.keywords?.length ? (
+                                    experiment.keywords.map((k, i) => (
+                                        <div key={i}>• {k}</div>
+                                    ))
+                                ) : <EmptyValue text="Nema ključnih riječi"/>}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader><CardTitle>Opis</CardTitle></CardHeader>
+                        <CardContent>{experiment.description || <EmptyValue text="Nema opisa"/>}</CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader><CardTitle>Pribor i potrošni materijal</CardTitle></CardHeader>
+                        <CardContent>{experiment.materials ||
+                            <EmptyValue text="Nema pribora i potrošnog materijala"/>}</CardContent>
+                    </Card>
+                </div>
+
+                <div className="flex flex-col gap-6">
+                    <Card>
+                        <CardHeader><CardTitle>Komponente</CardTitle></CardHeader>
+                        <CardContent>
+                            {experiment.componentDTOList?.length ? (
+                                experiment.componentDTOList.map(comp => (
+                                    <div
+                                        key={comp.id}
+                                        className="text-blue-500 hover:underline cursor-pointer"
+                                        onClick={() => navigate(`/komponenteprimjer/${comp.id}`)}
+                                    >
+                                        {comp.name} - {comp.zpf}
+                                    </div>
+                                ))
+                            ) : <EmptyValue text="Nema povezanih komponenti"/>}
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Zadnji logovi</CardTitle>
+                        </CardHeader>
+
+                        <CardContent className="space-y-4">
+
+                            <div className="flex gap-2">
+                                <input
+                                    value={newLog}
+                                    onChange={(e) => setNewLog(e.target.value)}
+                                    placeholder="Dodaj novi log..."
+                                    className="flex-1 border rounded px-3 py-2 text-sm"
+                                />
+
+                                <button
+                                    onClick={handleAddLog}
+                                    disabled={addingLog}
+                                    className="bg-pink-500 text-white px-3 py-2 rounded text-sm hover:bg-pink-600 disabled:opacity-50"
+                                >
+                                    {addingLog ? "..." : "Dodaj"}
+                                </button>
+                            </div>
+
+                            <div className="space-y-3">
+                                {latestLogs.length ? latestLogs.map(log => (
+                                    <div key={log.id} className="border-b pb-2 text-sm">
+                                        <div>{log.note}</div>
+                                        <div className="text-gray-500">
+                                            {log.userShowDTO.firstName} {log.userShowDTO.lastName} - {new Date(log.timestamp).toLocaleString()}
+                                        </div>
+                                    </div>
+                                )) : (
+                                    <EmptyValue text="Nema logova"/>
+                                )}
+                            </div>
+
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <div className="flex flex-col gap-6">
+                    <Card>
+                        <CardHeader><CardTitle>Galerija</CardTitle></CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-2 gap-2">
+                                {generalFiles?.length > 0 ? (
+                                    galleryImages.map(img => (
+                                        <img
+                                            key={img.id}
+                                            src={`data:image/jpeg;base64,${img.fileByte}`}
+                                            className="h-28 w-full object-cover rounded cursor-pointer hover:scale-105 transition"
+                                            onClick={() => openImage(img)}
+                                        />
+                                    ))
+                                ) : (
+                                    <EmptyValue text="Nema fotografija"/>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Dokumenti</CardTitle>
+                        </CardHeader>
+
+                        <CardContent className="space-y-2">
+                            {generalFiles?.length > 0 ? (
+                                generalFiles.map(file => (
+                                    <a
+                                        key={file.id}
+                                        href={`data:application/octet-stream;base64,${file.fileByte}`}
+                                        download={file.name}
+                                        className="block text-blue-600 hover:underline"
+                                    >
+                                        {file.name}
+                                    </a>
+                                ))
+                            ) : (
+                                <EmptyValue text="Nema datoteka"/>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                </div>
+            </div>
+
+            {activeImage && (
+                <div
+                    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+                    onClick={() => setActiveImage(null)}
+                >
+                    <img
+                        src={`data:image/jpeg;base64,${activeImage.fileByte}`}
+                        className="max-h-[85vh] rounded-lg shadow-xl"
+                        onClick={(e) => e.stopPropagation()}
+                    />
+                </div>
+            )}
+
         </div>
-
     );
 }
 
