@@ -192,7 +192,6 @@ public class FileServiceJPA {
                 fileShowDTO.setName(file.getName());
                 fileShowDTO.setFileCategory(file.getFileCategory());
                 fileShowDTO.setFileByte(Base64.getEncoder().encodeToString(file.getFileByte()));
-                fileShowDTOList.add(fileShowDTO);
 
                 fileShowDTOList.add(fileShowDTO);
             }
