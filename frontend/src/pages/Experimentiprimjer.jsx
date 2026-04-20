@@ -80,6 +80,7 @@ function Experimentiprimjer() {
                 if (!response.ok) throw new Error("Eksperiment nije pronađen.");
                 const data = await response.json();
                 setExperiment(data);
+                setLogs(data.logShowDTOList || []);
             } catch (err) {
                 setError(err.message);
             } finally {
