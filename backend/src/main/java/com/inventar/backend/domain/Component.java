@@ -28,7 +28,8 @@ public class Component {
 
     private FerStatus ferStatus;
 
-    private String deprecatedInventoryMarks;
+    @ElementCollection
+    private List<String> deprecatedInventoryMarks;
 
     private int quantity;
 
@@ -58,7 +59,7 @@ public class Component {
     public Component() {
     }
 
-    public Component(String name, String zpf, String fer, FerStatus ferStatus, String deprecatedInventoryMarks, int quantity, Location location, String description, List<String> keywords, List<Log> logList, List<Experiment> experimentList) {
+    public Component(String name, String zpf, String fer, FerStatus ferStatus, List<String> deprecatedInventoryMarks, int quantity, Location location, String description, List<String> keywords, List<Log> logList, List<Experiment> experimentList) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
@@ -72,7 +73,7 @@ public class Component {
         this.experimentList = experimentList;
     }
 
-    public Component(String name, String zpf, String fer, FerStatus ferStatus, String deprecatedInventoryMarks, int quantity, String description, List<String> keywords, Location location, List<Experiment> experimentList) {
+    public Component(String name, String zpf, String fer, FerStatus ferStatus, List<String> deprecatedInventoryMarks, int quantity, String description, List<String> keywords, Location location, List<Experiment> experimentList) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
@@ -85,7 +86,7 @@ public class Component {
         this.experimentList = experimentList;
     }
 
-    public Component(String name, String zpf, String fer, FerStatus ferStatus, String deprecatedInventoryMarks, int quantity, String description, List<String> keywords, Location location) {
+    public Component(String name, String zpf, String fer, FerStatus ferStatus, List<String> deprecatedInventoryMarks, int quantity, String description, List<String> keywords, Location location) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
@@ -185,19 +186,19 @@ public class Component {
         this.fileList = fileList;
     }
 
-    public String getDeprecatedInventoryMarks() {
-        return deprecatedInventoryMarks;
-    }
-
-    public void setDeprecatedInventoryMarks(String deprecatedInventoryMarks) {
-        this.deprecatedInventoryMarks = deprecatedInventoryMarks;
-    }
-
     public FerStatus getFerStatus() {
         return ferStatus;
     }
 
     public void setFerStatus(FerStatus ferStatus) {
         this.ferStatus = ferStatus;
+    }
+
+    public List<String> getDeprecatedInventoryMarks() {
+        return deprecatedInventoryMarks;
+    }
+
+    public void setDeprecatedInventoryMarks(List<String> deprecatedInventoryMarks) {
+        this.deprecatedInventoryMarks = deprecatedInventoryMarks;
     }
 }

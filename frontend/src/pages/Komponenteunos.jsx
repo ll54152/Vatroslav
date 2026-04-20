@@ -119,7 +119,9 @@ function Komponenteunos() {
             name: componentName,
             fer: fer,
             ferStatus: ferStatus,
-            deprecatedInventoryMarks: deprecatedMarks,
+            deprecatedInventoryMarks: deprecatedMarks
+                ? deprecatedMarks.split("; ").map(b => b.trim())
+                : [],
             zpf: internalCode + optionalNumbers,
             quantity: Number(quantity),
             locationID: Number(location),

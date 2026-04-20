@@ -10,7 +10,7 @@ public class ComponentAddDTO {
     private String zpf;
     private String fer;
     private FerStatus ferStatus;
-    private String deprecatedInventoryMarks;
+    private List<String> deprecatedInventoryMarks;
     private int quantity;
     private Long locationID;
     private String description;
@@ -19,7 +19,7 @@ public class ComponentAddDTO {
     private List<Long> experimentIds;
     private List<FileDTO> fileDTOList;
 
-    public ComponentAddDTO(String name, String zpf, String fer, FerStatus ferStatus, String deprecatedInventoryMarks, int quantity, Long locationID, String description, List<String> keywords, String log, List<Long> experimentIds, List<FileDTO> fileDTOList) {
+    public ComponentAddDTO(String name, String zpf, String fer, FerStatus ferStatus, List<String> deprecatedInventoryMarks, int quantity, Long locationID, String description, List<String> keywords, String log, List<Long> experimentIds, List<FileDTO> fileDTOList) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
@@ -37,7 +37,7 @@ public class ComponentAddDTO {
     public ComponentAddDTO() {
     }
 
-    public ComponentAddDTO(String name, String zpf, String fer, FerStatus ferStatus, String deprecatedInventoryMarks, int quantity, Long locationID, String description, List<String> keywords, String log, List<Long> experimentIds) {
+    public ComponentAddDTO(String name, String zpf, String fer, FerStatus ferStatus, List<String> deprecatedInventoryMarks, int quantity, Long locationID, String description, List<String> keywords, String log, List<Long> experimentIds) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
@@ -51,7 +51,7 @@ public class ComponentAddDTO {
         this.experimentIds = experimentIds;
     }
 
-    public ComponentAddDTO(String name, String zpf, String fer, FerStatus ferStatus, String deprecatedInventoryMarks, int quantity, Long locationID, String description, List<String> keywords, String log) {
+    public ComponentAddDTO(String name, String zpf, String fer, FerStatus ferStatus, List<String> deprecatedInventoryMarks, int quantity, Long locationID, String description, List<String> keywords, String log) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
@@ -64,7 +64,7 @@ public class ComponentAddDTO {
         this.log = log;
     }
 
-    public ComponentAddDTO(String name, String zpf, String fer, FerStatus ferStatus, String deprecatedInventoryMarks, int quantity, Long locationID, String description) {
+    public ComponentAddDTO(String name, String zpf, String fer, FerStatus ferStatus, List<String> deprecatedInventoryMarks, int quantity, Long locationID, String description) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
@@ -163,11 +163,11 @@ public class ComponentAddDTO {
         this.ferStatus = ferStatus;
     }
 
-    public String getDeprecatedInventoryMarks() {
+    public List<String> getDeprecatedInventoryMarks() {
         return deprecatedInventoryMarks;
     }
 
-    public void setDeprecatedInventoryMarks(String deprecatedInventoryMarks) {
+    public void setDeprecatedInventoryMarks(List<String> deprecatedInventoryMarks) {
         this.deprecatedInventoryMarks = deprecatedInventoryMarks;
     }
 }

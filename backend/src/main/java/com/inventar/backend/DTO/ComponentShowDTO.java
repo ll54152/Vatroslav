@@ -11,7 +11,7 @@ public class ComponentShowDTO {
     private String zpf;
     private String fer;
     private FerStatus ferStatus;
-    private String deprecatedInventoryMarks;
+    private List<String> deprecatedInventoryMarks;
     private int quantity;
     private LocationDTO locationDTO;
     private String description;
@@ -23,7 +23,7 @@ public class ComponentShowDTO {
     public ComponentShowDTO() {
     }
 
-    public ComponentShowDTO(Long id, String name, String zpf, String fer, FerStatus ferStatus, String deprecatedInventoryMarks, int quantity, LocationDTO locationDTO, String description, List<String> keywords, List<ExperimentShowDTO> experimentShowDTOList, List<LogShowDTO> logShowDTOList, List<FileShowDTO> fileShowDTOList) {
+    public ComponentShowDTO(Long id, String name, String zpf, String fer, FerStatus ferStatus, List<String> deprecatedInventoryMarks, int quantity, LocationDTO locationDTO, String description, List<String> keywords, List<ExperimentShowDTO> experimentShowDTOList, List<LogShowDTO> logShowDTOList, List<FileShowDTO> fileShowDTOList) {
         this.id = id;
         this.name = name;
         this.zpf = zpf;
@@ -135,11 +135,11 @@ public class ComponentShowDTO {
         this.ferStatus = ferStatus;
     }
 
-    public String getDeprecatedInventoryMarks() {
+    public List<String> getDeprecatedInventoryMarks() {
         return deprecatedInventoryMarks;
     }
 
-    public void setDeprecatedInventoryMarks(String deprecatedInventoryMarks) {
+    public void setDeprecatedInventoryMarks(List<String> deprecatedInventoryMarks) {
         this.deprecatedInventoryMarks = deprecatedInventoryMarks;
     }
 }
