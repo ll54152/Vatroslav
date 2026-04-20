@@ -390,6 +390,10 @@ public class ExperimentServiceJPA {
     }
 
     private Experiment mapDTOtoEntity(ExperimentAddDTO experimentAddDTO, List<Component> componentList) {
+        if (experimentRepo.findByZpf(experimentAddDTO.getZpf()).isPresent()) {
+            throw new RuntimeException("Experiment with same ZPF already exists");
+        }
+
         Experiment experiment = new Experiment(
                 experimentAddDTO.getName(),
                 experimentAddDTO.getZpf(),

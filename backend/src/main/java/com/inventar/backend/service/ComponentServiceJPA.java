@@ -131,6 +131,10 @@ public class ComponentServiceJPA {
     }
 
     private Component mapDTOtoEntity(ComponentAddDTO componentAddDTO, Location location, List<Experiment> experimentList) {
+        if (componentRepo.findByZpf(componentAddDTO.getZpf()).isPresent()) {
+            throw new RuntimeException("Component with same ZPF already exists");
+        }
+
         Component component = new Component(
                 componentAddDTO.getName(),
                 componentAddDTO.getZpf(),
