@@ -227,7 +227,7 @@ function Komponenteunos() {
                     {/* First Column: Code Information */}
                     <div className="flex flex-col space-y-6">
                         <div className="w-full flex flex-col space-y-1.5">
-                            <CardTitle>Interna oznaka (ZPF)</CardTitle>
+                            <CardTitle>ZPF Inventarna oznaka</CardTitle>
                             <Input
                                 id="intozn-letters"
                                 placeholder="Unesite 5 velikih slova (obavezno)"
@@ -284,7 +284,7 @@ function Komponenteunos() {
                         <div className="w-full flex flex-col space-y-1.5">
                             <CardTitle>Zastarjele inventarne oznake</CardTitle>
                             <Textarea
-                                placeholder="Unesite stare oznake (ako postoje)"
+                                placeholder="Unesite zastarjele oznake (ako postoje)"
                                 value={deprecatedMarks}
                                 onChange={(e) => setDeprecatedMarks(e.target.value)}
                             />
