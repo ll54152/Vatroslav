@@ -13,28 +13,28 @@ import {Button} from "@/components/ui/button";
 import {Textarea} from "@/components/ui/textarea";
 
 function Komponenteunos() {
-    const [componentName, setComponentName] = useState("");
-    const [internalCode, setInternalCode] = useState("");
-    const [location, setLocation] = useState("");
+    const [componentName, setComponentName] = useState();
+    const [internalCode, setInternalCode] = useState();
+    const [location, setLocation] = useState();
     const [experiments, setExperiments] = useState([]);
-    const [experimentSearchQuery, setExperimentSearchQuery] = useState("");
+    const [experimentSearchQuery, setExperimentSearchQuery] = useState();
     const [experimentSearchResults, setExperimentSearchResults] = useState([]);
     const [selectedExperiments, setSelectedExperiments] = useState([]);
-    const [keywords, setKeywords] = useState("");
-    const [ferStatus, setFerStatus] = useState("CATALOGED");
-    const [fer, setFer] = useState("");
-    const [deprecatedMarks, setDeprecatedMarks] = useState("");
-
-    const [quantity, setQuantity] = useState("");
-    const [description, setDescription] = useState("");
+    const [keywords, setKeywords] = useState();
+    const [ferStatus, setFerStatus] = useState();
+    const [fer, setFer] = useState();
+    const [deprecatedMarks, setDeprecatedMarks] = useState();
+    const [showAddLocation, setShowAddLocation] = useState(false);
+    const [quantity, setQuantity] = useState();
+    const [description, setDescription] = useState();
     const [locations, setLocations] = useState([]);
-    const [newLocationAddress, setNewLocationAddress] = useState("");
-    const [newLocationRoom, setNewLocationRoom] = useState("");
-    const [locationSearchQuery, setLocationSearchQuery] = useState("");
+    const [newLocationAddress, setNewLocationAddress] = useState();
+    const [newLocationRoom, setNewLocationRoom] = useState();
+    const [locationSearchQuery, setLocationSearchQuery] = useState();
     const [files, setFiles] = useState([]);
-    const [validationMessage, setValidationMessage] = useState("");
+    const [validationMessage, setValidationMessage] = useState();
     const navigate = useNavigate();
-    const [optionalNumbers, setOptionalNumbers] = useState("");
+    const [optionalNumbers, setOptionalNumbers] = useState();
 
 
     useEffect(() => {
@@ -58,7 +58,7 @@ function Komponenteunos() {
             }
         };
 
-        const fetchExperiments = async () => {  // Nova funkcija za dohvat eksperimenata
+        const fetchExperiments = async () => {
             try {
                 const token = localStorage.getItem("jwt");
                 const response = await fetch("/vatroslav/api/experiment/getAll", {
@@ -78,8 +78,8 @@ function Komponenteunos() {
             }
         };
 
-        fetchLocations();
-        fetchExperiments();  // Pozivamo funkciju za eksperimente
+        fetchLocations().then(r => console.log("Locations fetched:", r));
+        fetchExperiments().then(r => console.log("Experiments fetched:", r));
     }, []);
 
     const handleDeleteLocation = async (locationId) => {
@@ -125,7 +125,7 @@ function Komponenteunos() {
             locationID: Number(location),
             description: description,
             keywords: keywords
-                ? keywords.split(",").map(k => k.trim())
+                ? keywords.split("; ").map(k => k.trim())
                 : [],
             experimentIds: selectedExperiments.map(e => e.id),
         };
@@ -165,7 +165,7 @@ function Komponenteunos() {
     const handleAddLocation = async (event) => {
         event.preventDefault();
         const newLocation = {
-            adress: newLocationAddress,
+            address: newLocationAddress,
             room: newLocationRoom,
         };
 
@@ -357,7 +357,7 @@ function Komponenteunos() {
                             {location && (
                                 <p className="text-sm text-green-600">
                                     Odabrano: {
-                                    locations.find(loc => loc.id === parseInt(location))?.adress
+                                    locations.find(loc => loc.id === parseInt(location))?.address
                                 } - {
                                     locations.find(loc => loc.id === parseInt(location))?.room
                                 }
@@ -367,7 +367,7 @@ function Komponenteunos() {
                                 <div className="border rounded-md max-h-60 overflow-y-auto mt-1">
                                     {locations
                                         .filter(loc =>
-                                            `${loc.adress} ${loc.room}`
+                                            `${loc.address} ${loc.room}`
                                                 .toLowerCase()
                                                 .includes(locationSearchQuery.toLowerCase())
                                         )
@@ -386,7 +386,7 @@ function Komponenteunos() {
                                                     }}
                                                 >
                                                     <span
-                                                        className="text-sm truncate"><strong>Address:</strong> {loc.adress}</span>
+                                                        className="text-sm truncate"><strong>Address:</strong> {loc.address}</span>
                                                     <span className="text-sm truncate"><strong>Room:</strong> {loc.room}</span>
                                                 </div>
                                                 <Button
@@ -401,6 +401,38 @@ function Komponenteunos() {
                                 </div>
                             )}
                         </div>
+
+                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                            <input
+                                id="addLocationCheckbox"
+                                type="checkbox"
+                                checked={showAddLocation}
+                                onChange={(e) => setShowAddLocation(e.target.checked)}
+                                className="mr-2"
+                            />
+                            <label htmlFor="addLocationCheckbox">Dodaj novu lokaciju</label>
+                        </div>
+
+                        {showAddLocation && (
+                            <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                                <CardTitle>Dodaj novu lokaciju</CardTitle>
+                                <Input
+                                    id="newLocationAddress"
+                                    placeholder="Unesite adresu"
+                                    value={newLocationAddress}
+                                    onChange={(e) => setNewLocationAddress(e.target.value)}
+                                />
+                                <Input
+                                    id="newLocationRoom"
+                                    placeholder="Unesite dvoranu"
+                                    value={newLocationRoom}
+                                    onChange={(e) => setNewLocationRoom(e.target.value)}
+                                />
+                                <Button className="bg-pink-500 text-white" onClick={handleAddLocation}>
+                                    Dodaj lokaciju
+                                </Button>
+                            </div>
+                        )}
 
                         <div className="w-full flex flex-col space-y-1.5">
                             <CardTitle>Dokumentacija</CardTitle>
