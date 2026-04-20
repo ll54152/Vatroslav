@@ -6,7 +6,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import {useNavigate} from "react-router-dom";
-import {useState, useEffect} from "react";
+import React, {useState, useEffect} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
@@ -237,8 +237,8 @@ function Komponenteunos() {
                 <form className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-6 w-full">
                     {/* First Column: Code Information */}
                     <div className="flex flex-col space-y-6">
-                        <div className="w-full flex flex-col space-y-1.5">
-                            <CardTitle>ZPF Inventarna oznaka</CardTitle>
+                        <Card className="w-full flex flex-col space-y-1.5">
+                            <CardTitle><CardHeader>ZPF Inventarna oznaka</CardHeader></CardTitle>
                             <Input
                                 id="intozn-letters"
                                 placeholder="Unesite 5 velikih slova (obavezno)"
@@ -267,19 +267,19 @@ function Komponenteunos() {
                                     {validationMessage}
                                 </p>
                             )}
-                        </div>
+                        </Card>
 
-                        <div className="w-full flex flex-col space-y-1.5">
-                            <CardTitle>FER Inventarna oznaka</CardTitle>
+                        <Card className="w-full flex flex-col space-y-1.5">
+                            <CardHeader><CardTitle>FER Inventarska oznaka</CardTitle></CardHeader>
                             <Input
                                 placeholder="Unesite FER"
                                 value={fer}
                                 onChange={(e) => setFer(e.target.value)}
                             />
-                        </div>
+                        </Card>
 
-                        <div className="w-full flex flex-col space-y-1.5">
-                            <CardTitle>Status FER inventarne oznake</CardTitle>
+                        <Card className="w-full flex flex-col space-y-1.5">
+                           <CardTitle><CardHeader>Status FER inventarne oznake</CardHeader></CardTitle>
                             <Select value={ferStatus} onValueChange={setFerStatus}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Odaberi status"/>
@@ -290,22 +290,22 @@ function Komponenteunos() {
                                     <SelectItem value="UNKNOWN">Unknown</SelectItem>
                                 </SelectContent>
                             </Select>
-                        </div>
+                        </Card>
 
-                        <div className="w-full flex flex-col space-y-1.5">
-                            <CardTitle>Zastarjele inventarne oznake</CardTitle>
+                        <Card className="w-full flex flex-col space-y-1.5">
+                           <CardHeader><CardTitle>Zastarjele inventarne oznake</CardTitle></CardHeader>
                             <Textarea
                                 placeholder="Unesite zastarjele oznake (ako postoje)"
                                 value={deprecatedMarks}
                                 onChange={(e) => setDeprecatedMarks(e.target.value)}
                             />
-                        </div>
+                        </Card>
 
                     </div>
 
                     <div className="flex flex-col space-y-6">
-                        <div className="w-full flex flex-col space-y-1.5">
-                            <CardTitle>Eksperimenti</CardTitle>
+                        <Card className="w-full flex flex-col space-y-1.5">
+                            <CardHeader><CardTitle>Eksperimenti</CardTitle></CardHeader>
                             <Input
                                 placeholder="Pretraži eksperimente"
                                 value={experimentSearchQuery}
@@ -356,10 +356,10 @@ function Komponenteunos() {
                                     </div>
                                 ))}
                             </div>
-                        </div>
+                        </Card>
 
-                        <div className="w-full flex flex-col space-y-1.5">
-                            <CardTitle>Gdje se nalazi</CardTitle>
+                        <Card className="w-full flex flex-col space-y-1.5">
+                           <CardHeader><CardTitle>Gdje se nalazi</CardTitle></CardHeader>
                             <Input
                                 placeholder="Pretraži lokacije..."
                                 value={locationSearchQuery}
@@ -411,7 +411,7 @@ function Komponenteunos() {
                                         ))}
                                 </div>
                             )}
-                        </div>
+
 
                         <div className="w-full max-w-4xl flex flex-col space-y-1.5">
                             <input
@@ -444,7 +444,10 @@ function Komponenteunos() {
                                 </Button>
                             </div>
                         )}
+                        </Card>
 
+                        <Card className="flex flex-col space-y-6">
+                            <CardHeader><CardTitle>Datoteke:</CardTitle></CardHeader>
                         <div className="w-full max-w-4xl flex flex-col space-y-1.5">
                             <CardTitle>Profilna slika</CardTitle>
                             <input
@@ -465,46 +468,46 @@ function Komponenteunos() {
                         </div>
 
                         <div className="w-full max-w-4xl flex flex-col space-y-1.5">
-                            <CardTitle>Dokumentacija (PDF, DOC...)</CardTitle>
+                            <CardTitle>Dokumentacija</CardTitle>
                             <input
                                 type="file"
                                 multiple
                                 onChange={(e) => setDocuments(Array.from(e.target.files))}
                             />
                         </div>
-
+                        </Card>
                     </div>
 
                     <div className="flex flex-col space-y-6">
-                        <div className="w-full flex flex-col space-y-1.5">
-                            <CardTitle>Količina</CardTitle>
+                        <Card className="w-full flex flex-col space-y-1.5">
+                            <CardHeader><CardTitle>Količina</CardTitle></CardHeader>
                             <Input
                                 id="kolicina"
                                 placeholder="Unesite količinu"
                                 value={quantity}
                                 onChange={(e) => setQuantity(e.target.value)}
                             />
-                        </div>
+                        </Card>
 
-                        <div className="w-full flex flex-col space-y-1.5">
-                            <CardTitle>Kratak opis</CardTitle>
+                        <Card className="w-full flex flex-col space-y-1.5">
+                            <CardHeader><CardTitle>Kratak opis</CardTitle></CardHeader>
                             <Textarea
                                 id="opis"
                                 placeholder="Unesite kratak opis"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                             />
-                        </div>
+                        </Card>
 
-                        <div className="w-full flex flex-col space-y-1.5">
-                            <CardTitle>Ključne riječi</CardTitle>
+                        <Card className="w-full flex flex-col space-y-1.5">
+                            <CardHeader><CardTitle>Ključne riječi</CardTitle></CardHeader>
                             <Textarea
                                 id="keywords"
                                 placeholder="Unesite ključne riječi odvojene točkom-zarezom (;)"
                                 value={keywords}
                                 onChange={(e) => setKeywords(e.target.value)}
                             />
-                        </div>
+                        </Card>
 
                     </div>
                 </form>
