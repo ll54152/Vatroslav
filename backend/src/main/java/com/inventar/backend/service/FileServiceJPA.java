@@ -126,7 +126,7 @@ public class FileServiceJPA {
         }
     }
 
-    public void handleExperimentFiles(Experiment experiment, MultipartFile[] files, MultipartFile profileImage, User user) {
+    public void handleExperimentFiles(Experiment experiment, MultipartFile[] files, MultipartFile profileImage, MultipartFile[] otherImages, User user) {
         List<MultipartFile> multipartFiles = new ArrayList<>();
 
         if (files != null) {
@@ -135,6 +135,10 @@ public class FileServiceJPA {
 
         if (profileImage != null) {
             multipartFiles.add(profileImage);
+        }
+
+        if (otherImages != null) {
+            multipartFiles.addAll(List.of(otherImages));
         }
 
         for (MultipartFile multipartFile : multipartFiles) {
@@ -146,6 +150,8 @@ public class FileServiceJPA {
 
                 if (multipartFile.equals(profileImage)) {
                     file.setFileCategory("profileImage");
+                } else if (otherImages != null && List.of(otherImages).contains(multipartFile)) {
+                    file.setFileCategory("otherImage");
                 } else {
                     file.setFileCategory("general");
                 }

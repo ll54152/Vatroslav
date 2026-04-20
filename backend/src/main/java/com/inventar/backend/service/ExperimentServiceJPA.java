@@ -62,7 +62,7 @@ public class ExperimentServiceJPA {
     }
 
     @Transactional
-    public Experiment save(ExperimentAddDTO experimentAddDTO, MultipartFile[] files, MultipartFile profileImage) {
+    public Experiment save(ExperimentAddDTO experimentAddDTO, MultipartFile[] files, MultipartFile profileImage, MultipartFile[] otherImages) {
         User user = userServiceJPA.getAuthenticatedUser();
 
         List<Component> componentList = componentServiceJPA.findAllByIds(experimentAddDTO.getComponentIds());
@@ -73,7 +73,7 @@ public class ExperimentServiceJPA {
 
         logServiceJPA.experimentCreation(experiment, user);
 
-        fileServiceJPA.handleExperimentFiles(experiment, files, profileImage, user);
+        fileServiceJPA.handleExperimentFiles(experiment, files, profileImage, otherImages, user);
 
         linkComponentsWithExperiment(experiment, componentList, user);
 
@@ -400,7 +400,7 @@ public class ExperimentServiceJPA {
                 experimentAddDTO.getField(),
                 experimentAddDTO.getSubject(),
                 experimentAddDTO.getDescription(),
-                Collections.singletonList(experimentAddDTO.getKeywords()).toString(),
+                experimentAddDTO.getKeywords(),
                 experimentAddDTO.getMaterials()
         );
 

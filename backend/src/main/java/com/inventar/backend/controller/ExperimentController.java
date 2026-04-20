@@ -42,9 +42,10 @@ public class ExperimentController {
     public ResponseEntity<String> addExperiment(
             @RequestPart("data") ExperimentAddDTO experimentAddDTO,
             @RequestPart(value = "files", required = false) MultipartFile[] files,
-            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
+            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
+            @RequestPart(value = "otherImages", required = false) MultipartFile[] otherImages) {
 
-        experimentServiceJPA.save(experimentAddDTO, files, profileImage);
+        experimentServiceJPA.save(experimentAddDTO, files, profileImage, otherImages);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Eksperiment dodan uspješno");
     }
@@ -79,6 +80,7 @@ public class ExperimentController {
         }
     }
 
+    /*
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PutMapping("/update/{id}")
     public ResponseEntity<String> updateExperiment(@PathVariable Long id,
@@ -158,4 +160,5 @@ public class ExperimentController {
 
         return new ResponseEntity<>(experimentServiceJPA.update(id, experimentAddDTO, componentList, logList, deletedFilesList, fileDTOList), HttpStatus.OK);
     }
+    */
 }

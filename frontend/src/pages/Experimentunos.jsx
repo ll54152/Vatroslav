@@ -5,45 +5,31 @@ import {Input} from "@/components/ui/input";
 import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Button} from "@/components/ui/button";
+import {Textarea} from "@/components/ui/textarea.jsx";
 
 function Experimentunos() {
-    const [komponente, setKomponente] = useState([]);
-    const [searchResults, setSearchResults] = useState([]);
-    const [allComponents, setAllComponents] = useState([]);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [files, setFiles] = useState([]);
-    const [isSearchVisible, setIsSearchVisible] = useState(false); // Kontrolira prikaz pretrage
-    const [formData, setFormData] = useState({
-        name: "",
-        field: "",
-        subject: "",
-        description: "",
-        materials: "",
-        log: "",
-    });
+    const [components, setComponents] = useState([]);
     const navigate = useNavigate();
     const [profileImage, setProfileImage] = useState(null);
     const [keywords, setKeywords] = useState("");
     const [validationMessage, setValidationMessage] = useState("");
-    const [otherFiles, setOtherFiles] = useState([]);
     const [internalCode, setInternalCode] = useState("");
     const [optionalNumbers, setOptionalNumbers] = useState("");
-    const handleProfileImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file && file.type.startsWith('image/')) {
-            setProfileImage(file);
-        } else {
-            alert('Please select a valid image file.');
-        }
-    };
 
-    const handleOtherFilesChange = (e) => {
-        setOtherFiles(Array.from(e.target.files));
-    };
+    const [experimentName, setExperimentName] = useState();
+    const [field, setField] = useState();
+    const [description, setDescription] = useState();
+    const [materials, setMaterials] = useState();
+    const [subject, setSubject] = useState();
+    const [otherImages, setOtherImages] = useState([]);
+    const [documents, setDocuments] = useState([]);
+
+    const [componentSearchQuery, setComponentSearchQuery] = useState();
+    const [componentSearchResults, setComponentSearchResults] = useState([]);
+    const [selectedComponents, setSelectedComponents] = useState([]);
 
 
     useEffect(() => {
-        // Dohvaćanje svih komponenti iz backend-a
         const fetchComponents = async () => {
             try {
                 const token = localStorage.getItem("jwt");
@@ -55,7 +41,7 @@ function Experimentunos() {
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    setAllComponents(data);
+                    setComponents(data);
                 } else {
                     console.error("Greška pri dohvaćanju komponenti:", response.statusText);
                 }
@@ -67,24 +53,22 @@ function Experimentunos() {
         fetchComponents();
     }, []);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
+    const handleSubmit = async () => {
         const token = localStorage.getItem("jwt");
 
         const formToSend = new FormData();
 
         const requestData = {
-            name: formData.name,
+            name: experimentName,
             zpf: internalCode + optionalNumbers,
-            field: formData.field,
-            subject: formData.subject,
-            description: formData.description,
-            materials: formData.materials,
-            keywords: formData.keywords
-                ? formData.keywords.split(";").map(k => k.trim())
+            field: field,
+            subject: subject,
+            description: description,
+            materials: materials,
+            keywords: keywords
+                ? keywords.split(";").map(k => k.trim())
                 : [],
-            componentIds: komponente.map(c => c.id),
+            componentIds: selectedComponents.map(c => c.id),
         };
 
         formToSend.append(
@@ -92,22 +76,29 @@ function Experimentunos() {
             new Blob([JSON.stringify(requestData)], {type: "application/json"})
         );
 
-        files.forEach(file => formToSend.append("files", file));
-
         if (profileImage) {
             formToSend.append("profileImage", profileImage);
         }
+
+        otherImages.forEach((file) => {
+            formToSend.append("otherImages", file);
+        });
+
+        documents.forEach((file) => {
+            formToSend.append("files", file);
+        });
 
         try {
             const response = await fetch("/vatroslav/api/experiment/add", {
                 method: "POST",
                 headers: {
-                    Authorization: token,
+                    Authorization: `${token}`,
                 },
                 body: formToSend,
             });
 
             if (response.ok) {
+                alert("Novi eksperiment dodan");
                 navigate("/experimenti/");
             } else {
                 const text = await response.text();
@@ -120,142 +111,28 @@ function Experimentunos() {
         }
     };
 
-
-    const handleInputChange = (e) => {
-        const {id, value} = e.target;
-        setFormData((prev) => ({...prev, [id]: value}));
-    };
-
-    const handleSearchChange = (e) => {
-        const query = e.target.value.toLowerCase();
-        setSearchQuery(query);
-
-        if (!query) {
-            setSearchResults([]);
-            return;
-        }
-
-        const filteredComponents = allComponents.filter((component) =>
-            component.name.toLowerCase().includes(query)
-        );
-        setSearchResults(filteredComponents);
-    };
-
-    const addComponent = (component, event) => {
-        event.preventDefault();
-        if (!komponente.some((komp) => komp.id === component.id)) {
-            setKomponente([...komponente, component]);
-        }
-    };
-
-    const removeComponent = (index) => {
-        const updatedKomponente = komponente.filter((_, i) => i !== index);
-        setKomponente(updatedKomponente);
-    };
-
-    const toggleSearchVisibility = () => {
-        setIsSearchVisible((prev) => !prev);
-    };
-
     return (
-        <Card
-
-        >
-            <CardHeader>
-                <CardTitle className="text-4xl font-bold grid w-full justify-center gap-4">
-                    Naziv eksperimenta
-                </CardTitle>
-                <div className="flex flex-col items-center space-y-1.5 w-full">
+        <Card className="w-full p-2 lg:p-4">
+            <CardHeader className="flex flex-col items-center p-3 lg:p-6">
+                <CardTitle className="text-4xl font-bold mb-4">Naziv eksperimenta</CardTitle>
+                <div className="w-full flex flex-col space-y-1.5">
                     <Input
-                        className="w-[40vw]"
-                        id="name"
+                        id="nazivEksperimenta"
                         placeholder="Unesite naziv eksperimenta"
-                        value={formData.name}
-                        onChange={handleInputChange}
+                        value={experimentName}
+                        onChange={(e) => setExperimentName(e.target.value)}
                     />
                 </div>
-                <br/>
             </CardHeader>
-            <CardContent>
-                <form>
-                    <div className="grid w-full justify-center gap-4">
-                        {[
-                            {
-                                id: "subject",
-                                label: "Nastavni predmet",
-                                placeholder: "Unesite naziv predmeta",
-                                value: formData.subject
-                            },
-                            {
-                                id: "field",
-                                label: "Područje fizike",
-                                placeholder: "Unesite naziv područja fizike",
-                                value: formData.field
-                            },
-                            {
-                                id: "description",
-                                label: "Kratak opis",
-                                placeholder: "Unesite kratak opis",
-                                value: formData.description
-                            },
-                            {
-                                id: "materials",
-                                label: "Pribor i potrošni materijal",
-                                placeholder: "Unesite pribor i potrošni materijal",
-                                value: formData.materials
-                            },
-                            {
-                                id: "keywords",
-                                label: "Ključne riječi",
-                                placeholder: "Unesite ključne riječi odvojene točka-zarezom (;)",
-                                value: formData.keywords
-                            },
-                        ].map(({id, label, placeholder, value}) => (
-                            <div key={id} className="flex flex-col items-center space-y-1.5 w-full">
-                                <CardTitle>{label}</CardTitle>
-                                <Input
-                                    className="w-[40vw]"
-                                    id={id}
-                                    placeholder={placeholder}
-                                    value={value}
-                                    onChange={handleInputChange}
-                                />
-                            </div>
-                        ))}
 
-                        <div className="flex flex-col items-center w-full">
-                            <label htmlFor="profileImage" className="font-semibold">Profilna slika:</label>
-                            <Input
-                                id="profileImage"
-                                type="file"
-                                accept="image/*"  // Restricts to images
-                                onChange={handleProfileImageChange}
-                            />
-                            {profileImage && (
-                                <p className="text-sm text-gray-600">Selected: {profileImage.name}</p>
-                            )}
-                        </div>
+            <CardContent className="w-full p-2 lg:p-6">
 
-                        {/* Other Files Picker */}
-                        <div className="flex flex-col items-center w-full">
-                            <label htmlFor="otherFiles" className="font-semibold">Ostale datoteke:</label>
-                            <Input
-                                id="otherFiles"
-                                type="file"
-                                multiple
-                                onChange={handleOtherFilesChange}
-                            />
-                            {otherFiles.length > 0 && (
-                                <ul className="text-sm text-gray-600">
-                                    {otherFiles.map((file, idx) => (
-                                        <li key={idx}>{file.name}</li>
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
+                <form className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-6 w-full">
 
-                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
-                            <CardTitle>Interna oznaka (ZPF)</CardTitle>
+                    <div className="flex flex-col space-y-6">
+
+                        <Card className="w-full flex flex-col space-y-1.5">
+                            <CardTitle><CardHeader>ZPF Inventarna oznaka</CardHeader></CardTitle>
                             <Input
                                 id="intozn-letters"
                                 placeholder="Unesite 5 velikih slova (obavezno)"
@@ -263,7 +140,6 @@ function Experimentunos() {
                                 onChange={(e) => {
                                     const value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 5);
                                     setInternalCode(value);
-                                    // Live validation for letters
                                     if (value.length === 5 && /^[A-Z]{5}$/.test(value)) {
                                         setValidationMessage("Ispravno (slova)");
                                     } else {
@@ -278,9 +154,6 @@ function Experimentunos() {
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 2);
                                     setOptionalNumbers(value);
-                                    if (value.length === 0 || (value.length === 2 && /^[0-9]{2}$/.test(value))) {
-                                    } else {
-                                    }
                                 }}
                             />
                             {validationMessage && (
@@ -288,77 +161,157 @@ function Experimentunos() {
                                     {validationMessage}
                                 </p>
                             )}
-                        </div>
+                        </Card>
 
+                        <Card className="w-full flex flex-col space-y-1.5">
+                            <CardHeader><CardTitle>Nastavni predmet</CardTitle></CardHeader>
+                            <Input
+                                placeholder="Unesite nastavni predmet"
+                                value={subject}
+                                onChange={(e) => setSubject(e.target.value)}
+                            />
+                        </Card>
 
-                        <Tabs defaultValue="komponente" className="w-[40vw] mx-auto">
-                            <TabsList className="grid w-full grid-cols-1">
-                                <TabsTrigger value="komponente" onClick={toggleSearchVisibility}>
-                                    Komponente
-                                </TabsTrigger>
-                            </TabsList>
-                            <TabsContent value="komponente">
-                                {isSearchVisible && (
-                                    <ScrollArea className="w-full rounded-md border p-4">
-                                        <div className="mb-4">
-                                            <Input
-                                                placeholder="Pretraži komponente"
-                                                value={searchQuery}
-                                                onChange={handleSearchChange}
-                                            />
-                                        </div>
-                                        <div>
-                                            <h4 className="text-sm font-medium leading-none">Rezultati pretrage</h4>
-                                            {searchResults.map((component) => (
-                                                <div
-                                                    key={component.id}
-                                                    className="flex items-center justify-between border-b py-2"
-                                                >
-                                                    <span>{component.name}</span>
-                                                    <Button
-                                                        onClick={(e) => addComponent(component, e)}
-                                                        className="bg-blue-500 text-white hover:bg-blue-600"
-                                                    >
-                                                        Dodaj
-                                                    </Button>
-                                                </div>
-                                            ))}
-                                        </div>
-                                        <div className="mt-4">
-                                            <h4 className="text-sm font-medium leading-none">Odabrane komponente</h4>
-                                            {komponente.map((komponenta, index) => (
-                                                <div
-                                                    key={index}
-                                                    className="flex items-center justify-between border-b py-2"
-                                                >
-                                                    <span>{komponenta.name}</span>
-                                                    <Button
-                                                        onClick={() => removeComponent(index)}
-                                                        className="bg-red-500 text-white hover:bg-red-600"
-                                                    >
-                                                        Ukloni
-                                                    </Button>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </ScrollArea>
-                                )}
-                            </TabsContent>
-                        </Tabs>
+                        <Card className="w-full flex flex-col space-y-1.5">
+                            <CardHeader><CardTitle>Područje fizike</CardTitle></CardHeader>
+                            <Input
+                                placeholder="Unesite područje fizike"
+                                value={field}
+                                onChange={(e) => setField(e.target.value)}
+                            />
+                        </Card>
                     </div>
-                </form>
-                <CardFooter className="flex justify-center">
-                    <Button
-                        type="button"
-                        className="m-5 bg-pink-500 text-white"
-                        onClick={handleSubmit}
-                    >
-                        Završi
-                    </Button>
-                </CardFooter>
-            </CardContent>
-        </Card>
 
+                    <div className="flex flex-col space-y-6">
+
+                        <Card className="w-full flex flex-col space-y-1.5">
+                            <CardHeader><CardTitle>Komponente</CardTitle></CardHeader>
+                            <Input
+                                placeholder="Pretraži komponente"
+                                value={componentSearchQuery}
+                                onChange={(e) => {
+                                    const query = e.target.value.toLowerCase();
+                                    setComponentSearchQuery(query);
+                                    if (!query) {
+                                        setComponentSearchResults([]);
+                                        return;
+                                    }
+                                    const filtered = components.filter((comp) =>
+                                        comp.name.toLowerCase().includes(query)
+                                    );
+                                    setComponentSearchResults(filtered);
+                                }}
+                            />
+                            {componentSearchResults.map((comp) => (
+                                <div key={comp.id} className="w-full flex flex-col space-y-1.5">
+                                    <span>{comp.name}</span>
+                                    <Button
+                                        type="button"
+                                        onClick={() => {
+                                            if (!selectedComponents.some(c => c.id === comp.id)) {
+                                                setSelectedComponents([...selectedComponents, comp]);
+                                            }
+                                        }}
+                                        className="bg-blue-500 text-white hover:bg-blue-600"
+                                    >
+                                        Dodaj
+                                    </Button>
+                                </div>
+                            ))}
+
+                            <div className="mt-2">
+                                <h4 className="text-sm font-medium">Odabrane komponente:</h4>
+                                {selectedComponents.map((comp, index) => (
+                                    <div key={comp.id} className="flex justify-between items-center border-b py-1">
+                                        <span>{comp.name}</span>
+                                        <Button
+                                            type="button"
+                                            onClick={() =>
+                                                setSelectedComponents(selectedComponents.filter((_, i) => i !== index))
+                                            }
+                                            className="bg-red-500 text-white hover:bg-red-600"
+                                        >
+                                            Ukloni
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        </Card>
+
+                        <Card className="flex flex-col space-y-6">
+                            <CardHeader><CardTitle>Datoteke:</CardTitle></CardHeader>
+                            <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                                <CardTitle>Profilna slika</CardTitle>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => setProfileImage(e.target.files[0])}
+                                />
+                            </div>
+
+                            <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                                <CardTitle>Ostale slike</CardTitle>
+                                <input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={(e) => setOtherImages(Array.from(e.target.files))}
+                                />
+                            </div>
+
+                            <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                                <CardTitle>Dokumentacija</CardTitle>
+                                <input
+                                    type="file"
+                                    multiple
+                                    onChange={(e) => setDocuments(Array.from(e.target.files))}
+                                />
+                            </div>
+                        </Card>
+
+                    </div>
+
+                    <div className="flex flex-col space-y-6">
+                        <Card className="w-full flex flex-col space-y-1.5">
+                            <CardHeader><CardTitle>Kratak opis</CardTitle></CardHeader>
+                            <Textarea
+                                id="opis"
+                                placeholder="Unesite kratak opis"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                            />
+                        </Card>
+
+                        <Card className="w-full flex flex-col space-y-1.5">
+                            <CardHeader><CardTitle>Ključne riječi</CardTitle></CardHeader>
+                            <Textarea
+                                id="keywords"
+                                placeholder="Unesite ključne riječi odvojene točkom-zarezom (;)"
+                                value={keywords}
+                                onChange={(e) => setKeywords(e.target.value)}
+                            />
+                        </Card>
+
+                        <Card className="w-full flex flex-col space-y-1.5">
+                            <CardHeader><CardTitle>Pribor i potrošni materijal</CardTitle></CardHeader>
+                            <Textarea
+                                id="opis"
+                                placeholder="Unesite pribor i potrošni materijal"
+                                value={materials}
+                                onChange={(e) => setMaterials(e.target.value)}
+                            />
+                        </Card>
+                    </div>
+
+                </form>
+            </CardContent>
+
+            <div className="flex justify-center">
+                <Button className="m-5 bg-pink-500 text-white" onClick={handleSubmit}>
+                    Završi
+                </Button>
+            </div>
+        </Card>
     );
 }
 

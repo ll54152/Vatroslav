@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ElementCollection;
 
 import java.util.List;
 
@@ -26,8 +27,8 @@ public class Experiment {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(columnDefinition = "TEXT")
-    private String keywords;
+    @ElementCollection
+    private List<String> keywords;
 
     @Column(columnDefinition = "TEXT")
     private String materials;
@@ -41,7 +42,7 @@ public class Experiment {
     @OneToMany(mappedBy = "experiment")
     private List<Log> logList;
 
-    public Experiment(String name, String zpf, String field, String subject, String description, String keywords, String materials) {
+    public Experiment(String name, String zpf, String field, String subject, String description, List<String> keywords, String materials) {
         this.name = name;
         this.zpf = zpf;
         this.field = field;
@@ -51,7 +52,7 @@ public class Experiment {
         this.materials = materials;
     }
 
-    public Experiment(String name, String zpf, String field, String subject, String description, String keywords, String materials, List<Component> componentList, List<Log> logList) {
+    public Experiment(String name, String zpf, String field, String subject, String description, List<String> keywords, String materials, List<Component> componentList, List<Log> logList) {
         this.name = name;
         this.zpf = zpf;
         this.field = field;
@@ -64,7 +65,7 @@ public class Experiment {
     }
 
 
-    public Experiment(String name, String zpf, String field, String subject, String description, String keywords, String materials, List<Log> logList) {
+    public Experiment(String name, String zpf, String field, String subject, String description, List<String> keywords, String materials, List<Log> logList) {
         this.name = name;
         this.zpf = zpf;
         this.field = field;
@@ -126,14 +127,6 @@ public class Experiment {
         this.description = description;
     }
 
-    public String getKeywords() {
-        return keywords;
-    }
-
-    public void setKeywords(String keywords) {
-        this.keywords = keywords;
-    }
-
     public String getMaterials() {
         return materials;
     }
@@ -164,5 +157,13 @@ public class Experiment {
 
     public void setFileList(List<File> fileList) {
         this.fileList = fileList;
+    }
+
+    public List<String> getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(List<String> keywords) {
+        this.keywords = keywords;
     }
 }

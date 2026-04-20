@@ -149,7 +149,7 @@ function Komponenteunos() {
         });
 
         documents.forEach((file) => {
-            formToSend.append("files", file); // keep "files" for docs
+            formToSend.append("files", file);
         });
 
         try {
@@ -235,7 +235,6 @@ function Komponenteunos() {
 
             <CardContent className="w-full p-2 lg:p-6">
                 <form className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-6 w-full">
-                    {/* First Column: Code Information */}
                     <div className="flex flex-col space-y-6">
                         <Card className="w-full flex flex-col space-y-1.5">
                             <CardTitle><CardHeader>ZPF Inventarna oznaka</CardHeader></CardTitle>

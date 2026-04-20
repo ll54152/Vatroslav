@@ -10,7 +10,7 @@ public class ExperimentShowDTO {
     private String subject;
     private String field;
     private String description;
-    private String keywords;
+    private List<String> keywords;
     private String materials;
     private List<ComponentDTO> componentDTOList;
     private List<LogShowDTO> logShowDTOList;
@@ -19,7 +19,7 @@ public class ExperimentShowDTO {
     public ExperimentShowDTO() {
     }
 
-    public ExperimentShowDTO(Long id, String name, String zpf, String subject, String field, String description, String keywords, String materials, List<ComponentDTO> componentDTOList, List<LogShowDTO> logShowDTOList, List<FileShowDTO> fileShowDTOList) {
+    public ExperimentShowDTO(Long id, String name, String zpf, String subject, String field, String description, List<String> keywords, String materials, List<ComponentDTO> componentDTOList, List<LogShowDTO> logShowDTOList, List<FileShowDTO> fileShowDTOList) {
         this.id = id;
         this.name = name;
         this.zpf = zpf;
@@ -81,14 +81,6 @@ public class ExperimentShowDTO {
         this.description = description;
     }
 
-    public String getKeywords() {
-        return keywords;
-    }
-
-    public void setKeywords(String keywords) {
-        this.keywords = keywords;
-    }
-
     public String getMaterials() {
         return materials;
     }
@@ -119,5 +111,13 @@ public class ExperimentShowDTO {
 
     public void setFileShowDTOList(List<FileShowDTO> fileShowDTOList) {
         this.fileShowDTOList = fileShowDTOList;
+    }
+
+    public List<String> getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(List<String> keywords) {
+        this.keywords = keywords;
     }
 }
