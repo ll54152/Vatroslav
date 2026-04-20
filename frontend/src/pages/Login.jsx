@@ -95,14 +95,14 @@ function Login() {
 
     if (!isAuthenticated) {
         return (
-            <Card className="w-[350px]">
+            <Card className="w-1/2 p-2 lg:p-4 mx-auto mt-10">
                 <CardHeader>
                     <CardTitle>Prijava</CardTitle>
                     <CardDescription>Prijava u bazu podataka.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit}>
-                        <div className="grid w-full items-center gap-4">
+                        <div className="grid items-center gap-4">
                             <div className="flex flex-col space-y-1.5">
                                 <Label htmlFor="email">Email</Label>
                                 <Input
@@ -123,7 +123,7 @@ function Login() {
                                 />
                             </div>
                         </div>
-                        <CardFooter className="flex flex-col items-start gap-2">
+                        <CardFooter className="flex flex-col items-center gap-2">
                             <div className="flex gap-2">
                                 <Button type="submit" className="m-5 bg-pink-500 text-white">Prijavi se</Button>
                                 <Link to="/home">
