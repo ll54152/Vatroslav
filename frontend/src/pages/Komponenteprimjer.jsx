@@ -263,8 +263,7 @@ export default function KomponentePrimjerView() {
                 <div className="flex flex-col gap-6">
                     <Card>
                         <CardHeader><CardTitle>Galerija</CardTitle></CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-2 gap-2">
+                        <CardContent className="grid grid-cols-2 gap-2">
                                 {generalFiles?.length > 0 ? (
                                     galleryImages.map(img => (
                                         <img
@@ -277,7 +276,6 @@ export default function KomponentePrimjerView() {
                                 ) : (
                                     <EmptyValue text="Nema fotografija"/>
                                 )}
-                            </div>
                         </CardContent>
                     </Card>
 
