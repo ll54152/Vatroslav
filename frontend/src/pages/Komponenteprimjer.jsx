@@ -9,6 +9,8 @@ export default function KomponentePrimjerView() {
     const [component, setComponent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeImage, setActiveImage] = useState(null);
+    const [newLog, setNewLog] = useState("");
+    const [addingLog, setAddingLog] = useState(false);
 
     useEffect(() => {
         const load = async () => {
@@ -29,7 +31,6 @@ export default function KomponentePrimjerView() {
     if (loading) return <div className="p-6">Učitavanje...</div>;
     if (!component) return <div className="p-6">Nema podataka</div>;
 
-    // FILE GROUPING
     const profileImage = component.fileShowDTOList?.find(f => f.fileCategory === "profileImage");
     const galleryImages = component.fileShowDTOList?.filter(f => f.fileCategory === "otherImage") || [];
     const generalFiles = component.fileShowDTOList?.filter(f => f.fileCategory === "general") || [];
@@ -39,17 +40,53 @@ export default function KomponentePrimjerView() {
     );
 
 
-    // LAST 3 LOGS
     const logs = (component.logShowDTOList || [])
         .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
         .slice(0, 3);
 
     const openImage = (img) => setActiveImage(img);
 
+    const handleAddLog = async () => {
+        if (!newLog.trim()) return;
+
+        const token = localStorage.getItem("jwt");
+
+        const logData = {
+            note: newLog,
+            entityType: "component",
+            entityId: Number(id),
+        };
+
+        try {
+            setAddingLog(true);
+
+            const response = await fetch(`/vatroslav/api/log/add`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `${token}`,
+                },
+                body: JSON.stringify(logData),
+            });
+
+            if (response.ok) {
+                const created = await response.json();
+
+                setComponent(prev => ({
+                    ...prev,
+                    logShowDTOList: [created, ...(prev.logShowDTOList || [])],
+                }));
+
+                setNewLog("");
+            }
+        } finally {
+            setAddingLog(false);
+        }
+    };
+
     return (
         <div className="min-h-screen p-6">
 
-            {/* ================= HERO ================= */}
             <div className="flex flex-col items-center mb-10">
 
                 {profileImage ? (
@@ -69,10 +106,8 @@ export default function KomponentePrimjerView() {
                 </p>
             </div>
 
-            {/* ================= 3 COLUMN GRID ================= */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                {/* ===== LEFT COLUMN ===== */}
                 <div className="flex flex-col gap-6">
 
                     <Card>
@@ -121,7 +156,6 @@ export default function KomponentePrimjerView() {
                 </div>
 
 
-                {/* ===== MIDDLE COLUMN ===== */}
                 <div className="flex flex-col gap-6">
 
 
@@ -143,25 +177,51 @@ export default function KomponentePrimjerView() {
                     </Card>
 
                     <Card>
-                        <CardHeader><CardTitle>Zadnji logovi</CardTitle></CardHeader>
-                        <CardContent className="space-y-3">
-                            {logs.length ? logs.map(log => (
-                                <div key={log.id} className="border-b pb-2 text-sm">
-                                    <div>{log.note}</div>
-                                    <div className="text-gray-500">
-                                        {new Date(log.timestamp).toLocaleString()}
+                        <CardHeader>
+                            <CardTitle>Zadnji logovi</CardTitle>
+                        </CardHeader>
+
+                        <CardContent className="space-y-4">
+
+                            {/* INPUT AREA */}
+                            <div className="flex gap-2">
+                                <input
+                                    value={newLog}
+                                    onChange={(e) => setNewLog(e.target.value)}
+                                    placeholder="Dodaj novi log..."
+                                    className="flex-1 border rounded px-3 py-2 text-sm"
+                                />
+
+                                <button
+                                    onClick={handleAddLog}
+                                    disabled={addingLog}
+                                    className="bg-pink-500 text-white px-3 py-2 rounded text-sm hover:bg-pink-600 disabled:opacity-50"
+                                >
+                                    {addingLog ? "..." : "Dodaj"}
+                                </button>
+                            </div>
+
+                            {/* LOG LIST */}
+                            <div className="space-y-3">
+                                {logs.length ? logs.map(log => (
+                                    <div key={log.id} className="border-b pb-2 text-sm">
+                                        <div>{log.note}</div>
+                                        <div className="text-gray-500">
+                                            {new Date(log.timestamp).toLocaleString()}
+                                        </div>
                                     </div>
-                                </div>
-                            )) : "Nema"}
+                                )) : (
+                                    <EmptyValue text="Nema logova" />
+                                )}
+                            </div>
+
                         </CardContent>
                     </Card>
 
                 </div>
 
-                {/* ===== RIGHT COLUMN ===== */}
                 <div className="flex flex-col gap-6">
 
-                    {/* GALLERY */}
                     <Card>
                         <CardHeader><CardTitle>Galerija</CardTitle></CardHeader>
                         <CardContent>
@@ -182,7 +242,6 @@ export default function KomponentePrimjerView() {
                         </CardContent>
                     </Card>
 
-                    {/* FILES */}
                     <Card>
                         <CardHeader>
                             <CardTitle>Dokumenti</CardTitle>
@@ -209,7 +268,6 @@ export default function KomponentePrimjerView() {
                 </div>
             </div>
 
-            {/* ================= LIGHTBOX ================= */}
             {activeImage && (
                 <div
                     className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"

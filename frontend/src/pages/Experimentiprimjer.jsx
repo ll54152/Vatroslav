@@ -92,8 +92,8 @@ function Experimentiprimjer() {
 
         const logData = {
             note: newLog,
-            entityType: "eksperiment",  // po zahtjevu
-            entityId: Number(id),      // id iz useParams
+            entityType: "experiment",
+            entityId: Number(id),
         };
 
         try {
@@ -124,7 +124,6 @@ function Experimentiprimjer() {
 
         setNewLog("");
 
-        // Ponovno dohvaćanje eksperimenta da osvježiš logove
         try {
             const response = await fetch(`/vatroslav/api/experiment/get/${id}`, {
                 headers: {

@@ -126,9 +126,9 @@ public class LogServiceJPA {
         log.setUser(userServiceJPA.getAuthenticatedUser());
         log.setNote(logAddDTO.getNote());
 
-        if (logAddDTO.getEntityType().equals("eksperiment")) {
+        if (logAddDTO.getEntityType().equals("experiment")) {
             log.setExperiment(experimentRepo.findById(logAddDTO.getEntityId()).orElseThrow(() -> new RuntimeException("Experiment not found")));
-        } else if (logAddDTO.getEntityType().equals("komponenta")) {
+        } else if (logAddDTO.getEntityType().equals("component")) {
             log.setComponent(componentRepo.findById(logAddDTO.getEntityId()).orElseThrow(() -> new RuntimeException("Component not found")));
         }
 
