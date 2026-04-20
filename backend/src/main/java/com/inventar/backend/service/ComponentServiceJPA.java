@@ -46,7 +46,7 @@ public class ComponentServiceJPA {
         this.fileServiceJPA = fileServiceJPA;
     }
 
-    public Component save(ComponentAddDTO componentAddDTO, MultipartFile[] files) {
+    public Component save(ComponentAddDTO componentAddDTO, MultipartFile[] files, MultipartFile profileImage, MultipartFile[] otherImages) {
         User user = userServiceJPA.getAuthenticatedUser();
 
         Location location = locationRepo.findById(componentAddDTO.getLocationID()).orElseThrow(() -> new RuntimeException("Location not found"));
@@ -59,7 +59,7 @@ public class ComponentServiceJPA {
 
         logServiceJPA.componentCreation(component, user);
 
-        fileServiceJPA.handleComponentFiles(component, files, user);
+        fileServiceJPA.handleComponentFiles(component, files, profileImage, otherImages, user);
 
         linkExperimentsWithComponent(component, experimentList, user);
 

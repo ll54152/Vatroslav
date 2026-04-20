@@ -84,21 +84,40 @@ public class FileServiceJPA {
         return fileRepo.save(file);
     }
 
-    public void handleComponentFiles(Component component, MultipartFile[] files, User user) {
-        if (files == null) return;
+    public void handleComponentFiles(Component component, MultipartFile[] files, MultipartFile profileImage, MultipartFile[] otherImages, User user) {
+        List<MultipartFile> multipartFiles = new ArrayList<>();
 
-        for (MultipartFile fileData : files) {
+        if (files != null) {
+            multipartFiles.addAll(List.of(files));
+        }
+
+        if (profileImage != null) {
+            multipartFiles.add(profileImage);
+        }
+
+        if (otherImages != null) {
+            multipartFiles.addAll(List.of(otherImages));
+        }
+
+        for (MultipartFile multipartFile : multipartFiles) {
             try {
                 File file = new File();
-                file.setName(fileData.getOriginalFilename());
+                file.setName(multipartFile.getOriginalFilename());
                 file.setComponent(component);
-                file.setFileType(fileData.getContentType());
-                file.setFileCategory("general");
+                file.setFileType(multipartFile.getContentType());
+
+                if (multipartFile.equals(profileImage)) {
+                    file.setFileCategory("profileImage");
+                } else if (otherImages != null && List.of(otherImages).contains(multipartFile)) {
+                    file.setFileCategory("otherImage");
+                } else {
+                    file.setFileCategory("general");
+                }
+
                 file.setUser(user);
-                file.setFileByte(fileData.getBytes());
+                file.setFileByte(multipartFile.getBytes());
 
                 fileRepo.save(file);
-
                 logServiceJPA.fileComponentCreation(component, file, user);
 
             } catch (Exception e) {
@@ -118,23 +137,23 @@ public class FileServiceJPA {
             multipartFiles.add(profileImage);
         }
 
-        for (MultipartFile fileData : multipartFiles) {
+        for (MultipartFile multipartFile : multipartFiles) {
             try {
                 File file = new File();
-                file.setName(fileData.getOriginalFilename());
+                file.setName(multipartFile.getOriginalFilename());
                 file.setExperiment(experiment);
-                file.setFileType(fileData.getContentType());
+                file.setFileType(multipartFile.getContentType());
 
-                file.setFileCategory(
-                        fileData.equals(profileImage) ? "profileImage" : "general"
-                );
-
+                if (multipartFile.equals(profileImage)) {
+                    file.setFileCategory("profileImage");
+                } else {
+                    file.setFileCategory("general");
+                }
 
                 file.setUser(user);
-                file.setFileByte(fileData.getBytes());
+                file.setFileByte(multipartFile.getBytes());
 
                 fileRepo.save(file);
-
                 logServiceJPA.fileExperimentCreation(experiment, file, user);
 
             } catch (Exception e) {

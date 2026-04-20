@@ -31,7 +31,9 @@ function Komponenteunos() {
     const [newLocationAddress, setNewLocationAddress] = useState();
     const [newLocationRoom, setNewLocationRoom] = useState();
     const [locationSearchQuery, setLocationSearchQuery] = useState();
-    const [files, setFiles] = useState([]);
+    const [profileImage, setProfileImage] = useState(null);
+    const [otherImages, setOtherImages] = useState([]);
+    const [documents, setDocuments] = useState([]);
     const [validationMessage, setValidationMessage] = useState();
     const navigate = useNavigate();
     const [optionalNumbers, setOptionalNumbers] = useState();
@@ -132,13 +134,22 @@ function Komponenteunos() {
             experimentIds: selectedExperiments.map(e => e.id),
         };
 
+
         formToSend.append(
             "data",
-            new Blob([JSON.stringify(requestData)], {type: "application/json"})
+            new Blob([JSON.stringify(requestData)], { type: "application/json" })
         );
 
-        files.forEach((file) => {
-            formToSend.append("files", file);
+        if (profileImage) {
+            formToSend.append("profileImage", profileImage);
+        }
+
+        otherImages.forEach((file) => {
+            formToSend.append("otherImages", file);
+        });
+
+        documents.forEach((file) => {
+            formToSend.append("files", file); // keep "files" for docs
         });
 
         try {
@@ -182,11 +193,9 @@ function Komponenteunos() {
                 body: JSON.stringify(newLocation),
             });
 
-            // Log the response body before parsing it as JSON
             const textResponse = await response.text();
             console.log("Response text:", textResponse);
 
-            // Check if the response is valid JSON
             let data;
             try {
                 data = JSON.parse(textResponse);
@@ -329,7 +338,7 @@ function Komponenteunos() {
                                     </Button>
                                 </div>
                             ))}
-                            {/* Selected Experiments */}
+
                             <div className="mt-2">
                                 <h4 className="text-sm font-medium">Odabrani eksperimenti:</h4>
                                 {selectedExperiments.map((exp, index) => (
@@ -436,13 +445,31 @@ function Komponenteunos() {
                             </div>
                         )}
 
-                        <div className="w-full flex flex-col space-y-1.5">
-                            <CardTitle>Dokumentacija</CardTitle>
+                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                            <CardTitle>Profilna slika</CardTitle>
                             <input
                                 type="file"
-                                id="files"
+                                accept="image/*"
+                                onChange={(e) => setProfileImage(e.target.files[0])}
+                            />
+                        </div>
+
+                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                            <CardTitle>Ostale slike</CardTitle>
+                            <input
+                                type="file"
                                 multiple
-                                onChange={(e) => setFiles(Array.from(e.target.files))}
+                                accept="image/*"
+                                onChange={(e) => setOtherImages(Array.from(e.target.files))}
+                            />
+                        </div>
+
+                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                            <CardTitle>Dokumentacija (PDF, DOC...)</CardTitle>
+                            <input
+                                type="file"
+                                multiple
+                                onChange={(e) => setDocuments(Array.from(e.target.files))}
                             />
                         </div>
 
