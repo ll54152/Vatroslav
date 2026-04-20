@@ -6,45 +6,36 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import {useNavigate} from "react-router-dom";
-import React, {useState, useEffect} from "react";
+import {useState, useEffect} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
-import {Label} from "@/components/ui/label";
-import reactRefresh from "eslint-plugin-react-refresh";
+import {Textarea} from "@/components/ui/textarea";
 
 function Komponenteunos() {
     const [componentName, setComponentName] = useState("");
     const [internalCode, setInternalCode] = useState("");
     const [location, setLocation] = useState("");
-    //const [experiment, setExperiment] = useState("");  // Novo stanje za eksperiment
-    //const [experiments, setExperiments] = useState([]);  // Stanje za eksperimente
-    const [experiments, setExperiments] = useState([]); // svi dohvaćeni eksperimenti
+    const [experiments, setExperiments] = useState([]);
     const [experimentSearchQuery, setExperimentSearchQuery] = useState("");
     const [experimentSearchResults, setExperimentSearchResults] = useState([]);
     const [selectedExperiments, setSelectedExperiments] = useState([]);
-
-    const [searchQuery, setSearchQuery] = useState("");
-    const [searchResults, setSearchResults] = useState([]);
     const [keywords, setKeywords] = useState("");
-
     const [ferStatus, setFerStatus] = useState("CATALOGED");
     const [fer, setFer] = useState("");
     const [deprecatedMarks, setDeprecatedMarks] = useState("");
 
     const [quantity, setQuantity] = useState("");
     const [description, setDescription] = useState("");
-    const [notes, setNotes] = useState("");
-    const [status, setStatus] = useState("active");
     const [locations, setLocations] = useState([]);
     const [newLocationAddress, setNewLocationAddress] = useState("");
     const [newLocationRoom, setNewLocationRoom] = useState("");
-    const [showAddLocation, setShowAddLocation] = useState(false);
     const [locationSearchQuery, setLocationSearchQuery] = useState("");
     const [files, setFiles] = useState([]);
     const [validationMessage, setValidationMessage] = useState("");
     const navigate = useNavigate();
     const [optionalNumbers, setOptionalNumbers] = useState("");
+
 
     useEffect(() => {
         const fetchLocations = async () => {
@@ -218,10 +209,10 @@ function Komponenteunos() {
     };
 
     return (
-        <Card className="w-full max-w-6xl mx-auto px-6">
-            <CardHeader className="flex flex-col items-center">
+        <Card className="w-full p-2 lg:p-4">
+            <CardHeader className="flex flex-col items-center p-3 lg:p-6">
                 <CardTitle className="text-4xl font-bold mb-4">Naziv komponente</CardTitle>
-                <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                <div className="w-full flex flex-col space-y-1.5">
                     <Input
                         id="nazivkomponente"
                         placeholder="Unesite naziv komponente"
@@ -231,11 +222,11 @@ function Komponenteunos() {
                 </div>
             </CardHeader>
 
-            <CardContent>
-                <form className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full max-w-6xl mx-auto">
+            <CardContent className="w-full p-2 lg:p-6">
+                <form className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-6 w-full">
                     {/* First Column: Code Information */}
                     <div className="flex flex-col space-y-6">
-                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                        <div className="w-full flex flex-col space-y-1.5">
                             <CardTitle>Interna oznaka (ZPF)</CardTitle>
                             <Input
                                 id="intozn-letters"
@@ -267,7 +258,7 @@ function Komponenteunos() {
                             )}
                         </div>
 
-                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                        <div className="w-full flex flex-col space-y-1.5">
                             <CardTitle>FER Inventarna oznaka</CardTitle>
                             <Input
                                 placeholder="Unesite FER"
@@ -276,9 +267,9 @@ function Komponenteunos() {
                             />
                         </div>
 
-                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                        <div className="w-full flex flex-col space-y-1.5">
                             <CardTitle>Status FER inventarne oznake</CardTitle>
-                            <Select value={fer} onValueChange={setFerStatus}>
+                            <Select value={ferStatus} onValueChange={setFerStatus}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Odaberi status"/>
                                 </SelectTrigger>
@@ -290,9 +281,9 @@ function Komponenteunos() {
                             </Select>
                         </div>
 
-                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                        <div className="w-full flex flex-col space-y-1.5">
                             <CardTitle>Zastarjele inventarne oznake</CardTitle>
-                            <Input
+                            <Textarea
                                 placeholder="Unesite stare oznake (ako postoje)"
                                 value={deprecatedMarks}
                                 onChange={(e) => setDeprecatedMarks(e.target.value)}
@@ -301,9 +292,8 @@ function Komponenteunos() {
 
                     </div>
 
-                    {/* Second Column: Location & Experiment Information */}
                     <div className="flex flex-col space-y-6">
-                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                        <div className="w-full flex flex-col space-y-1.5">
                             <CardTitle>Eksperimenti</CardTitle>
                             <Input
                                 placeholder="Pretraži eksperimente"
@@ -321,9 +311,8 @@ function Komponenteunos() {
                                     setExperimentSearchResults(filtered);
                                 }}
                             />
-                            {/* Search Results */}
                             {experimentSearchResults.map((exp) => (
-                                <div key={exp.id} className="w-full max-w-4xl flex flex-col space-y-1.5">
+                                <div key={exp.id} className="w-full flex flex-col space-y-1.5">
                                     <span>{exp.name}</span>
                                     <Button
                                         type="button"
@@ -358,7 +347,7 @@ function Komponenteunos() {
                             </div>
                         </div>
 
-                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                        <div className="w-full flex flex-col space-y-1.5">
                             <CardTitle>Gdje se nalazi</CardTitle>
                             <Input
                                 placeholder="Pretraži lokacije..."
@@ -393,7 +382,7 @@ function Komponenteunos() {
                                                     className="flex flex-col cursor-pointer gap-0.5 min-w-0"
                                                     onClick={() => {
                                                         setLocation(loc.id.toString());
-                                                        setLocationSearchQuery(""); // collapse after select
+                                                        setLocationSearchQuery("");
                                                     }}
                                                 >
                                                     <span
@@ -413,7 +402,7 @@ function Komponenteunos() {
                             )}
                         </div>
 
-                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                        <div className="w-full flex flex-col space-y-1.5">
                             <CardTitle>Dokumentacija</CardTitle>
                             <input
                                 type="file"
@@ -425,9 +414,8 @@ function Komponenteunos() {
 
                     </div>
 
-                    {/* Third Column: Quantity, Description, and Keywords */}
                     <div className="flex flex-col space-y-6">
-                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                        <div className="w-full flex flex-col space-y-1.5">
                             <CardTitle>Količina</CardTitle>
                             <Input
                                 id="kolicina"
@@ -437,9 +425,9 @@ function Komponenteunos() {
                             />
                         </div>
 
-                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                        <div className="w-full flex flex-col space-y-1.5">
                             <CardTitle>Kratak opis</CardTitle>
-                            <Input
+                            <Textarea
                                 id="opis"
                                 placeholder="Unesite kratak opis"
                                 value={description}
@@ -447,9 +435,9 @@ function Komponenteunos() {
                             />
                         </div>
 
-                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                        <div className="w-full flex flex-col space-y-1.5">
                             <CardTitle>Ključne riječi</CardTitle>
-                            <Input
+                            <Textarea
                                 id="keywords"
                                 placeholder="Unesite ključne riječi odvojene točkom-zarezom (;)"
                                 value={keywords}
