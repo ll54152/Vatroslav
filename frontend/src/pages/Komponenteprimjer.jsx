@@ -1,203 +1,228 @@
 import React, {useEffect, useState} from "react";
 import {useParams, useNavigate} from "react-router-dom";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from "@/components/ui/accordion";
-import {jwtDecode} from "jwt-decode";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 
-function Komponenteprimjer() {
+export default function KomponentePrimjerView() {
     const {id} = useParams();
-    const [component, setComponent] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    const isTokenValid = () => {
-        const token = localStorage.getItem("jwt");
-        if (!token) return false;
-        try {
-            const decoded = jwtDecode(token);
-            const currentTime = Date.now() / 1000;
-            return decoded.exp > currentTime;
-        } catch (error) {
-            return false;
-        }
-    };
-
-    const verifyToken = async () => {
-        const token = localStorage.getItem("jwt");
-        if (!token) return false;
-        try {
-            const response = await fetch("/vatroslav/api/auth/verify", {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `${token}`,
-                },
-            });
-            return response.ok;
-        } catch (error) {
-            return false;
-        }
-    };
+    const [component, setComponent] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [activeImage, setActiveImage] = useState(null);
 
     useEffect(() => {
-        const fetchComponent = async () => {
+        const load = async () => {
             const token = localStorage.getItem("jwt");
 
-            const isValid = isTokenValid();
-            const isVerified = await verifyToken();
+            const res = await fetch(`/vatroslav/api/component/get/${id}`, {
+                headers: {Authorization: `${token}`},
+            });
 
-            if (!isValid || !isVerified) {
-                localStorage.removeItem("jwt");
-                navigate("/login");
-                return;
-            }
-
-            try {
-                const response = await fetch(`/vatroslav/api/component/get/${id}`, {
-                    headers: {
-                        Authorization: `${token}`,
-                    },
-                });
-                if (!response.ok) {
-                    throw new Error("Greška prilikom dohvaćanja podataka!");
-                }
-                const data = await response.json();
-                setComponent(data);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
+            const data = await res.json();
+            setComponent(data);
+            setLoading(false);
         };
 
-        fetchComponent();
-    }, [id, navigate]);
+        load();
+    }, [id]);
 
-    if (loading) return <div>Učitavanje...</div>;
-    if (error) return <div>Greška: {error}</div>;
-    if (!component) return <div>Komponenta nije pronađena.</div>;
+    if (loading) return <div className="p-6">Učitavanje...</div>;
+    if (!component) return <div className="p-6">Nema podataka</div>;
+
+    // FILE GROUPING
+    const profileImage = component.fileShowDTOList?.find(f => f.fileCategory === "profileImage");
+    const galleryImages = component.fileShowDTOList?.filter(f => f.fileCategory === "otherImage") || [];
+    const generalFiles = component.fileShowDTOList?.filter(f => f.fileCategory === "general") || [];
+
+    const EmptyValue = ({ text = "N/A" }) => (
+        <span className="text-gray-400 italic">{text}</span>
+    );
+
+
+    // LAST 3 LOGS
+    const logs = (component.logShowDTOList || [])
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, 3);
+
+    const openImage = (img) => setActiveImage(img);
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center">
-            <Card className="w-[75vw] h-[160vh]">
-                <CardHeader>
-                    <CardTitle className="text-4xl font-bold grid w-full justify-center gap-4 ">
-                        {component.name || "Naziv komponente"}
-                    </CardTitle>
-                    
-                </CardHeader>
-                <CardContent>
-                    <form>
-                        <div className="grid w-full justify-center gap-4">
-                            {/* Prikaz svih informacija o komponenti */}
-                            <div className="flex flex-col space-y-1.5">
-                                <CardTitle>Interna oznaka (ZPF)</CardTitle>
-                               <CardDescription className="text-blue-900 text-lg">{component.zpf || "N/A"}</CardDescription>
-                                    
-                                
-                            </div>
-                            <div className="flex flex-col space-y-1.5">
-                                <CardTitle>FER Status (Active/InActive/Unknown)</CardTitle>
-                               
-                                    <CardDescription className="text-blue-900 text-lg">{component.fer || "N/A"}</CardDescription>
-                            
-                            </div>
-                            <div className="flex flex-col space-y-1.5">
-                                <CardTitle>Kratki opis</CardTitle>
-                                
-                                  <CardDescription className="text-blue-900 text-lg">{component.description|| "N/A"}</CardDescription>
-                               
-                            </div>
+        <div className="min-h-screen p-6">
 
-                            <div className="flex flex-col space-y-1.5">
-                                <CardTitle>Gdje se nalazi</CardTitle>
-                               
-                                    <CardDescription className="text-blue-900 text-lg">
-                                        {component.location && component.location.adress && component.location.room
-                                            ? `${component.location.adress}, ${component.location.room}`
-                                            : "Lokacija nije dostupna"}
-                                   </CardDescription>
-                                
-                            </div>
-                            <div className="flex flex-col space-y-1.5">
-                                <CardTitle>Količina</CardTitle>
-                                
-                                     <CardDescription className="text-blue-900 text-lg">{component.quantity|| "N/A"}</CardDescription>
-                               
-                            </div>
-                            <div className="flex flex-col space-y-1.5">
-                                <CardTitle>Zapisi (Logs)</CardTitle>
-                                <CardContent>
-                                    {component.logs && component.logs.length > 0 ? (
-                                        <ul>
-                                            {component.logs.map((log, index) => (
-                                                <li key={index}>
-                                                    <strong>Bilješka:</strong> {log.note} <br/>
-                                                    <strong>Vrijeme:</strong> {new Date(log.timestamp).toLocaleString()}
-                                                    <br/>
-                                                    <strong>Korisnik:</strong> {log.user?.name || "Nepoznato"}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        "Nema zapisa"
-                                    )}
+            {/* ================= HERO ================= */}
+            <div className="flex flex-col items-center mb-10">
 
-                                </CardContent>
+                {profileImage ? (
+                    <img
+                        src={`data:image/jpeg;base64,${profileImage.fileByte}`}
+                        onClick={() => openImage(profileImage)}
+                    />
+                ) : (
+                    <div className="w-56 h-56 bg-gray-200 rounded-3xl flex items-center justify-center">
+                        <EmptyValue text="Nema profilne fotografije"/>
+                    </div>
+                )}
+
+                <h1 className="text-3xl font-bold mt-4">{component.name}</h1>
+                <p className="text-gray-500">
+                    {component.zpf}
+                </p>
+            </div>
+
+            {/* ================= 3 COLUMN GRID ================= */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                {/* ===== LEFT COLUMN ===== */}
+                <div className="flex flex-col gap-6">
+
+                    <Card>
+                        <CardHeader><CardTitle>Osnovno</CardTitle></CardHeader>
+                        <CardContent className="space-y-2">
+                            <div>
+                                <b>Lokacija: </b>
+                                {component.locationDTO
+                                    ? `${component.locationDTO.address}, ${component.locationDTO.room}`
+                                    : <EmptyValue text="Nema lokacije"/>}
                             </div>
-                            <Accordion type="single" collapsible className="w-full">
-                                <AccordionItem value="eksperiments">
-                                    <AccordionTrigger
-                                        style={{
-                                            backgroundColor: "white",
-                                            color: "black",
-                                            padding: "0.5rem 1rem",
-                                            borderRadius: "0.25rem",
-                                            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                                            textAlign: "center",
-                                        }}
+                            <div><b>Količina:</b> {component.quantity}</div>
+                            <div><b>Ključne riječi: </b>
+                                {component.keywords?.length ? (
+                                    component.keywords.map((k, i) => (
+                                        <div key={i}>• {k}</div>
+                                    ))
+                                ) : <EmptyValue text="Nema ključnih riječi"/>}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader><CardTitle>Opis</CardTitle></CardHeader>
+                        <CardContent>{component.description || <EmptyValue text="Nema opisa"/>}</CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader><CardTitle>Inventarske oznake</CardTitle></CardHeader>
+                        <CardContent className="space-y-2">
+                            <div>
+                                <b>Status FER inventarne oznake: </b>
+                                {component.ferStatus || <EmptyValue text="Nema statusa FER inventarne oznake"/>}
+                            </div>
+                            <div><b>FER Inventarna oznaka: </b> {component.fer || "N/A"}</div>
+                            <div><b>Zastarjele inventarne oznake: </b>
+                                {component.deprecatedInventoryMarks?.length ? (
+                                    component.deprecatedInventoryMarks.map((k, i) => (
+                                        <div key={i}>• {k}</div>
+                                    ))
+                                ) : <EmptyValue text="Nema zastarjelih inventarskih oznaka"/>}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                </div>
+
+
+                {/* ===== MIDDLE COLUMN ===== */}
+                <div className="flex flex-col gap-6">
+
+
+                    <Card>
+                        <CardHeader><CardTitle>Eksperimenti</CardTitle></CardHeader>
+                        <CardContent>
+                            {component.experimentShowDTOList?.length ? (
+                                component.experimentShowDTOList.map(exp => (
+                                    <div
+                                        key={exp.id}
+                                        className="text-blue-500 hover:underline cursor-pointer"
+                                        onClick={() => navigate(`/experimentiprimjer/${exp.id}`)}
                                     >
-                                        Eksperimenti
-                                    </AccordionTrigger>
-                                    <AccordionContent>
-                                        {component.eksperimenti && component.eksperimenti.length > 0 ? (
-                                            <ul>
-                                                {component.eksperimenti.map((experiment) => (
-                                                    <li
-                                                        key={experiment.id}
-                                                        className="cursor-pointer text-blue-500 hover:underline"
-                                                        onClick={() => navigate(`/experimentiprimjer/${experiment.id}`)}
-                                                    >
-                                                        {experiment.name || "Nema imena"}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        ) : (
-                                            "Nema eksperimenata"
-                                        )}
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-                        </div>
-                    </form>
-                </CardContent>
-                <CardFooter className="flex justify-between"></CardFooter>
-            </Card>
+                                        {exp.name}
+                                    </div>
+                                ))
+                            ) : "Nema"}
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader><CardTitle>Zadnji logovi</CardTitle></CardHeader>
+                        <CardContent className="space-y-3">
+                            {logs.length ? logs.map(log => (
+                                <div key={log.id} className="border-b pb-2 text-sm">
+                                    <div>{log.note}</div>
+                                    <div className="text-gray-500">
+                                        {new Date(log.timestamp).toLocaleString()}
+                                    </div>
+                                </div>
+                            )) : "Nema"}
+                        </CardContent>
+                    </Card>
+
+                </div>
+
+                {/* ===== RIGHT COLUMN ===== */}
+                <div className="flex flex-col gap-6">
+
+                    {/* GALLERY */}
+                    <Card>
+                        <CardHeader><CardTitle>Galerija</CardTitle></CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-2 gap-2">
+                                {generalFiles?.length > 0 ? (
+                                galleryImages.map(img => (
+                                    <img
+                                        key={img.id}
+                                        src={`data:image/jpeg;base64,${img.fileByte}`}
+                                        className="h-28 w-full object-cover rounded cursor-pointer hover:scale-105 transition"
+                                        onClick={() => openImage(img)}
+                                    />
+                                    ))
+                                ) : (
+                                    <EmptyValue text="Nema fotografija"/>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* FILES */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Dokumenti</CardTitle>
+                        </CardHeader>
+
+                        <CardContent className="space-y-2">
+                            {generalFiles?.length > 0 ? (
+                                generalFiles.map(file => (
+                                    <a
+                                        key={file.id}
+                                        href={`data:application/octet-stream;base64,${file.fileByte}`}
+                                        download={file.name}
+                                        className="block text-blue-600 hover:underline"
+                                    >
+                                        {file.name}
+                                    </a>
+                                ))
+                            ) : (
+                                <EmptyValue text="Nema datoteka"/>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                </div>
+            </div>
+
+            {/* ================= LIGHTBOX ================= */}
+            {activeImage && (
+                <div
+                    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+                    onClick={() => setActiveImage(null)}
+                >
+                    <img
+                        src={`data:image/jpeg;base64,${activeImage.fileByte}`}
+                        className="max-h-[85vh] rounded-lg shadow-xl"
+                        onClick={(e) => e.stopPropagation()}
+                    />
+                </div>
+            )}
+
         </div>
     );
 }
-
-export default Komponenteprimjer;
