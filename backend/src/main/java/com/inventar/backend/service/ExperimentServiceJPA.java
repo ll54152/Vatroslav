@@ -151,7 +151,7 @@ public class ExperimentServiceJPA {
             experimentShowDTO.setKeywords(experiment.getKeywords());
             experimentShowDTO.setMaterials(experiment.getMaterials());
 
-            experimentShowDTO.setComponentShowDTOList(componentMapper.mapComponentsToDTOs(experiment.getComponentList()));
+            experimentShowDTO.setComponentDTOList(componentMapper.mapComponentsToDTOs(experiment.getComponentList()));
             experimentShowDTO.setLogShowDTOList(logServiceJPA.mapLogsToDTOs(experiment.getLogList()));
             experimentShowDTO.setFileShowDTOList(fileServiceJPA.mapFilesToDTOs(experiment.getFileList()));
 
@@ -185,7 +185,7 @@ public class ExperimentServiceJPA {
                 componentShowDTOList.add(componentShowDTO);
             }
 
-            experimentShowDTO.setComponentShowDTOList(componentShowDTOList);
+            //experimentShowDTO.setComponentShowDTOList(componentShowDTOList);
         }
 
 

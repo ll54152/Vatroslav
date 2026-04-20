@@ -16,14 +16,14 @@ public class ComponentShowDTO {
     private LocationDTO locationDTO;
     private String description;
     private List<String> keywords;
-    private List<ExperimentShowDTO> experimentShowDTOList;
+    private List<ExperimentDTO> experimentDTOList;
     private List<LogShowDTO> logShowDTOList;
     private List<FileShowDTO> fileShowDTOList;
 
     public ComponentShowDTO() {
     }
 
-    public ComponentShowDTO(Long id, String name, String zpf, String fer, FerStatus ferStatus, List<String> deprecatedInventoryMarks, int quantity, LocationDTO locationDTO, String description, List<String> keywords, List<ExperimentShowDTO> experimentShowDTOList, List<LogShowDTO> logShowDTOList, List<FileShowDTO> fileShowDTOList) {
+    public ComponentShowDTO(Long id, String name, String zpf, String fer, FerStatus ferStatus, List<String> deprecatedInventoryMarks, int quantity, LocationDTO locationDTO, String description, List<String> keywords, List<ExperimentDTO> experimentDTOList, List<LogShowDTO> logShowDTOList, List<FileShowDTO> fileShowDTOList) {
         this.id = id;
         this.name = name;
         this.zpf = zpf;
@@ -34,7 +34,7 @@ public class ComponentShowDTO {
         this.locationDTO = locationDTO;
         this.description = description;
         this.keywords = keywords;
-        this.experimentShowDTOList = experimentShowDTOList;
+        this.experimentDTOList = experimentDTOList;
         this.logShowDTOList = logShowDTOList;
         this.fileShowDTOList = fileShowDTOList;
     }
@@ -103,12 +103,12 @@ public class ComponentShowDTO {
         this.keywords = keywords;
     }
 
-    public List<ExperimentShowDTO> getExperimentShowDTOList() {
-        return experimentShowDTOList;
+    public List<ExperimentDTO> getExperimentDTOList() {
+        return experimentDTOList;
     }
 
-    public void setExperimentShowDTOList(List<ExperimentShowDTO> experimentShowDTOList) {
-        this.experimentShowDTOList = experimentShowDTOList;
+    public void setExperimentDTOList(List<ExperimentDTO> experimentDTOList) {
+        this.experimentDTOList = experimentDTOList;
     }
 
     public List<LogShowDTO> getLogShowDTOList() {

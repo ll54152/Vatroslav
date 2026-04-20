@@ -98,7 +98,7 @@ public class ComponentServiceJPA {
             componentShowDTO.setQuantity(component.getQuantity());
 
             componentShowDTO.setLocationDTO(locationMapper.mapLocationToDTO(component.getLocation()));
-            componentShowDTO.setExperimentShowDTOList(experimentMapper.mapExperimentsToDTOs(component.getExperimentList()));
+            componentShowDTO.setExperimentDTOList(experimentMapper.mapExperimentsToDTOs(component.getExperimentList()));
             componentShowDTO.setLogShowDTOList(logServiceJPA.mapLogsToDTOs(component.getLogList()));
             componentShowDTO.setFileShowDTOList(fileServiceJPA.mapFilesToDTOs(component.getFileList()));
 

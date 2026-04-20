@@ -12,14 +12,14 @@ public class ExperimentShowDTO {
     private String description;
     private String keywords;
     private String materials;
-    private List<ComponentShowDTO> componentShowDTOList;
+    private List<ComponentDTO> componentDTOList;
     private List<LogShowDTO> logShowDTOList;
     private List<FileShowDTO> fileShowDTOList;
 
     public ExperimentShowDTO() {
     }
 
-    public ExperimentShowDTO(Long id, String name, String zpf, String subject, String field, String description, String keywords, String materials, List<ComponentShowDTO> componentShowDTOList, List<LogShowDTO> logShowDTOList, List<FileShowDTO> fileShowDTOList) {
+    public ExperimentShowDTO(Long id, String name, String zpf, String subject, String field, String description, String keywords, String materials, List<ComponentDTO> componentDTOList, List<LogShowDTO> logShowDTOList, List<FileShowDTO> fileShowDTOList) {
         this.id = id;
         this.name = name;
         this.zpf = zpf;
@@ -28,7 +28,7 @@ public class ExperimentShowDTO {
         this.description = description;
         this.keywords = keywords;
         this.materials = materials;
-        this.componentShowDTOList = componentShowDTOList;
+        this.componentDTOList = componentDTOList;
         this.logShowDTOList = logShowDTOList;
         this.fileShowDTOList = fileShowDTOList;
     }
@@ -97,12 +97,12 @@ public class ExperimentShowDTO {
         this.materials = materials;
     }
 
-    public List<ComponentShowDTO> getComponentShowDTOList() {
-        return componentShowDTOList;
+    public List<ComponentDTO> getComponentDTOList() {
+        return componentDTOList;
     }
 
-    public void setComponentShowDTOList(List<ComponentShowDTO> componentShowDTOList) {
-        this.componentShowDTOList = componentShowDTOList;
+    public void setComponentDTOList(List<ComponentDTO> componentDTOList) {
+        this.componentDTOList = componentDTOList;
     }
 
     public List<LogShowDTO> getLogShowDTOList() {

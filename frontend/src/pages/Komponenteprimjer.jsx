@@ -11,6 +11,7 @@ export default function KomponentePrimjerView() {
     const [activeImage, setActiveImage] = useState(null);
     const [newLog, setNewLog] = useState("");
     const [addingLog, setAddingLog] = useState(false);
+    const [logs, setLogs] = useState([]);
 
     useEffect(() => {
         const load = async () => {
@@ -22,6 +23,7 @@ export default function KomponentePrimjerView() {
 
             const data = await res.json();
             setComponent(data);
+            setLogs(data.logShowDTOList || []);
             setLoading(false);
         };
 
@@ -39,8 +41,19 @@ export default function KomponentePrimjerView() {
         <span className="text-gray-400 italic">{text}</span>
     );
 
+    const fetchLogsAgain = async () => {
+        const token = localStorage.getItem("jwt");
 
-    const logs = (component.logShowDTOList || [])
+        const res = await fetch(`/vatroslav/api/component/get/${id}`, {
+            headers: { Authorization: token },
+        });
+
+        const data = await res.json();
+        setLogs(data.logShowDTOList || []);
+    };
+
+
+    const latestLogs = logs
         .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
         .slice(0, 3);
 
@@ -70,13 +83,7 @@ export default function KomponentePrimjerView() {
             });
 
             if (response.ok) {
-                const created = await response.json();
-
-                setComponent(prev => ({
-                    ...prev,
-                    logShowDTOList: [created, ...(prev.logShowDTOList || [])],
-                }));
-
+                await fetchLogsAgain();
                 setNewLog("");
             }
         } finally {
@@ -162,14 +169,14 @@ export default function KomponentePrimjerView() {
                     <Card>
                         <CardHeader><CardTitle>Eksperimenti</CardTitle></CardHeader>
                         <CardContent>
-                            {component.experimentShowDTOList?.length ? (
-                                component.experimentShowDTOList.map(exp => (
+                            {component.experimentDTOList?.length ? (
+                                component.experimentDTOList.map(exp => (
                                     <div
                                         key={exp.id}
                                         className="text-blue-500 hover:underline cursor-pointer"
                                         onClick={() => navigate(`/experimentiprimjer/${exp.id}`)}
                                     >
-                                        {exp.name}
+                                        {exp.name} - {exp.zpf}
                                     </div>
                                 ))
                             ) : "Nema"}
@@ -203,11 +210,11 @@ export default function KomponentePrimjerView() {
 
                             {/* LOG LIST */}
                             <div className="space-y-3">
-                                {logs.length ? logs.map(log => (
+                                {latestLogs.length ? latestLogs.map(log => (
                                     <div key={log.id} className="border-b pb-2 text-sm">
                                         <div>{log.note}</div>
                                         <div className="text-gray-500">
-                                            {new Date(log.timestamp).toLocaleString()}
+                                            {log.userShowDTO.firstName} {log.userShowDTO.lastName} - {new Date(log.timestamp).toLocaleString()}
                                         </div>
                                     </div>
                                 )) : (
