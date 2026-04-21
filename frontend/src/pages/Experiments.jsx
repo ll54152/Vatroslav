@@ -209,7 +209,7 @@ export default function Experiments() {
                                     {isAdmin ? (
                                         <>
                                             <Link
-                                                to={`/experimenti/edit/${exp.id}`}
+                                                to={`/experiment/edit/${exp.id}`}
                                                 className="bg-yellow-500 text-white px-3 py-1 rounded"
                                             >
                                                 Edit

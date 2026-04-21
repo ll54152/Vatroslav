@@ -99,7 +99,7 @@ function ExperimentAdd() {
 
             if (response.ok) {
                 alert("Novi eksperiment dodan");
-                navigate("/experimenti/");
+                navigate("/experiments/");
             } else {
                 const text = await response.text();
                 alert(`Greška: ${text}`);
