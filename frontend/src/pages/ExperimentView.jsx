@@ -293,6 +293,18 @@ function ExperimentView() {
                                 )) : (
                                     <EmptyValue text="Nema logova"/>
                                 )}
+
+                                {latestLogs.length ? (
+                                    <div className="pt-3 flex justify-center">
+                                        <button
+                                            onClick={() => navigate(`/experiment/view-log/${experiment.id}`)}
+                                            className="bg-pink-500 text-white px-3 py-2 rounded text-sm hover:bg-pink-600 disabled:opacity-50"
+                                        >
+                                            Svi logovi
+                                        </button>
+                                    </div>
+                                ) : null}
+
                                 {logToDelete && (
                                     <div className="fixed inset-0  flex items-center justify-center">
                                         <div className="bg-white p-4 rounded shadow">
@@ -329,18 +341,18 @@ function ExperimentView() {
                     <Card>
                         <CardHeader><CardTitle>Galerija</CardTitle></CardHeader>
                         <CardContent className="grid grid-cols-2 gap-2">
-                                {generalFiles?.length > 0 ? (
-                                    galleryImages.map(img => (
-                                        <img
-                                            key={img.id}
-                                            src={`data:image/jpeg;base64,${img.fileByte}`}
-                                            className="h-28 w-full object-cover rounded cursor-pointer hover:scale-105 transition"
-                                            onClick={() => openImage(img)}
-                                        />
-                                    ))
-                                ) : (
-                                    <EmptyValue text="Nema fotografija"/>
-                                )}
+                            {generalFiles?.length > 0 ? (
+                                galleryImages.map(img => (
+                                    <img
+                                        key={img.id}
+                                        src={`data:image/jpeg;base64,${img.fileByte}`}
+                                        className="h-28 w-full object-cover rounded cursor-pointer hover:scale-105 transition"
+                                        onClick={() => openImage(img)}
+                                    />
+                                ))
+                            ) : (
+                                <EmptyValue text="Nema fotografija"/>
+                            )}
                         </CardContent>
                     </Card>
 

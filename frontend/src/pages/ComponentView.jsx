@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useParams, useNavigate} from "react-router-dom";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 
 function ComponentView() {
     const {id} = useParams();
@@ -290,7 +290,7 @@ function ComponentView() {
                                     <EmptyValue text="Nema logova"/>
                                 )}
 
-                                {latestLogs.length  ? (
+                                {latestLogs.length ? (
                                     <div className="pt-3 flex justify-center">
                                         <button
                                             onClick={() => navigate(`/component/view-log/${component.id}`)}

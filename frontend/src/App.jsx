@@ -13,7 +13,8 @@ import Components from './pages/Components.jsx';
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import AccountManagement from "./pages/AccountManagement";
-import ComponentLogView from "./pages/ComponentLogView";
+import ComponentViewLog from "./pages/ComponentViewLog.jsx";
+import ExperimentViewLog from "./pages/ExperimentViewLog.jsx";
 
 function App() {
     return (
@@ -25,10 +26,11 @@ function App() {
             <Route path="/mainpage" element={<MainPage/>}/>
             <Route path="/experiments" element={<Experiments/>}/>
             <Route path="/experiment/view/:id" element={<ExperimentView/>}/>
+            <Route path="/experiment/view-log/:id" element={<ExperimentViewLog/>}/>
             <Route path="/experiment/edit/:id" element={<ExperimentEdit/>}/>
             <Route path="/experiment/add" element={<ExperimentAdd/>}/>
             <Route path="/component/view/:id" element={<ComponentView/>}/>
-            <Route path="/component/view-log/:id" element={<ComponentLogView/>}/>
+            <Route path="/component/view-log/:id" element={<ComponentViewLog/>}/>
             <Route path="/component/add" element={<ComponentAdd/>}/>
             <Route path="/components" element={<Components/>}/>
             <Route path="/forgot-password" element={<ForgotPassword/>}/>

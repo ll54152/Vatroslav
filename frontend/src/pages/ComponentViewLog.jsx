@@ -3,7 +3,7 @@ import {useParams, useNavigate} from "react-router-dom";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 
 
-function ComponentLogView() {
+function ComponentViewLog() {
     const {id} = useParams();
     const navigate = useNavigate();
 
@@ -260,4 +260,4 @@ function ComponentLogView() {
     );
 }
 
-export default ComponentLogView;
+export default ComponentViewLog;
