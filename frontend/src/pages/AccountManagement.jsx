@@ -94,7 +94,7 @@ function AccountManagement() {
 
     if (!token) {
         return (
-            <Card className="w-1/2 p-2 lg:p-4 mx-auto mt-10">
+            <Card className="w-1/3 p-2 lg:p-4 mx-auto mt-10">
                 <CardHeader>
                     <CardTitle>Niste prijavljeni</CardTitle>
                     <CardDescription>
@@ -111,7 +111,7 @@ function AccountManagement() {
     }
 
     return (
-        <Card className="w-1/2 p-2 lg:p-4 mx-auto mt-10">
+        <Card className="w-1/3 p-2 lg:p-4 mx-auto mt-10">
             <CardHeader>
                 <CardTitle>Upravljanje računom</CardTitle>
                 <CardDescription>Promijenite svoje podatke.</CardDescription>
