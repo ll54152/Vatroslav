@@ -183,7 +183,13 @@ function ComponentViewLog() {
 
                     <CardContent className="space-y-4">
 
-                        <div className="flex gap-2">
+                        <form
+                            className="flex gap-2"
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleAddLog();
+                            }}
+                        >
                             <input
                                 value={newLog}
                                 onChange={(e) => setNewLog(e.target.value)}
@@ -192,13 +198,13 @@ function ComponentViewLog() {
                             />
 
                             <button
-                                onClick={handleAddLog}
+                                type="submit"
                                 disabled={addingLog}
                                 className="bg-pink-500 text-white px-3 py-2 rounded text-sm hover:bg-pink-600 disabled:opacity-50"
                             >
                                 {addingLog ? "..." : "Dodaj"}
                             </button>
-                        </div>
+                        </form>
 
                         <div className="space-y-3">
                             {latestLogs.length ? latestLogs.map(log => (
