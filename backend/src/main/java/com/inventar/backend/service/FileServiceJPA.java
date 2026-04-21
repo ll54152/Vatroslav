@@ -9,6 +9,7 @@ import com.inventar.backend.domain.User;
 import com.inventar.backend.repo.ComponentRepo;
 import com.inventar.backend.repo.ExperimentRepo;
 import com.inventar.backend.repo.FileRepo;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,6 +42,7 @@ public class FileServiceJPA {
         return fileRepo.save(file);
     }
 
+    @Transactional
     public byte[] uploadFile(MultipartFile file) {
         byte[] bytes = null;
 
@@ -53,6 +55,7 @@ public class FileServiceJPA {
         return bytes;
     }
 
+    @Transactional
     public File uploadExperimentFile(FileDTO fileDTO) {
         byte[] bytes = uploadFile(fileDTO.getData());
 
@@ -68,6 +71,7 @@ public class FileServiceJPA {
         return fileRepo.save(file);
     }
 
+    @Transactional
     public File uploadComponentFile(FileDTO fileDTO) {
         byte[] bytes = uploadFile(fileDTO.getData());
 
@@ -84,6 +88,7 @@ public class FileServiceJPA {
         return fileRepo.save(file);
     }
 
+    @Transactional
     public void handleComponentFiles(Component component, MultipartFile[] files, MultipartFile profileImage, MultipartFile[] otherImages, User user) {
         List<MultipartFile> multipartFiles = new ArrayList<>();
 
@@ -126,6 +131,7 @@ public class FileServiceJPA {
         }
     }
 
+    @Transactional
     public void handleExperimentFiles(Experiment experiment, MultipartFile[] files, MultipartFile profileImage, MultipartFile[] otherImages, User user) {
         List<MultipartFile> multipartFiles = new ArrayList<>();
 
@@ -173,6 +179,7 @@ public class FileServiceJPA {
         return fileRepo.findById(fileId).orElse(null);
     }
 
+    @Transactional
     public void deleteById(Long fileId) {
         File file = fileRepo.findById(fileId).orElse(null);
         if (file != null) {
@@ -180,6 +187,7 @@ public class FileServiceJPA {
         }
     }
 
+    @Transactional
     public void deleteFiles(List<File> fileList) {
         if (fileList != null && !fileList.isEmpty()) {
             fileRepo.deleteAll(fileList);

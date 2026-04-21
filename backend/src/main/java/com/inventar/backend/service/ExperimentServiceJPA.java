@@ -370,7 +370,7 @@ public class ExperimentServiceJPA {
             for (Component component : componentList) {
                 component.getExperimentList().add(experiment);
 
-                componentServiceJPA.quickSave(component);
+                componentRepo.save(component);
 
                 logServiceJPA.linkComponentAndExperiment(component, experiment, user);
             }
@@ -379,10 +379,15 @@ public class ExperimentServiceJPA {
 
     private void unlinkComponentsFromExperiment(Experiment experiment, User user) {
         if (experiment.getComponentList() != null) {
-            for (Component component : experiment.getComponentList()) {
-                component.getExperimentList().remove(experiment);
 
-                componentServiceJPA.quickSave(component);
+            List<Component> componentsToUnlink = new ArrayList<>(experiment.getComponentList());
+
+            for (Component component : componentsToUnlink) {
+                component.getExperimentList().remove(experiment);
+                experiment.getComponentList().remove(component);
+
+                componentRepo.save(component);
+                experimentRepo.save(experiment);
 
                 logServiceJPA.unlinkComponentFromExperiment(component, experiment, user);
             }

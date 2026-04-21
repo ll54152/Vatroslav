@@ -11,6 +11,7 @@ import com.inventar.backend.mapper.LocationMapper;
 import com.inventar.backend.repo.ComponentRepo;
 import com.inventar.backend.repo.ExperimentRepo;
 import com.inventar.backend.repo.LocationRepo;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,6 +47,7 @@ public class ComponentServiceJPA {
         this.fileServiceJPA = fileServiceJPA;
     }
 
+    @Transactional
     public Component save(ComponentAddDTO componentAddDTO, MultipartFile[] files, MultipartFile profileImage, MultipartFile[] otherImages) {
         User user = userServiceJPA.getAuthenticatedUser();
 
@@ -66,6 +68,7 @@ public class ComponentServiceJPA {
         return component;
     }
 
+    @Transactional
     public void deleteById(Long id) {
         Component component = componentRepo.findById(id).orElseThrow(() -> new RuntimeException("Component not found"));
 
@@ -120,12 +123,17 @@ public class ComponentServiceJPA {
 
     private void unlinkExperimentsFromComponent(Component component, User user) {
         if (component.getExperimentList() != null) {
-            for (Experiment experiment : component.getExperimentList()) {
+
+            List<Experiment> experimentsToUnlink = new ArrayList<>(component.getExperimentList());
+
+            for (Experiment experiment : experimentsToUnlink) {
                 experiment.getComponentList().remove(component);
+                component.getExperimentList().remove(experiment);
 
                 experimentRepo.save(experiment);
+                componentRepo.save(component);
 
-                logServiceJPA.unlinkComponentFromExperiment(component, experiment, user);
+                logServiceJPA.unlinkExperimentFromComponent(experiment, component, user);
             }
         }
     }

@@ -10,6 +10,7 @@ import com.inventar.backend.domain.User;
 import com.inventar.backend.repo.ComponentRepo;
 import com.inventar.backend.repo.ExperimentRepo;
 import com.inventar.backend.repo.LogRepo;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +35,7 @@ public class LogServiceJPA {
         this.logRepo = logRepo;
     }
 
+    @Transactional
     public void linkComponentAndExperiment(Component component, Experiment experiment, User user) {
         Log componentLog = new Log();
         componentLog.setTimestamp(LocalDateTime.now());
@@ -50,6 +52,7 @@ public class LogServiceJPA {
         logRepo.save(experimentLog);
     }
 
+    @Transactional
     public void unlinkComponentFromExperiment(Component component, Experiment experiment, User user) {
         Log componentLog = new Log();
         componentLog.setTimestamp(LocalDateTime.now());
@@ -61,11 +64,29 @@ public class LogServiceJPA {
         Log experimentLog = new Log();
         experimentLog.setTimestamp(LocalDateTime.now());
         experimentLog.setUser(user);
+        experimentLog.setExperiment(null);
+        experimentLog.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio komponentu '" + component.getName() + "' iz eksperimenta '" + experiment.getName() + "'");
+        logRepo.save(experimentLog);
+    }
+
+    @Transactional
+    public void unlinkExperimentFromComponent(Experiment experiment, Component component, User user) {
+        Log componentLog = new Log();
+        componentLog.setTimestamp(LocalDateTime.now());
+        componentLog.setUser(user);
+        componentLog.setComponent(null);
+        componentLog.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio eksperiment '" + experiment.getName() + "' iz komponente '" + component.getName() + "'");
+        logRepo.save(componentLog);
+
+        Log experimentLog = new Log();
+        experimentLog.setTimestamp(LocalDateTime.now());
+        experimentLog.setUser(user);
         experimentLog.setExperiment(experiment);
         experimentLog.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio komponentu '" + component.getName() + "' iz eksperimenta '" + experiment.getName() + "'");
         logRepo.save(experimentLog);
     }
 
+    @Transactional
     public void componentCreation(Component component, User user) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
@@ -75,15 +96,17 @@ public class LogServiceJPA {
         logRepo.save(log);
     }
 
+    @Transactional
     public void componentDeletion(Component component, User user) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
         log.setUser(user);
-        log.setComponent(component);
+        log.setComponent(null);
         log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio komponentu '" + component.getName() + "' iz baze podataka");
         logRepo.save(log);
     }
 
+    @Transactional
     public void fileComponentCreation(Component component, File file, User user) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
@@ -93,6 +116,7 @@ public class LogServiceJPA {
         logRepo.save(log);
     }
 
+    @Transactional
     public void experimentCreation(Experiment experiment, User user) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
@@ -102,15 +126,17 @@ public class LogServiceJPA {
         logRepo.save(log);
     }
 
+    @Transactional
     public void experimentDeletion(Experiment experiment, User user) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
         log.setUser(user);
-        log.setExperiment(experiment);
+        log.setExperiment(null);
         log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio eksperiment '" + experiment.getName() + "' iz baze podataka");
         logRepo.save(log);
     }
 
+    @Transactional
     public void fileExperimentCreation(Experiment experiment, File file, User user) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
@@ -120,6 +146,7 @@ public class LogServiceJPA {
         logRepo.save(log);
     }
 
+    @Transactional
     public Log save(LogAddDTO logAddDTO) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
@@ -149,6 +176,7 @@ public class LogServiceJPA {
                 .toList();
     }
 
+    @Transactional
     public void deleteById(Long id) {
         logRepo.deleteById(id);
     }
@@ -173,6 +201,7 @@ public class LogServiceJPA {
         }
     }
 
+    @Transactional
     public void deleteLogs(List<Log> logList) {
         if (logList != null && !logList.isEmpty()) {
             logRepo.deleteAll(logList);
