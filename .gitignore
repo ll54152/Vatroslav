@@ -141,3 +141,5 @@ dist-ssr
 *.sw?
 # Project exclude paths
 /backend/target/
+
+backend/src/main/resources/application.properties
