@@ -140,4 +140,4 @@ dist-ssr
 *.sln
 *.sw?
 
-src/main/resources/application.properties
+!**/src/main/resources/application.properties
