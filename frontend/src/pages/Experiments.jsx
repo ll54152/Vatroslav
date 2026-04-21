@@ -160,14 +160,14 @@ export default function Experiments() {
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center">
-            <div className="w-[80vw] text-left">
+            <div className="w-full max-w-8xl px-4 text-left">
 
                 <header
                     className="fixed top-0 left-0 w-full bg-pink-500 text-white py-4 text-center text-2xl font-bold z-50">
                     Lista Eksperimenata
                 </header>
 
-                <div className="pt-24 mb-4">
+                <div className="pt-28 mb-4">
                     <input
                         type="text"
                         placeholder="Pretraži po imenu, ZPF, opisu ili ključnim riječima..."
@@ -190,7 +190,7 @@ export default function Experiments() {
                     return (
                         <div key={exp.id} className="flex flex-col bg-pink-200 p-5 mb-4 rounded-lg shadow-lg">
 
-                            <div className="flex justify-between items-start w-full">
+                            <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-start w-full">
                                 <Link
                                     to={`/experiment/view/${exp.id}`}
                                     className="text-blue-600 text-lg font-semibold"
@@ -198,7 +198,7 @@ export default function Experiments() {
                                     <HighlightedText text={exp.name} highlight={searchTerm}/>
                                 </Link>
 
-                                <div className="flex gap-2">
+                                <div className="flex flex-wrap gap-2 sm:flex-nowrap">
                                     <button
                                         onClick={() => toggleExpand(exp.id)}
                                         className="px-2 py-1 bg-gray-300 rounded text-sm"

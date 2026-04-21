@@ -159,7 +159,6 @@ export default function Components() {
 
         setFilteredComponents(filtered);
 
-        // AUTO EXPAND ako matcha ZPF/opis/keywords
         const autoExpanded = filtered
             .filter(comp =>
                 comp.description?.toLowerCase().includes(term.toLowerCase()) ||
@@ -175,13 +174,13 @@ export default function Components() {
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center">
-            <div className="w-[80vw] text-left">
+            <div className="w-full max-w-8xl px-4 text-left">
 
                 <header className="fixed top-0 left-0 w-full bg-pink-500 text-white py-4 text-center text-2xl font-bold z-50">
                     Lista Komponenata
                 </header>
 
-                <div className="pt-24 mb-4">
+                <div className="pt-28 mb-4">
                     <input
                         type="text"
                         placeholder="Pretraži po imenu, ZPF, opisu ili ključnoj riječi..."
@@ -205,8 +204,7 @@ export default function Components() {
                         <div key={comp.id}
                              className="flex flex-col bg-pink-200 p-5 mb-4 rounded-lg shadow-lg">
 
-                            {/* NAZIV */}
-                            <div className="flex justify-between items-start w-full">
+                            <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-start w-full">
                                 <Link
                                     to={`/component/view/${comp.id}`}
                                     className="text-blue-600 text-lg font-semibold"
@@ -214,7 +212,7 @@ export default function Components() {
                                     <HighlightedText text={comp.name} highlight={searchTerm}/>
                                 </Link>
 
-                                <div className="flex gap-2">
+                                <div className="flex flex-wrap gap-2 sm:flex-nowrap">
                                     <button
                                         onClick={() => toggleExpand(comp.id)}
                                         className="px-2 py-1 bg-gray-300 rounded text-sm"
@@ -237,7 +235,6 @@ export default function Components() {
                                 </div>
                             </div>
 
-                            {/* ZPF + OPIS */}
                             <div className="mt-2 text-sm text-gray-700 font-light">
                                 {comp.zpf && (
                                     <span>
@@ -253,7 +250,6 @@ export default function Components() {
                                 )}
                             </div>
 
-                            {/* KEYWORDS (COLLAPSABLE TAGS) */}
                             {isExpanded && (
                                 (() => {
                                     const keywordsArray = Array.isArray(comp.keywords)
