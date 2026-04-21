@@ -18,6 +18,7 @@ function AccountManagement() {
     const [userData, setUserData] = useState(null);
 
     const [formData, setFormData] = useState({
+        email: "",
         firstName: "",
         lastName: "",
         oldPassword: "",
@@ -40,6 +41,7 @@ function AccountManagement() {
 
                     setFormData(prev => ({
                         ...prev,
+                        email: data.email || "",
                         firstName: data.firstName || "",
                         lastName: data.lastName || ""
                     }));
@@ -72,10 +74,11 @@ function AccountManagement() {
                     Authorization: `${token}`,
                 },
                 body: JSON.stringify({
+                    email: formData.email,
                     firstName: formData.firstName,
                     lastName: formData.lastName,
                     oldPassword: formData.oldPassword,
-                    password: formData.newPassword,
+                    newPassword: formData.newPassword,
                 }),
             });
 
@@ -121,7 +124,12 @@ function AccountManagement() {
                     <div className="grid w-full items-center gap-4">
                         <div className="flex flex-col space-y-1.5">
                             <Label>Email</Label>
-                            <Input value={userData?.email || ""} disabled/>
+                            <Input
+                                name="email"
+                                placeholder="Email adresa"
+                                value={formData.email}
+                                onChange={handleChange}
+                            />
                         </div>
 
                         <div className="flex flex-col space-y-1.5">

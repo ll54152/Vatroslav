@@ -1,10 +1,6 @@
 package com.inventar.backend.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 
@@ -14,6 +10,9 @@ import java.util.List;
 @Table(name = "users")
 public class User {
     @Id
+    @GeneratedValue
+    private Long id;
+
     @Column(unique = true, nullable = false)
     @Email
     private String email;
@@ -104,6 +103,14 @@ public class User {
 
     public void setFileList(List<File> fileList) {
         this.fileList = fileList;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
 

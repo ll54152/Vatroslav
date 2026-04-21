@@ -21,7 +21,7 @@ import java.util.List;
 @RequestMapping("/location")
 public class LocationController {
 
-    private LocationServiceJPA locationServiceJPA;
+    private final LocationServiceJPA locationServiceJPA;
 
     @Autowired
     public LocationController(LocationServiceJPA locationServiceJPA) {

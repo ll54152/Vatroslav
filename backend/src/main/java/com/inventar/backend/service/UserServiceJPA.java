@@ -1,6 +1,7 @@
 package com.inventar.backend.service;
 
 import com.inventar.backend.DTO.UserShowDTO;
+import com.inventar.backend.DTO.UserUpdateDTO;
 import com.inventar.backend.domain.User;
 import com.inventar.backend.domain.PasswordResetToken;
 import com.inventar.backend.repo.PasswordResetTokenRepo;
@@ -48,7 +49,7 @@ public class UserServiceJPA {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 
         try {
-            User newUser = userRepo.save(user);
+            userRepo.save(user);
             return true;
         } catch (TransactionSystemException e) {
             e.printStackTrace();
@@ -132,7 +133,7 @@ public class UserServiceJPA {
         return true;
     }
 
-    public boolean updateUser(User user) {
+    public boolean updateUser(UserUpdateDTO userUpdateDTO) {
         Optional<User> optional = userRepo.findByEmail(authenticationServiceJPA.getEmailFromToken(httpServletRequest.getHeader("Authorization")));
         if (optional.isEmpty()) {
             return false;
@@ -140,20 +141,25 @@ public class UserServiceJPA {
 
         User existingUser = optional.get();
 
-        // ToDo: Add ID to User so that I can change email from user
-        //existingUser.setEmail(user.getEmail());
-
-        if (user.getFirstName() != null) {
-            existingUser.setFirstName(user.getFirstName());
+        if (!bCryptPasswordEncoder.matches(userUpdateDTO.getOldPassword(), existingUser.getPassword())) {
+            return false;
         }
 
-        if (user.getLastName() != null) {
-            existingUser.setLastName(user.getLastName());
+        if (userUpdateDTO.getEmail() != null) {
+            existingUser.setEmail(userUpdateDTO.getEmail());
         }
 
-        if (user.getPassword() != null && !user.getPassword().isBlank()) {
+        if (userUpdateDTO.getFirstName() != null) {
+            existingUser.setFirstName(userUpdateDTO.getFirstName());
+        }
+
+        if (userUpdateDTO.getLastName() != null) {
+            existingUser.setLastName(userUpdateDTO.getLastName());
+        }
+
+        if (userUpdateDTO.getNewPassword() != null && !userUpdateDTO.getNewPassword().isBlank()) {
             existingUser.setPassword(
-                    bCryptPasswordEncoder.encode(user.getPassword())
+                    bCryptPasswordEncoder.encode(userUpdateDTO.getNewPassword())
             );
         }
 
