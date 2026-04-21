@@ -23,7 +23,7 @@ public class ComponentMapper {
                 componentDTO.setName(component.getName());
                 componentDTO.setZPF(component.getZpf());
                 componentDTO.setDescription(component.getDescription());
-                componentDTO.setKeywords(component.getKeywords());
+                componentDTO.setKeywords(component.getKeywords().stream().sorted().toList());
 
                 componentDTOList.add(componentDTO);
             }
@@ -47,7 +47,7 @@ public class ComponentMapper {
                 componentShowDTO.setFerStatus(component.getFerStatus());
                 componentShowDTO.setDeprecatedInventoryMarks(component.getDeprecatedInventoryMarks());
                 componentShowDTO.setDescription(component.getDescription());
-                componentShowDTO.setKeywords(component.getKeywords());
+                componentShowDTO.setKeywords(component.getKeywords().stream().sorted().toList());
                 componentShowDTO.setQuantity(component.getQuantity());
 
                 componentShowDTOList.add(componentShowDTO);

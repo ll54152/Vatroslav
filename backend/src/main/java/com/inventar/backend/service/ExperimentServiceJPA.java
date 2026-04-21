@@ -148,7 +148,7 @@ public class ExperimentServiceJPA {
             experimentShowDTO.setField(experiment.getField());
             experimentShowDTO.setSubject(experiment.getSubject());
             experimentShowDTO.setDescription(experiment.getDescription());
-            experimentShowDTO.setKeywords(experiment.getKeywords());
+            experimentShowDTO.setKeywords(experiment.getKeywords().stream().sorted().toList());
             experimentShowDTO.setMaterials(experiment.getMaterials());
 
             experimentShowDTO.setComponentDTOList(componentMapper.mapComponentsToDTOs(experiment.getComponentList()));
@@ -167,7 +167,7 @@ public class ExperimentServiceJPA {
         experimentShowDTO.setField(experiment.getField());
         experimentShowDTO.setSubject(experiment.getSubject());
         experimentShowDTO.setDescription(experiment.getDescription());
-        experimentShowDTO.setKeywords(experiment.getKeywords());
+        experimentShowDTO.setKeywords(experiment.getKeywords().stream().sorted().toList());
         experimentShowDTO.setMaterials(experiment.getMaterials());
 
 
@@ -178,7 +178,7 @@ public class ExperimentServiceJPA {
                 componentShowDTO.setId(component.getId());
                 componentShowDTO.setName(component.getName());
                 componentShowDTO.setDescription(component.getDescription());
-                componentShowDTO.setKeywords(component.getKeywords());
+                componentShowDTO.setKeywords(component.getKeywords().stream().sorted().toList());
                 componentShowDTO.setZpf(component.getZpf());
                 componentShowDTO.setFer(component.getFer());
                 componentShowDTO.setQuantity(component.getQuantity());
@@ -405,7 +405,7 @@ public class ExperimentServiceJPA {
                 experimentAddDTO.getField(),
                 experimentAddDTO.getSubject(),
                 experimentAddDTO.getDescription(),
-                experimentAddDTO.getKeywords(),
+                experimentAddDTO.getKeywords().stream().sorted().toList(),
                 experimentAddDTO.getMaterials()
         );
 

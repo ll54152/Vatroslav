@@ -160,10 +160,10 @@ public class Experiment {
     }
 
     public List<String> getKeywords() {
-        return keywords;
+        return keywords.stream().sorted().toList();
     }
 
     public void setKeywords(List<String> keywords) {
-        this.keywords = keywords;
+        this.keywords = keywords.stream().sorted().toList();
     }
 }

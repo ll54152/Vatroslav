@@ -97,7 +97,7 @@ public class ComponentServiceJPA {
             componentShowDTO.setFerStatus(component.getFerStatus());
             componentShowDTO.setDeprecatedInventoryMarks(component.getDeprecatedInventoryMarks());
             componentShowDTO.setDescription(component.getDescription());
-            componentShowDTO.setKeywords(component.getKeywords());
+            componentShowDTO.setKeywords(component.getKeywords().stream().sorted().toList());
             componentShowDTO.setQuantity(component.getQuantity());
 
             componentShowDTO.setLocationDTO(locationMapper.mapLocationToDTO(component.getLocation()));
@@ -151,7 +151,7 @@ public class ComponentServiceJPA {
                 componentAddDTO.getDeprecatedInventoryMarks(),
                 componentAddDTO.getQuantity(),
                 componentAddDTO.getDescription(),
-                componentAddDTO.getKeywords(),
+                componentAddDTO.getKeywords().stream().sorted().toList(),
                 location
         );
 

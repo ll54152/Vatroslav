@@ -23,7 +23,7 @@ public class ExperimentMapper {
                 experimentDTO.setName(experiment.getName());
                 experimentDTO.setZpf(experiment.getZpf());
                 experimentDTO.setDescription(experiment.getDescription());
-                experimentDTO.setKeywords(experiment.getKeywords());
+                experimentDTO.setKeywords(experiment.getKeywords().stream().sorted().toList());
 
                 experimentDTOList.add(experimentDTO);
             }
@@ -46,7 +46,7 @@ public class ExperimentMapper {
                 experimentShowDTO.setSubject(experiment.getSubject());
                 experimentShowDTO.setField(experiment.getField());
                 experimentShowDTO.setDescription(experiment.getDescription());
-                experimentShowDTO.setKeywords(experiment.getKeywords());
+                experimentShowDTO.setKeywords(experiment.getKeywords().stream().sorted().toList());
                 experimentShowDTO.setMaterials(experiment.getMaterials());
 
                 experimentShowDTOList.add(experimentShowDTO);
