@@ -142,4 +142,4 @@ dist-ssr
 # Project exclude paths
 /backend/target/
 
-backend/src/main/resources/application.properties
+/backend/src/main/resources/application.properties
