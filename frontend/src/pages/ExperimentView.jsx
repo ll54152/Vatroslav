@@ -273,10 +273,10 @@ function ExperimentView() {
 
                             <div className="space-y-3">
                                 {latestLogs.length ? latestLogs.map(log => (
-                                    <div key={log.id} className="relative border-b pb-2 text-sm text-center">
+                                    <div key={log.id} className="relative border-b pb-2 pr-24 text-sm text-center">
 
                                         <div>
-                                            <div>{log.note}</div>
+                                            <div className="break-words">{log.note}</div>
                                             <div className="text-gray-500">
                                                 {log.userShowDTO.firstName} {log.userShowDTO.lastName} - {new Date(log.timestamp).toLocaleString()}
                                             </div>
