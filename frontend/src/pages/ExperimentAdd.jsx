@@ -7,7 +7,7 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Button} from "@/components/ui/button";
 import {Textarea} from "@/components/ui/textarea.jsx";
 
-function Experimentunos() {
+function ExperimentAdd() {
     const [components, setComponents] = useState([]);
     const navigate = useNavigate();
     const [profileImage, setProfileImage] = useState(null);
@@ -315,4 +315,4 @@ function Experimentunos() {
     );
 }
 
-export default Experimentunos;
+export default ExperimentAdd;

@@ -12,7 +12,7 @@ import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {Textarea} from "@/components/ui/textarea";
 
-function Komponenteunos() {
+function ComponentAdd() {
     const [componentName, setComponentName] = useState();
     const [internalCode, setInternalCode] = useState();
     const [location, setLocation] = useState();
@@ -163,7 +163,7 @@ function Komponenteunos() {
 
             if (response.ok) {
                 alert("Nova komponenta je dodana");
-                navigate("/komponente");
+                navigate("/components");
             } else {
                 const errorMessage = await response.text();
                 alert(`Greška: ${errorMessage}`);
@@ -522,4 +522,4 @@ function Komponenteunos() {
     );
 }
 
-export default Komponenteunos;
+export default ComponentAdd;

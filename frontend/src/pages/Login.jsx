@@ -38,24 +38,24 @@ function Login() {
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [loading, setLoading] = useState(true); // Dodajemo loading stanje za čekanje
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const checkToken = async () => {
             const token = localStorage.getItem("jwt");
             if (isTokenValid(token)) {
                 setIsAuthenticated(true);
-                navigate("/mainpage"); // Preusmjerenje na mainpage ako je token validan
+                navigate("/mainpage");
             } else {
                 const valid = await verifyToken(token);
                 if (valid) {
                     setIsAuthenticated(true);
-                    navigate("/mainpage"); // Preusmjerenje na mainpage nakon uspješne verifikacije
+                    navigate("/mainpage");
                 } else {
                     setIsAuthenticated(false);
                 }
             }
-            setLoading(false); // Kada završi provjera, postavimo loading na false
+            setLoading(false);
         };
 
         checkToken();
@@ -88,7 +88,6 @@ function Login() {
         }
     };
 
-    // Ako još uvijek čekamo na odgovor o autentifikaciji, prikazujemo loading
     if (loading) {
         return <p>Loading...</p>;
     }

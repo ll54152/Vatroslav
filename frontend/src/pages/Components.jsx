@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import {jwtDecode} from "jwt-decode";
 
-export default function Komponente() {
+export default function Components() {
     const [components, setComponents] = useState([]);
     const [filteredComponents, setFilteredComponents] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -208,7 +208,7 @@ export default function Komponente() {
                             {/* NAZIV */}
                             <div className="flex justify-between items-start w-full">
                                 <Link
-                                    to={`/komponenteprimjer/${comp.id}`}
+                                    to={`/component/view/${comp.id}`}
                                     className="text-blue-600 text-lg font-semibold"
                                 >
                                     <HighlightedText text={comp.name} highlight={searchTerm}/>

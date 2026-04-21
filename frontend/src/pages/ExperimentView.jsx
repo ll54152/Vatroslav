@@ -19,7 +19,7 @@ import {
     TabsTrigger,
 } from "@/components/ui/tabs";
 
-function Experimentiprimjer() {
+function ExperimentView() {
     const {id} = useParams();
     const navigate = useNavigate();
     const [experiment, setExperiment] = useState(null);
@@ -216,7 +216,7 @@ function Experimentiprimjer() {
                                     <div
                                         key={comp.id}
                                         className="text-blue-500 hover:underline cursor-pointer"
-                                        onClick={() => navigate(`/komponenteprimjer/${comp.id}`)}
+                                        onClick={() => navigate(`/component/view/${comp.id}`)}
                                     >
                                         {comp.name} - {comp.zpf}
                                     </div>
@@ -328,4 +328,4 @@ function Experimentiprimjer() {
     );
 }
 
-export default Experimentiprimjer;
+export default ExperimentView;

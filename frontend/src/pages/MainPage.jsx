@@ -85,10 +85,10 @@ export default function MainPage() {
 
     // 🔹 osnovne kartice
     const items = [
-        {path: "/experimenti", label: "Eksperimenti"},
-        {path: "/komponente", label: "Komponente"},
-        {path: "/experimentunos", label: "Dodaj eksperiment"},
-        {path: "/komponenteunos", label: "Dodaj komponentu"},
+        {path: "/experiments", label: "Eksperimenti"},
+        {path: "/components", label: "Komponente"},
+        {path: "/experiment/add", label: "Dodaj eksperiment"},
+        {path: "/component/add", label: "Dodaj komponentu"},
         {path: "/account", label: "Račun"},
         {path: "/signup", label: "Dodaj korisnika", adminOnly: true},
     ];

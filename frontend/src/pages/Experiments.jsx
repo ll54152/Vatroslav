@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {useNavigate, Link} from "react-router-dom";
 import {jwtDecode} from "jwt-decode";
 
-export default function Experimenti() {
+export default function Experiments() {
     const [experiments, setExperiments] = useState([]);
     const [filteredExperiments, setFilteredExperiments] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -192,7 +192,7 @@ export default function Experimenti() {
 
                             <div className="flex justify-between items-start w-full">
                                 <Link
-                                    to={`/experimentiprimjer/${exp.id}`}
+                                    to={`/experiment/view/${exp.id}`}
                                     className="text-blue-600 text-lg font-semibold"
                                 >
                                     <HighlightedText text={exp.name} highlight={searchTerm}/>

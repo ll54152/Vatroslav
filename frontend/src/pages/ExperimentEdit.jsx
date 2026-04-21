@@ -6,12 +6,12 @@ import {Textarea} from "@/components/ui/textarea";
 import {Button} from "@/components/ui/button";
 import {ScrollArea} from "@/components/ui/scroll-area";
 
-export default function EksperimentEdit() {
+export default function ExperimentEdit() {
     const {id} = useParams();
     const navigate = useNavigate();
 
     const [experiment, setExperiment] = useState(null);
-    const [komponente, setKomponente] = useState([]);
+    const [component, setComponent] = useState([]);
     const [allComponents, setAllComponents] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
@@ -51,7 +51,7 @@ export default function EksperimentEdit() {
                         description: data.description || "",
                         materials: data.materials || "",
                     });
-                    setKomponente(data.komponente || []);
+                    setComponent(data.komponente || []);
                     setLogs(data.logs || []);
                     setFiles(data.files || []);
                 } else {
@@ -104,13 +104,13 @@ export default function EksperimentEdit() {
 
     const addComponent = (component, e) => {
         e.preventDefault();
-        if (!komponente.some((k) => k.id === component.id)) {
-            setKomponente([...komponente, component]);
+        if (!component.some((k) => k.id === component.id)) {
+            setComponent([...component, component]);
         }
     };
 
     const removeComponent = (index) => {
-        setKomponente((prev) => prev.filter((_, i) => i !== index));
+        setComponent((prev) => prev.filter((_, i) => i !== index));
     };
 
     const removeLog = (index) => {
@@ -136,7 +136,7 @@ export default function EksperimentEdit() {
         data.append("subject", formData.subject);
         data.append("description", formData.description);
         data.append("materials", formData.materials);
-        data.append("komponente", JSON.stringify(komponente.map((k) => k.id)));
+        data.append("komponente", JSON.stringify(component.map((k) => k.id)));
         data.append("logovi", JSON.stringify(logs.map((log) => log.id)));
         data.append("deletedFileIds", JSON.stringify(deletedFileIds));
 
@@ -160,7 +160,7 @@ export default function EksperimentEdit() {
         });
 
         if (response.ok) {
-            navigate("/experimentiprimjer/" + id);
+            navigate("/experiment/view/" + id);
         } else {
             const text = await response.text();
             console.error("Greška:", text);
@@ -220,7 +220,7 @@ export default function EksperimentEdit() {
                         </ScrollArea>
                         <div className="mt-4">
                             <h4 className="font-semibold">Odabrane komponente:</h4>
-                            {komponente.map((comp, index) => (
+                            {component.map((comp, index) => (
                                 <div key={index} className="flex justify-between p-2 border-b">
                                     <span>{comp.name}</span>
                                     <Button size="sm" variant="destructive"

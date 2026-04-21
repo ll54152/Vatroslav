@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {useParams, useNavigate} from "react-router-dom";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 
-export default function KomponentePrimjerView() {
+function ComponentView() {
     const {id} = useParams();
     const navigate = useNavigate();
 
@@ -210,7 +210,7 @@ export default function KomponentePrimjerView() {
                                     <div
                                         key={exp.id}
                                         className="text-blue-500 hover:underline cursor-pointer"
-                                        onClick={() => navigate(`/experimentiprimjer/${exp.id}`)}
+                                        onClick={() => navigate(`/experiment/view/${exp.id}`)}
                                     >
                                         {exp.name} - {exp.zpf}
                                     </div>
@@ -321,3 +321,5 @@ export default function KomponentePrimjerView() {
         </div>
     );
 }
+
+export default ComponentView;
