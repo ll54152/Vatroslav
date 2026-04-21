@@ -29,6 +29,7 @@ function ExperimentView() {
     const [addingLog, setAddingLog] = useState(false);
     const [logs, setLogs] = useState([]);
     const [error, setError] = useState(null);
+    const [logToDelete, setLogToDelete] = useState(null);
 
     const isTokenValid = () => {
         const token = localStorage.getItem("jwt");
@@ -152,6 +153,27 @@ function ExperimentView() {
         }
     };
 
+    async function handleDeleteLog(id) {
+        const token = localStorage.getItem("jwt");
+
+        try {
+            const response = await fetch(`/vatroslav/api/log/delete/${id}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `${token}`,
+                },
+            });
+
+            if (response.ok) {
+                await fetchLogsAgain();
+            } else {
+                console.error("Failed to delete log");
+            }
+        } catch (err) {
+            console.error("Error deleting log:", err);
+        }
+    }
+
     return (
         <div className="min-h-screen p-6">
 
@@ -251,14 +273,51 @@ function ExperimentView() {
 
                             <div className="space-y-3">
                                 {latestLogs.length ? latestLogs.map(log => (
-                                    <div key={log.id} className="border-b pb-2 text-sm">
-                                        <div>{log.note}</div>
-                                        <div className="text-gray-500">
-                                            {log.userShowDTO.firstName} {log.userShowDTO.lastName} - {new Date(log.timestamp).toLocaleString()}
+                                    <div key={log.id} className="relative border-b pb-2 text-sm text-center">
+
+                                        <div>
+                                            <div>{log.note}</div>
+                                            <div className="text-gray-500">
+                                                {log.userShowDTO.firstName} {log.userShowDTO.lastName} - {new Date(log.timestamp).toLocaleString()}
+                                            </div>
                                         </div>
+
+                                        <button
+                                            onClick={() => setLogToDelete(log.id)}
+                                            className="absolute right-0 top-1/2 -translate-y-1/2 bg-red-500 text-white px-3 py-2 rounded text-sm hover:bg-red-600 disabled:opacity-50"
+                                        >
+                                            Izbriši
+                                        </button>
+
                                     </div>
                                 )) : (
                                     <EmptyValue text="Nema logova"/>
+                                )}
+                                {logToDelete && (
+                                    <div className="fixed inset-0  flex items-center justify-center">
+                                        <div className="bg-white p-4 rounded shadow">
+                                            <p className="mb-3">Želite li izbrisati Log?</p>
+
+                                            <div className="flex justify-end gap-2">
+                                                <button
+                                                    onClick={() => setLogToDelete(null)}
+                                                    className="bg-gray-200 text-black px-3 py-1 rounded"
+                                                >
+                                                    Odustani
+                                                </button>
+
+                                                <button
+                                                    onClick={async () => {
+                                                        await handleDeleteLog(logToDelete);
+                                                        setLogToDelete(null);
+                                                    }}
+                                                    className="bg-red-500 text-white px-3 py-1 rounded"
+                                                >
+                                                    Izbriši
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 )}
                             </div>
 
