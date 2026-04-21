@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useParams, useNavigate} from "react-router-dom";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-
+import { Link } from "react-router-dom";
 
 function ComponentView() {
     const {id} = useParams();
@@ -289,6 +289,18 @@ function ComponentView() {
                                 )) : (
                                     <EmptyValue text="Nema logova"/>
                                 )}
+
+                                {latestLogs.length  ? (
+                                    <div className="pt-3 flex justify-center">
+                                        <button
+                                            onClick={() => navigate(`/component/view-log/${component.id}`)}
+                                            className="bg-pink-500 text-white px-3 py-2 rounded text-sm hover:bg-pink-600 disabled:opacity-50"
+                                        >
+                                            Svi logovi
+                                        </button>
+                                    </div>
+                                ) : null}
+
                                 {logToDelete && (
                                     <div className="fixed inset-0  flex items-center justify-center">
                                         <div className="bg-white p-4 rounded shadow">

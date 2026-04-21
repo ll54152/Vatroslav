@@ -13,25 +13,28 @@ import Components from './pages/Components.jsx';
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import AccountManagement from "./pages/AccountManagement";
+import ComponentLogView from "./pages/ComponentLogView";
 
 function App() {
     return (
         <Routes>
             <Route index element={<Home/>}/>
             <Route path="/home" element={<Home/>}/>
-            <Route path="/Login" element={<Login/>}/>
-            <Route path="/Signup" element={<Signup/>}/>
-            <Route path="/MainPage" element={<MainPage/>}/>
+            <Route path="/login" element={<Login/>}/>
+            <Route path="/signup" element={<Signup/>}/>
+            <Route path="/mainpage" element={<MainPage/>}/>
             <Route path="/experiments" element={<Experiments/>}/>
             <Route path="/experiment/view/:id" element={<ExperimentView/>}/>
             <Route path="/experiment/edit/:id" element={<ExperimentEdit/>}/>
             <Route path="/experiment/add" element={<ExperimentAdd/>}/>
             <Route path="/component/view/:id" element={<ComponentView/>}/>
+            <Route path="/component/view-log/:id" element={<ComponentLogView/>}/>
             <Route path="/component/add" element={<ComponentAdd/>}/>
             <Route path="/components" element={<Components/>}/>
             <Route path="/forgot-password" element={<ForgotPassword/>}/>
             <Route path="/reset-password" element={<ResetPassword/>}/>
             <Route path="/account" element={<AccountManagement/>}/>
+
 
         </Routes>
     );
