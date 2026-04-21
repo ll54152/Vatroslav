@@ -94,7 +94,7 @@ function Login() {
 
     if (!isAuthenticated) {
         return (
-            <Card className="w-1/3 p-2 lg:p-4 mx-auto mt-10">
+            <Card className="w-full max-w-md mx-auto mt-10 p-4">
                 <CardHeader>
                     <CardTitle>Prijava</CardTitle>
                     <CardDescription>Prijava u bazu podataka.</CardDescription>
