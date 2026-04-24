@@ -129,7 +129,10 @@ function ComponentAdd() {
             locationID: Number(location),
             description: description,
             keywords: keywords
-                ? keywords.split("; ").map(k => k.trim())
+                ? keywords
+                    .split(";")
+                    .map(k => k.trim())
+                    .filter(k => k !== "")
                 : [],
             experimentIds: selectedExperiments.map(e => e.id),
         };

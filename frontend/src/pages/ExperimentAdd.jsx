@@ -66,7 +66,10 @@ function ExperimentAdd() {
             description: description,
             materials: materials,
             keywords: keywords
-                ? keywords.split(";").map(k => k.trim())
+                ? keywords
+                    .split(";")
+                    .map(k => k.trim())
+                    .filter(k => k !== "")
                 : [],
             componentIds: selectedComponents.map(c => c.id),
         };
