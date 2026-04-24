@@ -239,8 +239,8 @@ function ComponentAdd() {
             <CardContent className="w-full p-2 lg:p-6">
                 <form className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-6 w-full">
                     <div className="flex flex-col space-y-6">
-                        <Card className="w-full flex flex-col space-y-1.5">
-                            <CardTitle><CardHeader>ZPF Inventarna oznaka</CardHeader></CardTitle>
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>ZPF Inventarna oznaka</CardTitle>
                             <Input
                                 id="intozn-letters"
                                 placeholder="Unesite 5 velikih slova (obavezno)"
@@ -271,8 +271,8 @@ function ComponentAdd() {
                             )}
                         </Card>
 
-                        <Card className="w-full flex flex-col space-y-1.5">
-                            <CardHeader><CardTitle>FER Inventarska oznaka</CardTitle></CardHeader>
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>FER Inventarska oznaka</CardTitle>
                             <Input
                                 placeholder="Unesite FER"
                                 value={fer}
@@ -280,8 +280,8 @@ function ComponentAdd() {
                             />
                         </Card>
 
-                        <Card className="w-full flex flex-col space-y-1.5">
-                           <CardTitle><CardHeader>Status FER inventarne oznake</CardHeader></CardTitle>
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                           <CardTitle>Status FER inventarne oznake</CardTitle>
                             <Select value={ferStatus} onValueChange={setFerStatus}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Odaberi status"/>
@@ -294,8 +294,8 @@ function ComponentAdd() {
                             </Select>
                         </Card>
 
-                        <Card className="w-full flex flex-col space-y-1.5">
-                           <CardHeader><CardTitle>Zastarjele inventarne oznake</CardTitle></CardHeader>
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                           <CardTitle>Zastarjele inventarne oznake</CardTitle>
                             <Textarea
                                 placeholder="Unesite zastarjele oznake (ako postoje) odvojene točkom-zarezom (;) . Npr. ZPF-ABCGSD01; PMF-ABCD232"
                                 value={deprecatedMarks}
@@ -306,8 +306,8 @@ function ComponentAdd() {
                     </div>
 
                     <div className="flex flex-col space-y-6">
-                        <Card className="w-full flex flex-col space-y-1.5">
-                            <CardHeader><CardTitle>Eksperimenti</CardTitle></CardHeader>
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>Eksperimenti</CardTitle>
                             <Input
                                 placeholder="Pretraži eksperimente"
                                 value={experimentSearchQuery}
@@ -360,8 +360,8 @@ function ComponentAdd() {
                             </div>
                         </Card>
 
-                        <Card className="w-full flex flex-col space-y-1.5">
-                           <CardHeader><CardTitle>Gdje se nalazi</CardTitle></CardHeader>
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                           <CardTitle>Gdje se nalazi</CardTitle>
                             <Input
                                 placeholder="Pretraži lokacije..."
                                 value={locationSearchQuery}
@@ -449,7 +449,7 @@ function ComponentAdd() {
                         </Card>
 
                         <Card className="flex flex-col space-y-6">
-                            <CardHeader><CardTitle>Datoteke:</CardTitle></CardHeader>
+                            <CardTitle>Datoteke:</CardTitle>
                         <div className="w-full max-w-4xl flex flex-col space-y-1.5">
                             <CardTitle>Profilna slika</CardTitle>
                             <input
@@ -481,8 +481,8 @@ function ComponentAdd() {
                     </div>
 
                     <div className="flex flex-col space-y-6">
-                        <Card className="w-full flex flex-col space-y-1.5">
-                            <CardHeader><CardTitle>Količina</CardTitle></CardHeader>
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>Količina</CardTitle>
                             <Input
                                 id="kolicina"
                                 placeholder="Unesite količinu"
@@ -491,8 +491,8 @@ function ComponentAdd() {
                             />
                         </Card>
 
-                        <Card className="w-full flex flex-col space-y-1.5">
-                            <CardHeader><CardTitle>Kratak opis</CardTitle></CardHeader>
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>Kratak opis</CardTitle>
                             <Textarea
                                 id="opis"
                                 placeholder="Unesite kratak opis"
@@ -501,11 +501,11 @@ function ComponentAdd() {
                             />
                         </Card>
 
-                        <Card className="w-full flex flex-col space-y-1.5">
-                            <CardHeader><CardTitle>Ključne riječi</CardTitle></CardHeader>
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>Ključne riječi</CardTitle>
                             <Textarea
                                 id="keywords"
-                                placeholder="Unesite ključne riječi odvojene točkom-zarezom (;). Npr. Uređaj; Laptop;"
+                                placeholder="Unesite ključne riječi odvojene točkom-zarezom (;). Npr. Uređaj; Laptop"
                                 value={keywords}
                                 onChange={(e) => setKeywords(e.target.value)}
                             />

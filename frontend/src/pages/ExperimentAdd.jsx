@@ -134,8 +134,8 @@ function ExperimentAdd() {
 
                     <div className="flex flex-col space-y-6">
 
-                        <Card className="w-full flex flex-col space-y-1.5">
-                            <CardTitle><CardHeader>ZPF Inventarna oznaka</CardHeader></CardTitle>
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>ZPF Inventarna oznaka</CardTitle>
                             <Input
                                 id="intozn-letters"
                                 placeholder="Unesite 5 velikih slova (obavezno)"
@@ -157,8 +157,8 @@ function ExperimentAdd() {
                             )}
                         </Card>
 
-                        <Card className="w-full flex flex-col space-y-1.5">
-                            <CardHeader><CardTitle>Nastavni predmet</CardTitle></CardHeader>
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>Nastavni predmet</CardTitle>
                             <Input
                                 placeholder="Unesite nastavni predmet"
                                 value={subject}
@@ -166,8 +166,8 @@ function ExperimentAdd() {
                             />
                         </Card>
 
-                        <Card className="w-full flex flex-col space-y-1.5">
-                            <CardHeader><CardTitle>Područje fizike</CardTitle></CardHeader>
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>Područje fizike</CardTitle>
                             <Input
                                 placeholder="Unesite područje fizike"
                                 value={field}
@@ -178,8 +178,8 @@ function ExperimentAdd() {
 
                     <div className="flex flex-col space-y-6">
 
-                        <Card className="w-full flex flex-col space-y-1.5">
-                            <CardHeader><CardTitle>Komponente</CardTitle></CardHeader>
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>Komponente</CardTitle>
                             <Input
                                 placeholder="Pretraži komponente"
                                 value={componentSearchQuery}
@@ -233,7 +233,7 @@ function ExperimentAdd() {
                         </Card>
 
                         <Card className="flex flex-col space-y-6">
-                            <CardHeader><CardTitle>Datoteke:</CardTitle></CardHeader>
+                            <CardTitle>Datoteke:</CardTitle>
                             <div className="w-full max-w-4xl flex flex-col space-y-1.5">
                                 <CardTitle>Profilna slika</CardTitle>
                                 <input
@@ -266,8 +266,8 @@ function ExperimentAdd() {
                     </div>
 
                     <div className="flex flex-col space-y-6">
-                        <Card className="w-full flex flex-col space-y-1.5">
-                            <CardHeader><CardTitle>Kratak opis</CardTitle></CardHeader>
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>Kratak opis</CardTitle>
                             <Textarea
                                 id="opis"
                                 placeholder="Unesite kratak opis"
@@ -276,8 +276,8 @@ function ExperimentAdd() {
                             />
                         </Card>
 
-                        <Card className="w-full flex flex-col space-y-1.5">
-                            <CardHeader><CardTitle>Ključne riječi</CardTitle></CardHeader>
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>Ključne riječi</CardTitle>
                             <Textarea
                                 id="keywords"
                                 placeholder="Unesite ključne riječi odvojene točkom-zarezom (;). Npr. Uređaj; Laptop;"
@@ -286,8 +286,8 @@ function ExperimentAdd() {
                             />
                         </Card>
 
-                        <Card className="w-full flex flex-col space-y-1.5">
-                            <CardHeader><CardTitle>Pribor i potrošni materijal</CardTitle></CardHeader>
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>Pribor i potrošni materijal</CardTitle>
                             <Textarea
                                 id="opis"
                                 placeholder="Unesite pribor i potrošni materijal"
