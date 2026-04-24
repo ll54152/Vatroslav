@@ -343,7 +343,7 @@ function ComponentView() {
                     <Card>
                         <CardHeader><CardTitle>Galerija</CardTitle></CardHeader>
                         <CardContent className="grid grid-cols-2 gap-2">
-                            {generalFiles?.length > 0 ? (
+                            {galleryImages?.length > 0 ? (
                                 galleryImages.map(img => (
                                     <img
                                         key={img.id}
