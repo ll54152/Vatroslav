@@ -36,7 +36,7 @@ function ComponentAdd() {
     const [documents, setDocuments] = useState([]);
     const [validationMessage, setValidationMessage] = useState();
     const navigate = useNavigate();
-    const [optionalNumbers, setOptionalNumbers] = useState();
+    const [optionalNumbers, setOptionalNumbers] = useState("");
 
 
     useEffect(() => {

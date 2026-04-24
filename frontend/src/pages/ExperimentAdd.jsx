@@ -60,7 +60,7 @@ function ExperimentAdd() {
 
         const requestData = {
             name: experimentName,
-            zpf: internalCode + optionalNumbers,
+            zpf: internalCode,
             field: field,
             subject: subject,
             description: description,
@@ -144,23 +144,14 @@ function ExperimentAdd() {
                                     const value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 5);
                                     setInternalCode(value);
                                     if (value.length === 5 && /^[A-Z]{5}$/.test(value)) {
-                                        setValidationMessage("Ispravno (slova)");
+                                        setValidationMessage("Ispravno");
                                     } else {
                                         setValidationMessage("Neispravno: Točno 5 velikih slova!");
                                     }
                                 }}
                             />
-                            <Input
-                                id="intozn-numbers"
-                                placeholder="Unesite 2 broja (opcionalno)"
-                                value={optionalNumbers}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 2);
-                                    setOptionalNumbers(value);
-                                }}
-                            />
                             {validationMessage && (
-                                <p className={`text-sm ${validationMessage === "Ispravno (slova)" ? "text-green-600" : "text-red-600"}`}>
+                                <p className={`text-sm ${validationMessage === "Ispravno" ? "text-green-600" : "text-red-600"}`}>
                                     {validationMessage}
                                 </p>
                             )}
