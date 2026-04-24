@@ -289,7 +289,7 @@ function ExperimentAdd() {
                             <CardHeader><CardTitle>Ključne riječi</CardTitle></CardHeader>
                             <Textarea
                                 id="keywords"
-                                placeholder="Unesite ključne riječi odvojene točkom-zarezom (;)"
+                                placeholder="Unesite ključne riječi odvojene točkom-zarezom (;). Npr. Uređaj; Laptop;"
                                 value={keywords}
                                 onChange={(e) => setKeywords(e.target.value)}
                             />

@@ -297,7 +297,7 @@ function ComponentAdd() {
                         <Card className="w-full flex flex-col space-y-1.5">
                            <CardHeader><CardTitle>Zastarjele inventarne oznake</CardTitle></CardHeader>
                             <Textarea
-                                placeholder="Unesite zastarjele oznake (ako postoje)"
+                                placeholder="Unesite zastarjele oznake (ako postoje) odvojene točkom-zarezom (;) . Npr. ZPF-ABCGSD01; PMF-ABCD232"
                                 value={deprecatedMarks}
                                 onChange={(e) => setDeprecatedMarks(e.target.value)}
                             />
@@ -505,7 +505,7 @@ function ComponentAdd() {
                             <CardHeader><CardTitle>Ključne riječi</CardTitle></CardHeader>
                             <Textarea
                                 id="keywords"
-                                placeholder="Unesite ključne riječi odvojene točkom-zarezom (;)"
+                                placeholder="Unesite ključne riječi odvojene točkom-zarezom (;). Npr. Uređaj; Laptop;"
                                 value={keywords}
                                 onChange={(e) => setKeywords(e.target.value)}
                             />
