@@ -121,34 +121,6 @@ function ComponentView() {
         if (galleryImages.length > 0) loadGalleryImages();
     }, [galleryImages]);
 
-    useEffect(() => {
-        const loadGeneralFiles = async () => {
-            const token = localStorage.getItem("jwt");
-
-            const urls = await Promise.all(
-                generalFiles.map(async (file) => {
-                    if (!generalFileUrls[file.id]) {
-                        const res = await fetch(`/vatroslav/api/files/download/${file.id}`, {
-                            headers: {Authorization: `${token}`},
-                        });
-                        if (!res.ok) return null;
-                        const blob = await res.blob();
-                        return {id: file.id, url: URL.createObjectURL(blob)};
-                    }
-                    return null;
-                })
-            );
-
-            const urlMap = urls.reduce((acc, cur) => {
-                if (cur) acc[cur.id] = cur.url;
-                return acc;
-            }, {...generalFileUrls});
-
-            setGeneralFileUrls(urlMap);
-        };
-
-        if (generalFiles.length > 0) loadGeneralFiles();
-    }, [generalFiles]);
 
     const handleDownload = async (file) => {
         const token = localStorage.getItem("jwt");
@@ -297,13 +269,6 @@ function ComponentView() {
                     profileImageUrl ? (
                         <img
                             src={profileImageUrl}
-                            onClick={() =>
-                                openImage({
-                                    ...profileImageFile,
-                                    url: profileImageUrl,
-                                    name: profileImageFile.name,
-                                })
-                            }
                             className="w-full max-w-md sm:max-w-2xl h-auto rounded-2xl object-contain cursor-pointer"
                         />
                     ) : (
@@ -520,7 +485,7 @@ function ComponentView() {
                                     <button
                                         key={file.id}
                                         onClick={() => handleDownload(file)}
-                                        className="bg-pink-500 text-white px-3 py-2 rounded text-sm hover:bg-pink-600 disabled:opacity-50"
+                                        className="bg-pink-500 text-white px-3 py-2 m-1 rounded text-sm hover:bg-pink-600 disabled:opacity-50"
                                     >
                                         {file.name}
                                     </button>
