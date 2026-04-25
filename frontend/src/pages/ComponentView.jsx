@@ -14,7 +14,6 @@ function ComponentView() {
     const [logs, setLogs] = useState([]);
     const [error, setError] = useState(null);
     const [logToDelete, setLogToDelete] = useState(null);
-    const [imageUrls, setImageUrls] = useState({});
 
     const [profileImageUrl, setProfileImageUrl] = useState(null);
     const [galleryImageUrls, setGalleryImageUrls] = useState({});
@@ -28,7 +27,6 @@ function ComponentView() {
         return component?.fileShowDTOList?.filter(f => f.fileCategory === "general") || [];
     }, [component?.fileShowDTOList]);
 
-    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
     const [activeImageIndex, setActiveImageIndex] = useState(null);
     const activeImage = activeImageIndex !== null ? galleryImages[activeImageIndex] : null;
     const profileImageFile = component?.fileShowDTOList?.find(f => f.fileCategory === "profileImage");
@@ -83,8 +81,6 @@ function ComponentView() {
             setComponent(data);
             setLogs(data.logShowDTOList || []);
             setLoading(false);
-
-
         };
 
 
@@ -119,7 +115,7 @@ function ComponentView() {
         };
 
         if (galleryImages.length > 0) loadGalleryImages();
-    }, [galleryImages]);
+    }, [galleryImageUrls, galleryImages]);
 
 
     const handleDownload = async (file) => {

@@ -1,23 +1,13 @@
 import * as React from "react";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {useParams, useNavigate} from "react-router-dom";
-import {ScrollArea} from "@/components/ui/scroll-area";
-import {Separator} from "@/components/ui/separator";
-import {Button} from "@/components/ui/button";
+
 import {
     Card,
     CardContent,
-    CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from "@/components/ui/tabs";
 
 function ExperimentView() {
     const {id} = useParams();
@@ -25,11 +15,27 @@ function ExperimentView() {
     const [experiment, setExperiment] = useState(null);
     const [loading, setLoading] = useState(true);
     const [newLog, setNewLog] = useState("");
-    const [activeImage, setActiveImage] = useState(null);
     const [addingLog, setAddingLog] = useState(false);
     const [logs, setLogs] = useState([]);
     const [error, setError] = useState(null);
     const [logToDelete, setLogToDelete] = useState(null);
+
+
+    const [profileImageUrl, setProfileImageUrl] = useState(null);
+    const [galleryImageUrls, setGalleryImageUrls] = useState({});
+
+
+    const galleryImages = useMemo(() => {
+        return experiment?.fileShowDTOList?.filter(f => f.fileCategory === "otherImage") || [];
+    }, [experiment?.fileShowDTOList]);
+
+    const generalFiles = useMemo(() => {
+        return experiment?.fileShowDTOList?.filter(f => f.fileCategory === "general") || [];
+    }, [experiment?.fileShowDTOList]);
+
+    const [activeImageIndex, setActiveImageIndex] = useState(null);
+    const activeImage = activeImageIndex !== null ? galleryImages[activeImageIndex] : null;
+    const profileImageFile = experiment?.fileShowDTOList?.find(f => f.fileCategory === "profileImage");
 
     const isTokenValid = () => {
         const token = localStorage.getItem("jwt");
@@ -92,6 +98,93 @@ function ExperimentView() {
         fetchExperiment();
     }, [id, navigate]);
 
+    useEffect(() => {
+        const loadGalleryImages = async () => {
+            const token = localStorage.getItem("jwt");
+
+            const urls = await Promise.all(
+                galleryImages.map(async (img) => {
+                    if (!galleryImageUrls[img.id]) {
+                        const res = await fetch(`/vatroslav/api/files/image/${img.id}`, {
+                            headers: {Authorization: `${token}`},
+                        });
+                        if (!res.ok) return null;
+                        const blob = await res.blob();
+                        return {id: img.id, url: URL.createObjectURL(blob)};
+                    }
+                    return null;
+                })
+            );
+
+            const urlMap = urls.reduce((acc, cur) => {
+                if (cur) acc[cur.id] = cur.url;
+                return acc;
+            }, {...galleryImageUrls});
+
+            setGalleryImageUrls(urlMap);
+        };
+
+        if (galleryImages.length > 0) loadGalleryImages();
+    }, [galleryImageUrls, galleryImages]);
+
+    const handleDownload = async (file) => {
+        const token = localStorage.getItem("jwt");
+        const res = await fetch(`/vatroslav/api/files/download/${file.id}`, {
+            headers: {Authorization: `${token}`},
+        });
+        if (!res.ok) return alert("Cannot download file");
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = file.name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    };
+
+    useEffect(() => {
+        const loadProfileImage = async () => {
+            if (!profileImageFile) return;
+
+            const token = localStorage.getItem("jwt");
+            const res = await fetch(`/vatroslav/api/files/image/${profileImageFile.id}`, {
+                headers: {Authorization: `${token}`},
+            });
+
+            if (!res.ok) return;
+
+            const blob = await res.blob();
+            setProfileImageUrl(URL.createObjectURL(blob));
+        };
+
+        loadProfileImage();
+    }, [profileImageFile]);
+
+    useEffect(() => {
+        if (activeImageIndex === null) return;
+
+        const handleKeyDown = (e) => {
+            if (e.key === "ArrowRight") {
+                setActiveImageIndex((prev) =>
+                    prev === null || prev === galleryImages.length - 1 ? 0 : prev + 1
+                );
+            } else if (e.key === "ArrowLeft") {
+                setActiveImageIndex((prev) =>
+                    prev === null || prev === 0 ? galleryImages.length - 1 : prev - 1
+                );
+            } else if (e.key === "Escape") {
+                setActiveImageIndex(null);
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [activeImageIndex, galleryImages.length]);
+
     if (loading) return <div className="p-6">Učitavanje...</div>;
     if (error) return <p className="text-red-500">{error}</p>;
     if (!experiment) return <div className="p-6">Nema podataka</div>;
@@ -100,9 +193,6 @@ function ExperimentView() {
         <span className="text-gray-400 italic">{text}</span>
     );
 
-    const profileImage = experiment.fileShowDTOList?.find(f => f.fileCategory === "profileImage");
-    const galleryImages = experiment.fileShowDTOList?.filter(f => f.fileCategory === "otherImage") || [];
-    const generalFiles = experiment.fileShowDTOList?.filter(f => f.fileCategory === "general") || [];
 
     const fetchLogsAgain = async () => {
         const token = localStorage.getItem("jwt");
@@ -178,12 +268,17 @@ function ExperimentView() {
         <div className="min-h-screen p-6">
 
             <div className="flex flex-col items-center mb-10">
-
-                {profileImage ? (
-                    <img
-                        src={`data:image/jpeg;base64,${profileImage.fileByte}`}
-                        onClick={() => openImage(profileImage)}
-                    />
+                {profileImageFile ? (
+                    profileImageUrl ? (
+                        <img
+                            src={profileImageUrl}
+                            className="w-full max-w-md sm:max-w-2xl h-auto rounded-2xl object-contain cursor-pointer"
+                        />
+                    ) : (
+                        <div className="w-56 h-56 bg-gray-200 rounded-3xl flex items-center justify-center">
+                            <span className="text-gray-400 italic">Učitavanje...</span>
+                        </div>
+                    )
                 ) : (
                     <div className="w-56 h-56 bg-gray-200 rounded-3xl flex items-center justify-center">
                         <EmptyValue text="Nema profilne fotografije"/>
@@ -191,9 +286,7 @@ function ExperimentView() {
                 )}
 
                 <h1 className="text-3xl font-bold mt-4">{experiment.name}</h1>
-                <p className="text-gray-500">
-                    {experiment.zpf}
-                </p>
+                <p className="text-gray-500">{experiment.zpf}</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -345,16 +438,23 @@ function ExperimentView() {
 
                 <div className="flex flex-col gap-6">
                     <Card>
-                        <CardHeader><CardTitle>Galerija</CardTitle></CardHeader>
-                        <CardContent className="grid grid-cols-2 gap-2">
-                            {galleryImages?.length > 0 ? (
-                                galleryImages.map(img => (
-                                    <img
-                                        key={img.id}
-                                        src={`data:image/jpeg;base64,${img.fileByte}`}
-                                        className="h-28 w-full object-cover rounded cursor-pointer hover:scale-105 transition"
-                                        onClick={() => openImage(img)}
-                                    />
+                        <CardHeader>
+                            <CardTitle>Galerija</CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-2">
+                            {galleryImages.length > 0 ? (
+                                galleryImages.map((img, idx) => (
+                                    galleryImageUrls[img.id] ? (
+                                        <img
+                                            key={img.id}
+                                            src={galleryImageUrls[img.id]}
+                                            className="w-full aspect-square object-cover rounded cursor-pointer"
+                                            onClick={() => openImage(idx)}
+                                        />
+                                    ) : (
+                                        <div key={img.id}
+                                             className="h-28 w-full bg-gray-200 rounded animate-pulse"></div>
+                                    )
                                 ))
                             ) : (
                                 <EmptyValue text="Nema fotografija"/>
@@ -366,18 +466,16 @@ function ExperimentView() {
                         <CardHeader>
                             <CardTitle>Dokumenti</CardTitle>
                         </CardHeader>
-
                         <CardContent className="space-y-2">
-                            {generalFiles?.length > 0 ? (
-                                generalFiles.map(file => (
-                                    <a
+                            {generalFiles.length > 0 ? (
+                                generalFiles.map((file) => (
+                                    <button
                                         key={file.id}
-                                        href={`data:application/octet-stream;base64,${file.fileByte}`}
-                                        download={file.name}
-                                        className="block text-blue-600 hover:underline"
+                                        onClick={() => handleDownload(file)}
+                                        className="bg-pink-500 text-white px-3 py-2 m-1 rounded text-sm hover:bg-pink-600 disabled:opacity-50"
                                     >
                                         {file.name}
-                                    </a>
+                                    </button>
                                 ))
                             ) : (
                                 <EmptyValue text="Nema datoteka"/>
@@ -388,16 +486,47 @@ function ExperimentView() {
                 </div>
             </div>
 
-            {activeImage && (
+            {activeImageIndex !== null && (
                 <div
                     className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
-                    onClick={() => setActiveImage(null)}
+                    onClick={() => setActiveImageIndex(null)}
                 >
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveImageIndex((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1));
+                        }}
+                        className="absolute left-4 text-white text-3xl font-bold"
+                    >
+                        ‹
+                    </button>
+
                     <img
-                        src={`data:image/jpeg;base64,${activeImage.fileByte}`}
-                        className="max-h-[85vh] rounded-lg shadow-xl"
+                        src={galleryImageUrls[galleryImages[activeImageIndex].id]}
+                        alt={galleryImages[activeImageIndex].name}
+                        className="max-h-[85vh] max-w-[95vw] object-contain rounded-lg shadow-xl"
                         onClick={(e) => e.stopPropagation()}
                     />
+
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveImageIndex((prev) => (prev === galleryImages.length - 1 ? 0 : prev + 1));
+                        }}
+                        className="absolute right-4 text-white text-3xl font-bold"
+                    >
+                        ›
+                    </button>
+
+                    <div className="absolute bottom-4 right-4 flex gap-2">
+                        <a
+                            href={galleryImageUrls[galleryImages[activeImageIndex].id]}
+                            download={galleryImages[activeImageIndex].name}
+                            className="bg-pink-500 text-white px-3 py-1 rounded"
+                        >
+                            Download
+                        </a>
+                    </div>
                 </div>
             )}
 
