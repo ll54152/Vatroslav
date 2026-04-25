@@ -22,8 +22,8 @@ public class File {
 
     private String fileCategory;
 
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
+    //@Lob
+    //@Basic(fetch = FetchType.LAZY)
     @Column(columnDefinition = "bytea")
     private byte[] fileByte;
 
