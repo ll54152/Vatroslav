@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {useParams, useNavigate} from "react-router-dom";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Link} from "react-router-dom";
@@ -15,6 +15,24 @@ function ComponentView() {
     const [logs, setLogs] = useState([]);
     const [error, setError] = useState(null);
     const [logToDelete, setLogToDelete] = useState(null);
+    const [imageUrls, setImageUrls] = useState({});
+
+    const [profileImageUrl, setProfileImageUrl] = useState(null);
+    const [galleryImageUrls, setGalleryImageUrls] = useState({});
+
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+
+    const profileImageFile = component?.fileShowDTOList?.find(f => f.fileCategory === "profileImage");
+
+    const galleryImages = useMemo(() => {
+        return component?.fileShowDTOList?.filter(f => f.fileCategory === "otherImage") || [];
+    }, [component?.fileShowDTOList]);
+
+    const generalFiles = useMemo(() => {
+        return component?.fileShowDTOList?.filter(f => f.fileCategory === "general") || [];
+    }, [component?.fileShowDTOList]);
+
+
 
     const isTokenValid = () => {
         const token = localStorage.getItem("jwt");
@@ -65,10 +83,110 @@ function ComponentView() {
             setComponent(data);
             setLogs(data.logShowDTOList || []);
             setLoading(false);
+
+
         };
+
+
 
         load();
     }, [id, navigate]);
+
+
+    useEffect(() => {
+        const loadGalleryImages = async () => {
+            const token = localStorage.getItem("jwt");
+
+            const urls = await Promise.all(
+                galleryImages.map(async (img) => {
+                    if (!galleryImageUrls[img.id]) {
+                        const res = await fetch(`/vatroslav/api/files/image/${img.id}`, {
+                            headers: { Authorization: `${token}` },
+                        });
+                        if (!res.ok) return null;
+                        const blob = await res.blob();
+                        return { id: img.id, url: URL.createObjectURL(blob) };
+                    }
+                    return null;
+                })
+            );
+
+            const urlMap = urls.reduce((acc, cur) => {
+                if (cur) acc[cur.id] = cur.url;
+                return acc;
+            }, { ...galleryImageUrls });
+
+            setGalleryImageUrls(urlMap);
+        };
+
+        if (galleryImages.length > 0) loadGalleryImages();
+    }, [galleryImages]);
+
+    useEffect(() => {
+        const loadGeneralFiles = async () => {
+            const token = localStorage.getItem("jwt");
+
+            const urls = await Promise.all(
+                generalFiles.map(async (file) => {
+                    if (!generalFileUrls[file.id]) {
+                        const res = await fetch(`/vatroslav/api/files/download/${file.id}`, {
+                            headers: { Authorization: `${token}` },
+                        });
+                        if (!res.ok) return null;
+                        const blob = await res.blob();
+                        return { id: file.id, url: URL.createObjectURL(blob) };
+                    }
+                    return null;
+                })
+            );
+
+            const urlMap = urls.reduce((acc, cur) => {
+                if (cur) acc[cur.id] = cur.url;
+                return acc;
+            }, { ...generalFileUrls });
+
+            setGeneralFileUrls(urlMap);
+        };
+
+        if (generalFiles.length > 0) loadGeneralFiles();
+    }, [generalFiles]);
+
+    const handleDownload = async (file) => {
+        const token = localStorage.getItem("jwt");
+        const res = await fetch(`/vatroslav/api/files/download/${file.id}`, {
+            headers: { Authorization: `${token}` },
+        });
+        if (!res.ok) return alert("Cannot download file");
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = file.name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    };
+
+    useEffect(() => {
+        const loadProfileImage = async () => {
+            if (!profileImageFile) return;
+
+            const token = localStorage.getItem("jwt");
+            const res = await fetch(`/vatroslav/api/files/image/${profileImageFile.id}`, {
+                headers: { Authorization: `${token}` },
+            });
+
+            if (!res.ok) return;
+
+            const blob = await res.blob();
+            setProfileImageUrl(URL.createObjectURL(blob));
+        };
+
+        loadProfileImage();
+    }, [profileImageFile]);
 
     if (loading) return <div className="p-6">Učitavanje...</div>;
     if (error) return <p className="text-red-500">{error}</p>;
@@ -77,10 +195,6 @@ function ComponentView() {
     const EmptyValue = ({text = "N/A"}) => (
         <span className="text-gray-400 italic">{text}</span>
     );
-
-    const profileImage = component.fileShowDTOList?.find(f => f.fileCategory === "profileImage");
-    const galleryImages = component.fileShowDTOList?.filter(f => f.fileCategory === "otherImage") || [];
-    const generalFiles = component.fileShowDTOList?.filter(f => f.fileCategory === "general") || [];
 
     const fetchLogsAgain = async () => {
         const token = localStorage.getItem("jwt");
@@ -154,16 +268,30 @@ function ComponentView() {
         }
     }
 
+
+
     return (
         <div className="min-h-screen p-6">
 
             <div className="flex flex-col items-center mb-10">
-
-                {profileImage ? (
-                    <img
-                        src={`data:image/jpeg;base64,${profileImage.fileByte}`}
-                        onClick={() => openImage(profileImage)}
-                    />
+                {profileImageFile ? (
+                    profileImageUrl ? (
+                        <img
+                            src={profileImageUrl} // <-- use blob URL
+                            onClick={() =>
+                                openImage({
+                                    ...profileImageFile,
+                                    url: profileImageUrl,
+                                    name: profileImageFile.name,
+                                })
+                            }
+                            className="max-w-2xl rounded-2xl object-cover cursor-pointer"
+                        />
+                    ) : (
+                        <div className="w-56 h-56 bg-gray-200 rounded-3xl flex items-center justify-center">
+                            <span className="text-gray-400 italic">Učitavanje...</span>
+                        </div>
+                    )
                 ) : (
                     <div className="w-56 h-56 bg-gray-200 rounded-3xl flex items-center justify-center">
                         <EmptyValue text="Nema profilne fotografije"/>
@@ -171,9 +299,7 @@ function ComponentView() {
                 )}
 
                 <h1 className="text-3xl font-bold mt-4">{component.name}</h1>
-                <p className="text-gray-500">
-                    {component.zpf}
-                </p>
+                <p className="text-gray-500">{component.zpf}</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -341,19 +467,31 @@ function ComponentView() {
 
                 <div className="flex flex-col gap-6">
                     <Card>
-                        <CardHeader><CardTitle>Galerija</CardTitle></CardHeader>
-                        <CardContent className="grid grid-cols-2 gap-2">
-                            {galleryImages?.length > 0 ? (
-                                galleryImages.map(img => (
-                                    <img
-                                        key={img.id}
-                                        src={`data:image/jpeg;base64,${img.fileByte}`}
-                                        className="h-28 w-full object-cover rounded cursor-pointer hover:scale-105 transition"
-                                        onClick={() => openImage(img)}
-                                    />
+                        <CardHeader>
+                            <CardTitle>Galerija</CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid grid-cols-7 gap-2">
+                            {galleryImages.length > 0 ? (
+                                galleryImages.map((img) => (
+                                    galleryImageUrls[img.id] ? (
+                                        <img
+                                            key={img.id}
+                                            src={galleryImageUrls[img.id]}
+                                            className="h-28 w-full object-cover rounded cursor-pointer hover:scale-105 transition"
+                                            onClick={() =>
+                                                openImage({
+                                                    ...img,
+                                                    url: galleryImageUrls[img.id],
+                                                    name: img.name,
+                                                })
+                                            }
+                                        />
+                                    ) : (
+                                        <div key={img.id} className="h-28 w-full bg-gray-200 rounded animate-pulse"></div>
+                                    )
                                 ))
                             ) : (
-                                <EmptyValue text="Nema fotografija"/>
+                                <EmptyValue text="Nema fotografija" />
                             )}
                         </CardContent>
                     </Card>
@@ -362,18 +500,16 @@ function ComponentView() {
                         <CardHeader>
                             <CardTitle>Dokumenti</CardTitle>
                         </CardHeader>
-
                         <CardContent className="space-y-2">
-                            {generalFiles?.length > 0 ? (
-                                generalFiles.map(file => (
-                                    <a
+                            {generalFiles.length > 0 ? (
+                                generalFiles.map((file) => (
+                                    <button
                                         key={file.id}
-                                        href={`data:application/octet-stream;base64,${file.fileByte}`}
-                                        download={file.name}
-                                        className="block text-blue-600 hover:underline"
+                                        onClick={() => handleDownload(file)}
+                                        className="bg-pink-500 text-white px-3 py-2 rounded text-sm hover:bg-pink-600 disabled:opacity-50"
                                     >
                                         {file.name}
-                                    </a>
+                                    </button>
                                 ))
                             ) : (
                                 <EmptyValue text="Nema datoteka"/>
@@ -390,7 +526,8 @@ function ComponentView() {
                     onClick={() => setActiveImage(null)}
                 >
                     <img
-                        src={`data:image/jpeg;base64,${activeImage.fileByte}`}
+                        src={activeImage.url}
+                        alt={activeImage.name}
                         className="max-h-[85vh] rounded-lg shadow-xl"
                         onClick={(e) => e.stopPropagation()}
                     />
