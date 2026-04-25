@@ -9,7 +9,6 @@ function ComponentView() {
 
     const [component, setComponent] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [activeImage, setActiveImage] = useState(null);
     const [newLog, setNewLog] = useState("");
     const [addingLog, setAddingLog] = useState(false);
     const [logs, setLogs] = useState([]);
@@ -20,9 +19,6 @@ function ComponentView() {
     const [profileImageUrl, setProfileImageUrl] = useState(null);
     const [galleryImageUrls, setGalleryImageUrls] = useState({});
 
-    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
-
-    const profileImageFile = component?.fileShowDTOList?.find(f => f.fileCategory === "profileImage");
 
     const galleryImages = useMemo(() => {
         return component?.fileShowDTOList?.filter(f => f.fileCategory === "otherImage") || [];
@@ -32,6 +28,10 @@ function ComponentView() {
         return component?.fileShowDTOList?.filter(f => f.fileCategory === "general") || [];
     }, [component?.fileShowDTOList]);
 
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+    const [activeImageIndex, setActiveImageIndex] = useState(null);
+    const activeImage = activeImageIndex !== null ? galleryImages[activeImageIndex] : null;
+    const profileImageFile = component?.fileShowDTOList?.find(f => f.fileCategory === "profileImage");
 
 
     const isTokenValid = () => {
@@ -88,7 +88,6 @@ function ComponentView() {
         };
 
 
-
         load();
     }, [id, navigate]);
 
@@ -101,11 +100,11 @@ function ComponentView() {
                 galleryImages.map(async (img) => {
                     if (!galleryImageUrls[img.id]) {
                         const res = await fetch(`/vatroslav/api/files/image/${img.id}`, {
-                            headers: { Authorization: `${token}` },
+                            headers: {Authorization: `${token}`},
                         });
                         if (!res.ok) return null;
                         const blob = await res.blob();
-                        return { id: img.id, url: URL.createObjectURL(blob) };
+                        return {id: img.id, url: URL.createObjectURL(blob)};
                     }
                     return null;
                 })
@@ -114,7 +113,7 @@ function ComponentView() {
             const urlMap = urls.reduce((acc, cur) => {
                 if (cur) acc[cur.id] = cur.url;
                 return acc;
-            }, { ...galleryImageUrls });
+            }, {...galleryImageUrls});
 
             setGalleryImageUrls(urlMap);
         };
@@ -130,11 +129,11 @@ function ComponentView() {
                 generalFiles.map(async (file) => {
                     if (!generalFileUrls[file.id]) {
                         const res = await fetch(`/vatroslav/api/files/download/${file.id}`, {
-                            headers: { Authorization: `${token}` },
+                            headers: {Authorization: `${token}`},
                         });
                         if (!res.ok) return null;
                         const blob = await res.blob();
-                        return { id: file.id, url: URL.createObjectURL(blob) };
+                        return {id: file.id, url: URL.createObjectURL(blob)};
                     }
                     return null;
                 })
@@ -143,7 +142,7 @@ function ComponentView() {
             const urlMap = urls.reduce((acc, cur) => {
                 if (cur) acc[cur.id] = cur.url;
                 return acc;
-            }, { ...generalFileUrls });
+            }, {...generalFileUrls});
 
             setGeneralFileUrls(urlMap);
         };
@@ -154,7 +153,7 @@ function ComponentView() {
     const handleDownload = async (file) => {
         const token = localStorage.getItem("jwt");
         const res = await fetch(`/vatroslav/api/files/download/${file.id}`, {
-            headers: { Authorization: `${token}` },
+            headers: {Authorization: `${token}`},
         });
         if (!res.ok) return alert("Cannot download file");
 
@@ -176,7 +175,7 @@ function ComponentView() {
 
             const token = localStorage.getItem("jwt");
             const res = await fetch(`/vatroslav/api/files/image/${profileImageFile.id}`, {
-                headers: { Authorization: `${token}` },
+                headers: {Authorization: `${token}`},
             });
 
             if (!res.ok) return;
@@ -187,6 +186,27 @@ function ComponentView() {
 
         loadProfileImage();
     }, [profileImageFile]);
+
+    useEffect(() => {
+        if (activeImageIndex === null) return;
+
+        const handleKeyDown = (e) => {
+            if (e.key === "ArrowRight") {
+                setActiveImageIndex((prev) =>
+                    prev === null || prev === galleryImages.length - 1 ? 0 : prev + 1
+                );
+            } else if (e.key === "ArrowLeft") {
+                setActiveImageIndex((prev) =>
+                    prev === null || prev === 0 ? galleryImages.length - 1 : prev - 1
+                );
+            } else if (e.key === "Escape") {
+                setActiveImageIndex(null);
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [activeImageIndex, galleryImages.length]);
 
     if (loading) return <div className="p-6">Učitavanje...</div>;
     if (error) return <p className="text-red-500">{error}</p>;
@@ -212,7 +232,7 @@ function ComponentView() {
         .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
         .slice(0, 3);
 
-    const openImage = (img) => setActiveImage(img);
+    const openImage = (index) => setActiveImageIndex(index);
 
     const handleAddLog = async () => {
         if (!newLog.trim()) return;
@@ -269,7 +289,6 @@ function ComponentView() {
     }
 
 
-
     return (
         <div className="min-h-screen p-6">
 
@@ -277,7 +296,7 @@ function ComponentView() {
                 {profileImageFile ? (
                     profileImageUrl ? (
                         <img
-                            src={profileImageUrl} // <-- use blob URL
+                            src={profileImageUrl}
                             onClick={() =>
                                 openImage({
                                     ...profileImageFile,
@@ -472,26 +491,21 @@ function ComponentView() {
                         </CardHeader>
                         <CardContent className="grid grid-cols-7 gap-2">
                             {galleryImages.length > 0 ? (
-                                galleryImages.map((img) => (
+                                galleryImages.map((img, idx) => (
                                     galleryImageUrls[img.id] ? (
                                         <img
                                             key={img.id}
                                             src={galleryImageUrls[img.id]}
                                             className="h-28 w-full object-cover rounded cursor-pointer hover:scale-105 transition"
-                                            onClick={() =>
-                                                openImage({
-                                                    ...img,
-                                                    url: galleryImageUrls[img.id],
-                                                    name: img.name,
-                                                })
-                                            }
+                                            onClick={() => openImage(idx)}
                                         />
                                     ) : (
-                                        <div key={img.id} className="h-28 w-full bg-gray-200 rounded animate-pulse"></div>
+                                        <div key={img.id}
+                                             className="h-28 w-full bg-gray-200 rounded animate-pulse"></div>
                                     )
                                 ))
                             ) : (
-                                <EmptyValue text="Nema fotografija" />
+                                <EmptyValue text="Nema fotografija"/>
                             )}
                         </CardContent>
                     </Card>
@@ -520,17 +534,47 @@ function ComponentView() {
 
             </div>
 
-            {activeImage && (
+            {activeImageIndex !== null && (
                 <div
                     className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
-                    onClick={() => setActiveImage(null)}
+                    onClick={() => setActiveImageIndex(null)}
                 >
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveImageIndex((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1));
+                        }}
+                        className="absolute left-4 text-white text-3xl font-bold"
+                    >
+                        ‹
+                    </button>
+
                     <img
-                        src={activeImage.url}
-                        alt={activeImage.name}
+                        src={galleryImageUrls[galleryImages[activeImageIndex].id]}
+                        alt={galleryImages[activeImageIndex].name}
                         className="max-h-[85vh] rounded-lg shadow-xl"
                         onClick={(e) => e.stopPropagation()}
                     />
+
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveImageIndex((prev) => (prev === galleryImages.length - 1 ? 0 : prev + 1));
+                        }}
+                        className="absolute right-4 text-white text-3xl font-bold"
+                    >
+                        ›
+                    </button>
+
+                    <div className="absolute bottom-4 right-4 flex gap-2">
+                        <a
+                            href={galleryImageUrls[galleryImages[activeImageIndex].id]}
+                            download={galleryImages[activeImageIndex].name}
+                            className="bg-pink-500 text-white px-3 py-1 rounded"
+                        >
+                            Download
+                        </a>
+                    </div>
                 </div>
             )}
 
