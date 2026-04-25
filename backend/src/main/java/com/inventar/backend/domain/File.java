@@ -36,7 +36,7 @@ public class File {
     private Experiment experiment;
 
     @ManyToOne
-    @JoinColumn(name = "user_email")
+    @JoinColumn(name = "user_id")
     private User user;
 
     public File(String name, byte[] fileByte, String fileType, String fileCategory, Component component, Experiment experiment, User user) {

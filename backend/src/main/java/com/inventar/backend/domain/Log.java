@@ -29,7 +29,7 @@ public class Log {
     private LocalDateTime timestamp;
 
     @ManyToOne
-    @JoinColumn(name = "user_email")
+    @JoinColumn(name = "user_id")
     private User user;
 
 
