@@ -230,7 +230,7 @@ public class FileServiceJPA {
                 fileShowDTO.setId(file.getId());
                 fileShowDTO.setName(file.getName());
                 fileShowDTO.setFileCategory(file.getFileCategory());
-                fileShowDTO.setFileByte(Base64.getEncoder().encodeToString(file.getFileByte()));
+                //fileShowDTO.setFileByte(Base64.getEncoder().encodeToString(file.getFileByte()));
 
                 fileShowDTOList.add(fileShowDTO);
             }

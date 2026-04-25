@@ -5,13 +5,11 @@ public class FileShowDTO {
     private Long id;
     private String name;
     private String fileCategory;
-    private String fileByte;
 
-    public FileShowDTO(Long id, String name, String fileCategory, String fileByte) {
+    public FileShowDTO(Long id, String name, String fileCategory) {
         this.id = id;
         this.name = name;
         this.fileCategory = fileCategory;
-        this.fileByte = fileByte;
     }
 
     public FileShowDTO() {
@@ -31,14 +29,6 @@ public class FileShowDTO {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getFileByte() {
-        return fileByte;
-    }
-
-    public void setFileByte(String fileByte) {
-        this.fileByte = fileByte;
     }
 
     public String getFileCategory() {

@@ -4,6 +4,7 @@ import com.inventar.backend.DTO.FileDTO;
 import com.inventar.backend.domain.File;
 import com.inventar.backend.service.FileServiceJPA;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import java.io.ByteArrayInputStream;
 
 @RestController
 @RequestMapping("/files")
@@ -25,7 +28,7 @@ public class FileController {
     }
 
     @GetMapping("/download/{id}")
-    public ResponseEntity<byte[]> download(@PathVariable Long id) {
+    public ResponseEntity<InputStreamResource> download(@PathVariable Long id) {
         File file = fileServiceJPA.findById(id);
 
         if (file == null) {
@@ -35,7 +38,7 @@ public class FileController {
         if (file.getFileCategory().equals("general")) {
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
-                    .body(file.getFileByte());
+                    .body(new InputStreamResource(new ByteArrayInputStream(file.getFileByte())));
         } else {
             return ResponseEntity.badRequest().build();
         }
