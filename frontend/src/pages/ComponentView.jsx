@@ -304,7 +304,7 @@ function ComponentView() {
                                     name: profileImageFile.name,
                                 })
                             }
-                            className="max-w-2xl rounded-2xl object-cover cursor-pointer"
+                            className="w-full max-w-md sm:max-w-2xl h-auto rounded-2xl object-contain cursor-pointer"
                         />
                     ) : (
                         <div className="w-56 h-56 bg-gray-200 rounded-3xl flex items-center justify-center">
@@ -489,14 +489,14 @@ function ComponentView() {
                         <CardHeader>
                             <CardTitle>Galerija</CardTitle>
                         </CardHeader>
-                        <CardContent className="grid grid-cols-7 gap-2">
+                        <CardContent className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-2">
                             {galleryImages.length > 0 ? (
                                 galleryImages.map((img, idx) => (
                                     galleryImageUrls[img.id] ? (
                                         <img
                                             key={img.id}
                                             src={galleryImageUrls[img.id]}
-                                            className="h-28 w-full object-cover rounded cursor-pointer hover:scale-105 transition"
+                                            className="w-full aspect-square object-cover rounded cursor-pointer"
                                             onClick={() => openImage(idx)}
                                         />
                                     ) : (
@@ -552,7 +552,7 @@ function ComponentView() {
                     <img
                         src={galleryImageUrls[galleryImages[activeImageIndex].id]}
                         alt={galleryImages[activeImageIndex].name}
-                        className="max-h-[85vh] rounded-lg shadow-xl"
+                        className="max-h-[85vh] max-w-[95vw] object-contain rounded-lg shadow-xl"
                         onClick={(e) => e.stopPropagation()}
                     />
 
