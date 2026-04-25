@@ -122,7 +122,10 @@ function ComponentAdd() {
             fer: fer,
             ferStatus: ferStatus,
             deprecatedInventoryMarks: deprecatedMarks
-                ? deprecatedMarks.split("; ").map(b => b.trim())
+                ? deprecatedMarks
+                    .split(";")
+                    .map(k => k.trim())
+                    .filter(k => k !== "")
                 : [],
             zpf: internalCode + optionalNumbers,
             quantity: Number(quantity),
