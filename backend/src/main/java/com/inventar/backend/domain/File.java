@@ -6,6 +6,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Column;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
+import jakarta.persistence.Basic;
+import jakarta.persistence.FetchType;
 
 @Entity
 public class File {
@@ -19,6 +22,8 @@ public class File {
 
     private String fileCategory;
 
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
     @Column(columnDefinition = "bytea")
     private byte[] fileByte;
 
