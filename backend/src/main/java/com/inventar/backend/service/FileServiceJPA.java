@@ -132,6 +132,31 @@ public class FileServiceJPA {
     }
 
     @Transactional
+    public void syncComponentFiles(Component component,
+                                   List<Long> existingFileIds,
+                                   MultipartFile[] files,
+                                   MultipartFile profileImage,
+                                   MultipartFile[] otherImages,
+                                   User user) {
+
+        List<File> currentFiles = component.getFileList() != null
+                ? component.getFileList()
+                : new ArrayList<>();
+
+        for (File file : new ArrayList<>(currentFiles)) {
+
+            if (existingFileIds == null || !existingFileIds.contains(file.getId())) {
+
+                fileRepo.delete(file);
+
+                logServiceJPA.fileComponentDeletion(component, file, user);
+            }
+        }
+
+        handleComponentFiles(component, files, profileImage, otherImages, user);
+    }
+
+    @Transactional
     public void handleExperimentFiles(Experiment experiment, MultipartFile[] files, MultipartFile profileImage, MultipartFile[] otherImages, User user) {
         List<MultipartFile> multipartFiles = new ArrayList<>();
 

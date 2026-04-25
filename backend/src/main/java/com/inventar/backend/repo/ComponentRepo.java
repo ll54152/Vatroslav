@@ -9,4 +9,6 @@ public interface ComponentRepo extends JpaRepository<Component, Long> {
     Optional<Component> findByZpf(String zpf);
 
     Optional<Component> findById(Long id);
+
+    Optional<Component> findByFer(String fer);
 }

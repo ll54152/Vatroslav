@@ -4,8 +4,9 @@ import com.inventar.backend.DTO.ComponentAddDTO;
 import com.inventar.backend.DTO.ComponentShowDTO;
 import com.inventar.backend.domain.Component;
 import com.inventar.backend.domain.Experiment;
-import com.inventar.backend.domain.User;
+import com.inventar.backend.domain.File;
 import com.inventar.backend.domain.Location;
+import com.inventar.backend.domain.User;
 import com.inventar.backend.mapper.ExperimentMapper;
 import com.inventar.backend.mapper.LocationMapper;
 import com.inventar.backend.repo.ComponentRepo;
@@ -66,6 +67,90 @@ public class ComponentServiceJPA {
         linkExperimentsWithComponent(component, experimentList, user);
 
         return component;
+    }
+
+    @Transactional
+    public void update(Long id, ComponentAddDTO componentAddDTO, MultipartFile[] files, MultipartFile profileImage, MultipartFile[] otherImages) {
+        User user = userServiceJPA.getAuthenticatedUser();
+
+        Component component = componentRepo.findById(id).orElseThrow(() -> new RuntimeException("Component not found"));
+
+        Location location = locationRepo.findById(componentAddDTO.getLocationID()).orElseThrow(() -> new RuntimeException("Location not found"));
+
+        List<Experiment> newExperiments = experimentRepo.findAllById(componentAddDTO.getExperimentIds());
+
+        updateBasicFields(component, componentAddDTO, location);
+
+        syncExperimentsWithComponent(component, newExperiments, user);
+
+        List<Long> existingFileIds = component.getFileList() != null
+                ? component.getFileList().stream().map(File::getId).toList()
+                : new ArrayList<>();
+
+        fileServiceJPA.syncComponentFiles(component, existingFileIds, files, profileImage, otherImages, user);
+
+        logServiceJPA.componentUpdated(component, user);
+
+        componentRepo.save(component);
+    }
+
+    private void syncExperimentsWithComponent(Component component, List<Experiment> newExperiments, User user) {
+
+        List<Experiment> currentExperiments = component.getExperimentList() != null
+                ? component.getExperimentList()
+                : new ArrayList<>();
+
+        for (Experiment oldExperiment : new ArrayList<>(currentExperiments)) {
+            if (!newExperiments.contains(oldExperiment)) {
+
+                oldExperiment.getComponentList().remove(component);
+                experimentRepo.save(oldExperiment);
+
+                logServiceJPA.unlinkComponentFromExperiment(component, oldExperiment, user);
+            }
+        }
+
+        for (Experiment newExperiment : newExperiments) {
+            if (!currentExperiments.contains(newExperiment)) {
+
+                newExperiment.getComponentList().add(component);
+                experimentRepo.save(newExperiment);
+
+                logServiceJPA.linkComponentAndExperiment(component, newExperiment, user);
+            }
+        }
+
+        component.setExperimentList(newExperiments);
+    }
+
+    private void updateBasicFields(Component component, ComponentAddDTO componentAddDTO, Location location) {
+
+        component.setName(componentAddDTO.getName());
+        component.setQuantity(componentAddDTO.getQuantity());
+        component.setDescription(componentAddDTO.getDescription());
+        component.setLocation(location);
+
+        if (componentAddDTO.getKeywords() != null) {
+            component.setKeywords(componentAddDTO.getKeywords().stream().sorted().toList());
+        }
+
+        if (componentAddDTO.getDeprecatedInventoryMarks() != null) {
+            component.setDeprecatedInventoryMarks(componentAddDTO.getDeprecatedInventoryMarks());
+        }
+
+        if (!component.getZpf().equals(componentAddDTO.getZpf())) {
+            if (componentRepo.findByZpf(componentAddDTO.getZpf()).isPresent()) {
+                throw new RuntimeException("Component with same code1 exists");
+            }
+            component.setZpf(componentAddDTO.getZpf());
+        }
+
+        if (!component.getFer().equals(componentAddDTO.getFer())) {
+            if (componentRepo.findByFer(componentAddDTO.getFer()).isPresent()) {
+                throw new RuntimeException("Component with same code1 exists");
+            }
+            component.setFer(componentAddDTO.getFer());
+        }
     }
 
     @Transactional

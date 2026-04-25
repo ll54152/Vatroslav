@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,6 +39,18 @@ public class ComponentController {
                                                @RequestPart(value = "otherImages", required = false) MultipartFile[] otherImages) {
         componentServiceJPA.save(componentAddDTO, files, profileImage, otherImages);
         return ResponseEntity.status(HttpStatus.CREATED).body("Komponenta dodata uspješno");
+    }
+
+    @PutMapping(value = "/update/{id}")
+    public ResponseEntity<String> updateComponent(
+            @PathVariable Long id,
+            @RequestPart("data") ComponentAddDTO dto,
+            @RequestPart(value = "files", required = false) MultipartFile[] files,
+            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
+            @RequestPart(value = "otherImages", required = false) MultipartFile[] otherImages
+    ) {
+        componentServiceJPA.update(id, dto, files, profileImage, otherImages);
+        return ResponseEntity.ok("Komponenta ažurirana");
     }
 
     @GetMapping("/getAll")

@@ -107,12 +107,32 @@ public class LogServiceJPA {
     }
 
     @Transactional
+    public void componentUpdated(Component component, User user) {
+        Log log = new Log();
+        log.setTimestamp(LocalDateTime.now());
+        log.setUser(user);
+        log.setComponent(component);
+        log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je ažurirao komponentu '" + component.getName() + "' u bazi podataka");
+        logRepo.save(log);
+    }
+
+    @Transactional
     public void fileComponentCreation(Component component, File file, User user) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
         log.setUser(user);
         log.setComponent(component);
         log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao datoteku '" + file.getName() + "' u komponentu '" + component.getName() + "'");
+        logRepo.save(log);
+    }
+
+    @Transactional
+    public void fileComponentDeletion(Component component, File file, User user) {
+        Log log = new Log();
+        log.setTimestamp(LocalDateTime.now());
+        log.setUser(user);
+        log.setComponent(component);
+        log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je izbrisao datoteku '" + file.getName() + "' iz komponente '" + component.getName() + "'");
         logRepo.save(log);
     }
 
