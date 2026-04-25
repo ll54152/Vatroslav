@@ -95,14 +95,12 @@ public class ComponentServiceJPA {
     }
 
     private void syncExperimentsWithComponent(Component component, List<Experiment> newExperiments, User user) {
-
-        List<Experiment> currentExperiments = component.getExperimentList() != null
+        List<Experiment> currentExperiments = new ArrayList<>(component.getExperimentList() != null
                 ? component.getExperimentList()
-                : new ArrayList<>();
+                : new ArrayList<>());
 
         for (Experiment oldExperiment : new ArrayList<>(currentExperiments)) {
             if (!newExperiments.contains(oldExperiment)) {
-
                 oldExperiment.getComponentList().remove(component);
                 experimentRepo.save(oldExperiment);
 
@@ -112,7 +110,6 @@ public class ComponentServiceJPA {
 
         for (Experiment newExperiment : newExperiments) {
             if (!currentExperiments.contains(newExperiment)) {
-
                 newExperiment.getComponentList().add(component);
                 experimentRepo.save(newExperiment);
 
@@ -120,19 +117,19 @@ public class ComponentServiceJPA {
             }
         }
 
-        component.setExperimentList(newExperiments);
+        component.setExperimentList(new ArrayList<>(newExperiments));
     }
 
-    private void updateBasicFields(Component component, ComponentAddDTO componentAddDTO, Location location) {
+     private void updateBasicFields(Component component, ComponentAddDTO componentAddDTO, Location location) {
 
-        component.setName(componentAddDTO.getName());
-        component.setQuantity(componentAddDTO.getQuantity());
-        component.setDescription(componentAddDTO.getDescription());
-        component.setLocation(location);
+         component.setName(componentAddDTO.getName());
+         component.setQuantity(componentAddDTO.getQuantity());
+         component.setDescription(componentAddDTO.getDescription());
+         component.setLocation(location);
 
-        if (componentAddDTO.getKeywords() != null) {
-            component.setKeywords(componentAddDTO.getKeywords().stream().sorted().toList());
-        }
+         if (componentAddDTO.getKeywords() != null) {
+             component.setKeywords(componentAddDTO.getKeywords());
+         }
 
         if (componentAddDTO.getDeprecatedInventoryMarks() != null) {
             component.setDeprecatedInventoryMarks(componentAddDTO.getDeprecatedInventoryMarks());
@@ -228,17 +225,17 @@ public class ComponentServiceJPA {
             throw new RuntimeException("Component with same ZPF already exists");
         }
 
-        Component component = new Component(
-                componentAddDTO.getName(),
-                componentAddDTO.getZpf(),
-                componentAddDTO.getFer(),
-                componentAddDTO.getFerStatus(),
-                componentAddDTO.getDeprecatedInventoryMarks(),
-                componentAddDTO.getQuantity(),
-                componentAddDTO.getDescription(),
-                componentAddDTO.getKeywords().stream().sorted().toList(),
-                location
-        );
+         Component component = new Component(
+                 componentAddDTO.getName(),
+                 componentAddDTO.getZpf(),
+                 componentAddDTO.getFer(),
+                 componentAddDTO.getFerStatus(),
+                 componentAddDTO.getDeprecatedInventoryMarks(),
+                 componentAddDTO.getQuantity(),
+                 componentAddDTO.getDescription(),
+                 componentAddDTO.getKeywords(),
+                 location
+         );
 
         if (experimentList != null && !experimentList.isEmpty()) {
             component.setExperimentList(experimentList);

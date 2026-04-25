@@ -68,7 +68,7 @@ public class Component {
         this.quantity = quantity;
         this.location = location;
         this.description = description;
-        this.keywords = keywords;
+        this.setKeywords(keywords);
         this.logList = logList;
         this.experimentList = experimentList;
     }
@@ -81,7 +81,7 @@ public class Component {
         this.deprecatedInventoryMarks = deprecatedInventoryMarks;
         this.quantity = quantity;
         this.description = description;
-        this.keywords = keywords;
+        this.setKeywords(keywords);
         this.location = location;
         this.experimentList = experimentList;
     }
@@ -94,7 +94,7 @@ public class Component {
         this.deprecatedInventoryMarks = deprecatedInventoryMarks;
         this.quantity = quantity;
         this.description = description;
-        this.keywords = keywords;
+        this.setKeywords(keywords);
         this.location = location;
     }
 
@@ -155,11 +155,18 @@ public class Component {
     }
 
     public List<String> getKeywords() {
+        if (keywords == null) {
+            return null;
+        }
         return keywords.stream().sorted().toList();
     }
 
     public void setKeywords(List<String> keywords) {
-        this.keywords = keywords.stream().sorted().toList();
+        if (keywords != null) {
+            this.keywords = new java.util.ArrayList<>(keywords.stream().sorted().toList());
+        } else {
+            this.keywords = null;
+        }
     }
 
     public List<Log> getLogList() {

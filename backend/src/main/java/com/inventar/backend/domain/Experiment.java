@@ -48,7 +48,7 @@ public class Experiment {
         this.field = field;
         this.subject = subject;
         this.description = description;
-        this.keywords = keywords;
+        this.setKeywords(keywords);
         this.materials = materials;
     }
 
@@ -58,7 +58,7 @@ public class Experiment {
         this.field = field;
         this.subject = subject;
         this.description = description;
-        this.keywords = keywords;
+        this.setKeywords(keywords);
         this.materials = materials;
         this.componentList = componentList;
         this.logList = logList;
@@ -71,7 +71,7 @@ public class Experiment {
         this.field = field;
         this.subject = subject;
         this.description = description;
-        this.keywords = keywords;
+        this.setKeywords(keywords);
         this.materials = materials;
         this.logList = logList;
     }
@@ -160,10 +160,17 @@ public class Experiment {
     }
 
     public List<String> getKeywords() {
+        if (keywords == null) {
+            return null;
+        }
         return keywords.stream().sorted().toList();
     }
 
     public void setKeywords(List<String> keywords) {
-        this.keywords = keywords.stream().sorted().toList();
+        if (keywords != null) {
+            this.keywords = new java.util.ArrayList<>(keywords.stream().sorted().toList());
+        } else {
+            this.keywords = null;
+        }
     }
 }

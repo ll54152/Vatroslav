@@ -15,6 +15,7 @@ import ResetPassword from "./pages/ResetPassword";
 import AccountManagement from "./pages/AccountManagement";
 import ComponentViewLog from "./pages/ComponentViewLog.jsx";
 import ExperimentViewLog from "./pages/ExperimentViewLog.jsx";
+import ComponentUpdate from "./pages/ComponentUpdate.jsx";
 
 function App() {
     return (
@@ -31,13 +32,12 @@ function App() {
             <Route path="/experiment/add" element={<ExperimentAdd/>}/>
             <Route path="/component/view/:id" element={<ComponentView/>}/>
             <Route path="/component/view-log/:id" element={<ComponentViewLog/>}/>
+            <Route path="/component/update/:id" element={<ComponentUpdate/>}/>
             <Route path="/component/add" element={<ComponentAdd/>}/>
             <Route path="/components" element={<Components/>}/>
             <Route path="/forgot-password" element={<ForgotPassword/>}/>
             <Route path="/reset-password" element={<ResetPassword/>}/>
             <Route path="/account" element={<AccountManagement/>}/>
-
-
         </Routes>
     );
 }
