@@ -4,9 +4,11 @@ import com.inventar.backend.DTO.FileDTO;
 import com.inventar.backend.domain.File;
 import com.inventar.backend.service.FileServiceJPA;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +22,40 @@ public class FileController {
     @Autowired
     public FileController(FileServiceJPA fileServiceJPA) {
         this.fileServiceJPA = fileServiceJPA;
+    }
+
+    @GetMapping("/download/{id}")
+    public ResponseEntity<byte[]> download(@PathVariable Long id) {
+        File file = fileServiceJPA.findById(id);
+
+        if (file == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (file.getFileCategory().equals("general")) {
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
+                    .body(file.getFileByte());
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/image/{id}")
+    public ResponseEntity<byte[]> image(@PathVariable Long id) {
+        File file = fileServiceJPA.findById(id);
+
+        if (file == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (file.getFileCategory().equals("profileImage") || file.getFileCategory().equals("otherImage")) {
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, "image/*")
+                    .body(file.getFileByte());
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping("/upload")
