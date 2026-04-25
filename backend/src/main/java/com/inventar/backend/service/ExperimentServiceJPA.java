@@ -62,7 +62,7 @@ public class ExperimentServiceJPA {
     }
 
     @Transactional
-    public Experiment save(ExperimentAddDTO experimentAddDTO, MultipartFile[] files, MultipartFile profileImage, MultipartFile[] otherImages) {
+    public Long save(ExperimentAddDTO experimentAddDTO, MultipartFile[] files, MultipartFile profileImage, MultipartFile[] otherImages) {
         User user = userServiceJPA.getAuthenticatedUser();
 
         List<Component> componentList = componentServiceJPA.findAllByIds(experimentAddDTO.getComponentIds());
@@ -77,7 +77,7 @@ public class ExperimentServiceJPA {
 
         linkComponentsWithExperiment(experiment, componentList, user);
 
-        return experiment;
+        return experiment.getId();
     }
 
     @Transactional

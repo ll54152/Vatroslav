@@ -33,12 +33,12 @@ public class ComponentController {
     }
 
     @PostMapping(value = "/add")
-    public ResponseEntity<String> addComponent(@RequestPart("data") ComponentAddDTO componentAddDTO,
-                                               @RequestPart(value = "files", required = false) MultipartFile[] files,
-                                               @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
-                                               @RequestPart(value = "otherImages", required = false) MultipartFile[] otherImages) {
-        componentServiceJPA.save(componentAddDTO, files, profileImage, otherImages);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Komponenta dodata uspješno");
+    public ResponseEntity<Long> addComponent(@RequestPart("data") ComponentAddDTO componentAddDTO,
+                                             @RequestPart(value = "files", required = false) MultipartFile[] files,
+                                             @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
+                                             @RequestPart(value = "otherImages", required = false) MultipartFile[] otherImages) {
+        Long componentId = componentServiceJPA.save(componentAddDTO, files, profileImage, otherImages);
+        return ResponseEntity.status(HttpStatus.CREATED).body(componentId);
     }
 
     @PutMapping(value = "/update/{id}")

@@ -101,8 +101,9 @@ function ExperimentAdd() {
             });
 
             if (response.ok) {
+                const newExperimentId = await response.json();
                 alert("Novi eksperiment dodan");
-                navigate("/experiments/");
+                navigate(`/experiment/view/${newExperimentId}`);
             } else {
                 const text = await response.text();
                 alert(`Greška: ${text}`);

@@ -39,15 +39,15 @@ public class ExperimentController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<String> addExperiment(
+    public ResponseEntity<Long> addExperiment(
             @RequestPart("data") ExperimentAddDTO experimentAddDTO,
             @RequestPart(value = "files", required = false) MultipartFile[] files,
             @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
             @RequestPart(value = "otherImages", required = false) MultipartFile[] otherImages) {
 
-        experimentServiceJPA.save(experimentAddDTO, files, profileImage, otherImages);
+        Long experimentId = experimentServiceJPA.save(experimentAddDTO, files, profileImage, otherImages);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("Eksperiment dodan uspješno");
+        return ResponseEntity.status(HttpStatus.CREATED).body(experimentId);
     }
 
     @GetMapping("/getAll")

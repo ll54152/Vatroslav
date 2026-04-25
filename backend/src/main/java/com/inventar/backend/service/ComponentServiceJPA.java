@@ -49,7 +49,7 @@ public class ComponentServiceJPA {
     }
 
     @Transactional
-    public Component save(ComponentAddDTO componentAddDTO, MultipartFile[] files, MultipartFile profileImage, MultipartFile[] otherImages) {
+    public Long save(ComponentAddDTO componentAddDTO, MultipartFile[] files, MultipartFile profileImage, MultipartFile[] otherImages) {
         User user = userServiceJPA.getAuthenticatedUser();
 
         Location location = locationRepo.findById(componentAddDTO.getLocationID()).orElseThrow(() -> new RuntimeException("Location not found"));
@@ -66,7 +66,7 @@ public class ComponentServiceJPA {
 
         linkExperimentsWithComponent(component, experimentList, user);
 
-        return component;
+        return component.getId();
     }
 
     @Transactional

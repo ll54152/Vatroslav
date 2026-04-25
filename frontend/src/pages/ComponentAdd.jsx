@@ -140,7 +140,7 @@ function ComponentAdd() {
 
         formToSend.append(
             "data",
-            new Blob([JSON.stringify(requestData)], { type: "application/json" })
+            new Blob([JSON.stringify(requestData)], {type: "application/json"})
         );
 
         if (profileImage) {
@@ -165,8 +165,9 @@ function ComponentAdd() {
             });
 
             if (response.ok) {
+                const newComponentId = await response.json();
                 alert("Nova komponenta je dodana");
-                navigate("/components");
+                navigate(`/component/view/${newComponentId}`);
             } else {
                 const errorMessage = await response.text();
                 alert(`Greška: ${errorMessage}`);
@@ -281,7 +282,7 @@ function ComponentAdd() {
                         </Card>
 
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
-                           <CardTitle>Status FER inventarne oznake</CardTitle>
+                            <CardTitle>Status FER inventarne oznake</CardTitle>
                             <Select value={ferStatus} onValueChange={setFerStatus}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Odaberi status"/>
@@ -295,7 +296,7 @@ function ComponentAdd() {
                         </Card>
 
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
-                           <CardTitle>Zastarjele inventarne oznake</CardTitle>
+                            <CardTitle>Zastarjele inventarne oznake</CardTitle>
                             <Textarea
                                 placeholder="Unesite zastarjele oznake (ako postoje) odvojene točkom-zarezom (;) . Npr. ZPF-ABCGSD01; PMF-ABCD232"
                                 value={deprecatedMarks}
@@ -361,7 +362,7 @@ function ComponentAdd() {
                         </Card>
 
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
-                           <CardTitle>Gdje se nalazi</CardTitle>
+                            <CardTitle>Gdje se nalazi</CardTitle>
                             <Input
                                 placeholder="Pretraži lokacije..."
                                 value={locationSearchQuery}
@@ -415,68 +416,68 @@ function ComponentAdd() {
                             )}
 
 
-                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
-                            <input
-                                id="addLocationCheckbox"
-                                type="checkbox"
-                                checked={showAddLocation}
-                                onChange={(e) => setShowAddLocation(e.target.checked)}
-                                className="mr-2"
-                            />
-                            <label htmlFor="addLocationCheckbox">Dodaj novu lokaciju</label>
-                        </div>
-
-                        {showAddLocation && (
                             <div className="w-full max-w-4xl flex flex-col space-y-1.5">
-                                <CardTitle>Dodaj novu lokaciju</CardTitle>
-                                <Input
-                                    id="newLocationAddress"
-                                    placeholder="Unesite adresu"
-                                    value={newLocationAddress}
-                                    onChange={(e) => setNewLocationAddress(e.target.value)}
+                                <input
+                                    id="addLocationCheckbox"
+                                    type="checkbox"
+                                    checked={showAddLocation}
+                                    onChange={(e) => setShowAddLocation(e.target.checked)}
+                                    className="mr-2"
                                 />
-                                <Input
-                                    id="newLocationRoom"
-                                    placeholder="Unesite dvoranu"
-                                    value={newLocationRoom}
-                                    onChange={(e) => setNewLocationRoom(e.target.value)}
-                                />
-                                <Button className="bg-pink-500 text-white" onClick={handleAddLocation}>
-                                    Dodaj lokaciju
-                                </Button>
+                                <label htmlFor="addLocationCheckbox">Dodaj novu lokaciju</label>
                             </div>
-                        )}
+
+                            {showAddLocation && (
+                                <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                                    <CardTitle>Dodaj novu lokaciju</CardTitle>
+                                    <Input
+                                        id="newLocationAddress"
+                                        placeholder="Unesite adresu"
+                                        value={newLocationAddress}
+                                        onChange={(e) => setNewLocationAddress(e.target.value)}
+                                    />
+                                    <Input
+                                        id="newLocationRoom"
+                                        placeholder="Unesite dvoranu"
+                                        value={newLocationRoom}
+                                        onChange={(e) => setNewLocationRoom(e.target.value)}
+                                    />
+                                    <Button className="bg-pink-500 text-white" onClick={handleAddLocation}>
+                                        Dodaj lokaciju
+                                    </Button>
+                                </div>
+                            )}
                         </Card>
 
                         <Card className="flex flex-col space-y-6">
                             <CardTitle>Datoteke:</CardTitle>
-                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
-                            <CardTitle>Profilna slika</CardTitle>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => setProfileImage(e.target.files[0])}
-                            />
-                        </div>
+                            <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                                <CardTitle>Profilna slika</CardTitle>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => setProfileImage(e.target.files[0])}
+                                />
+                            </div>
 
-                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
-                            <CardTitle>Ostale slike</CardTitle>
-                            <input
-                                type="file"
-                                multiple
-                                accept="image/*"
-                                onChange={(e) => setOtherImages(Array.from(e.target.files))}
-                            />
-                        </div>
+                            <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                                <CardTitle>Ostale slike</CardTitle>
+                                <input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={(e) => setOtherImages(Array.from(e.target.files))}
+                                />
+                            </div>
 
-                        <div className="w-full max-w-4xl flex flex-col space-y-1.5">
-                            <CardTitle>Dokumentacija</CardTitle>
-                            <input
-                                type="file"
-                                multiple
-                                onChange={(e) => setDocuments(Array.from(e.target.files))}
-                            />
-                        </div>
+                            <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                                <CardTitle>Dokumentacija</CardTitle>
+                                <input
+                                    type="file"
+                                    multiple
+                                    onChange={(e) => setDocuments(Array.from(e.target.files))}
+                                />
+                            </div>
                         </Card>
                     </div>
 
