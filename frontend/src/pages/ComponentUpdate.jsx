@@ -139,7 +139,7 @@ function ComponentUpdate() {
 
         formData.append(
             "data",
-            new Blob([JSON.stringify(dto)], { type: "application/json" })
+            new Blob([JSON.stringify(dto)], {type: "application/json"})
         );
 
         if (profileImage) formData.append("profileImage", profileImage);
@@ -243,6 +243,7 @@ function ComponentUpdate() {
                 </CardTitle>
 
                 <Input
+                    placeholder="Unesite naziv komponente"
                     value={componentName}
                     onChange={(e) => setComponentName(e.target.value)}
                 />
@@ -254,8 +255,8 @@ function ComponentUpdate() {
                 <form className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-6 w-full">
                     <div className="flex flex-col space-y-6">
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
-                            <CardTitle>ZPF</CardTitle>
-                            <Input value={internalCode}
+                            <CardTitle>ZPF inventarna oznaka</CardTitle>
+                            <Input placeholder="Unesite 5 velikih slova (obavezno)" value={internalCode}
                                    onChange={(e) => {
                                        const value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 5);
                                        setInternalCode(value);
@@ -265,7 +266,7 @@ function ComponentUpdate() {
                                            setValidationMessage("Neispravno: Točno 5 velikih slova!");
                                        }
                                    }}/>
-                            <Input value={optionalNumbers}
+                            <Input placeholder="Unesite 2 broja (opcionalno)" value={optionalNumbers}
                                    onChange={(e) => {
                                        const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 2);
                                        setOptionalNumbers(value);
@@ -278,15 +279,16 @@ function ComponentUpdate() {
                         </Card>
 
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
-                            <CardTitle>FER Inventarska oznaka</CardTitle>
-                            <Input value={fer} onChange={(e) => setFer(e.target.value)}/>
+                            <CardTitle>FER inventarska oznaka</CardTitle>
+                            <Input placeholder="Unesite FER inventarsku oznaku" value={fer}
+                                   onChange={(e) => setFer(e.target.value)}/>
                         </Card>
 
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
                             <CardTitle>Status FER inventarne oznake</CardTitle>
                             <Select value={ferStatus} onValueChange={setFerStatus}>
                                 <SelectTrigger>
-                                    <SelectValue/>
+                                    <SelectValue placeholder="Odaberite status FER inventarne oznake"/>
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="CATALOGED">Cataloged</SelectItem>
@@ -299,6 +301,7 @@ function ComponentUpdate() {
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
                             <CardTitle>Zastarjele inventarne oznake</CardTitle>
                             <Textarea
+                                placeholder="Unesite zastarjele oznake (ako postoje) odvojene točkom-zarezom (;) . Npr. ZPF-ABCGSD01; PMF-ABCD232"
                                 value={deprecatedMarks}
                                 onChange={(e) => setDeprecatedMarks(e.target.value)}
                             />
@@ -312,7 +315,7 @@ function ComponentUpdate() {
                             <CardTitle>Eksperimenti</CardTitle>
 
                             <Input
-                                placeholder="Pretraži eksperimente"
+                                placeholder="Pretražite eksperimente"
                                 value={experimentSearchQuery}
                                 onChange={(e) => {
                                     const query = e.target.value.toLowerCase();
@@ -364,9 +367,9 @@ function ComponentUpdate() {
                         </Card>
 
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
-                            <CardTitle>Gdje se nalazi</CardTitle>
+                            <CardTitle>Lokacija</CardTitle>
                             <Input
-                                placeholder="Pretraži lokacije..."
+                                placeholder="Pretražite lokacije..."
                                 value={locationSearchQuery}
                                 onChange={(e) => setLocationSearchQuery(e.target.value)}
                             />
@@ -463,17 +466,21 @@ function ComponentUpdate() {
 
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
                             <CardTitle>Količina</CardTitle>
-                            <Input value={quantity} onChange={(e) => setQuantity(e.target.value)}/>
+                            <Input placeholder="Unesite količinu" value={quantity}
+                                   onChange={(e) => setQuantity(e.target.value)}/>
                         </Card>
 
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
-                            <CardTitle>Kratak opis</CardTitle>
-                            <Textarea value={description} onChange={(e) => setDescription(e.target.value)}/>
+                            <CardTitle>Opis</CardTitle>
+                            <Textarea placeholder="Unesite kratak opis" value={description}
+                                      onChange={(e) => setDescription(e.target.value)}/>
                         </Card>
 
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
                             <CardTitle>Ključne riječi</CardTitle>
-                            <Textarea value={keywords} onChange={(e) => setKeywords(e.target.value)}/>
+                            <Textarea
+                                placeholder="Unesite ključne riječi odvojene točkom-zarezom (;). Npr. Uređaj; Laptop"
+                                value={keywords} onChange={(e) => setKeywords(e.target.value)}/>
                         </Card>
                     </div>
                 </form>

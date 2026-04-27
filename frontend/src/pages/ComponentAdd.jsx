@@ -244,7 +244,7 @@ function ComponentAdd() {
                 <form className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-6 w-full">
                     <div className="flex flex-col space-y-6">
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
-                            <CardTitle>ZPF Inventarna oznaka</CardTitle>
+                            <CardTitle>ZPF inventarna oznaka</CardTitle>
                             <Input
                                 id="intozn-letters"
                                 placeholder="Unesite 5 velikih slova (obavezno)"
@@ -276,9 +276,9 @@ function ComponentAdd() {
                         </Card>
 
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
-                            <CardTitle>FER Inventarska oznaka</CardTitle>
+                            <CardTitle>FER inventarska oznaka</CardTitle>
                             <Input
-                                placeholder="Unesite FER"
+                                placeholder="Unesite FER inventarsku oznaku"
                                 value={fer}
                                 onChange={(e) => setFer(e.target.value)}
                             />
@@ -288,7 +288,7 @@ function ComponentAdd() {
                             <CardTitle>Status FER inventarne oznake</CardTitle>
                             <Select value={ferStatus} onValueChange={setFerStatus}>
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Odaberi status"/>
+                                    <SelectValue placeholder="Odaberite status FER inventarne oznake"/>
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="CATALOGED">Cataloged</SelectItem>
@@ -313,7 +313,7 @@ function ComponentAdd() {
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
                             <CardTitle>Eksperimenti</CardTitle>
                             <Input
-                                placeholder="Pretraži eksperimente"
+                                placeholder="Pretražite eksperimente"
                                 value={experimentSearchQuery}
                                 onChange={(e) => {
                                     const query = e.target.value.toLowerCase();
@@ -365,9 +365,9 @@ function ComponentAdd() {
                         </Card>
 
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
-                            <CardTitle>Gdje se nalazi</CardTitle>
+                            <CardTitle>Lokacija</CardTitle>
                             <Input
-                                placeholder="Pretraži lokacije..."
+                                placeholder="Pretražite lokacije..."
                                 value={locationSearchQuery}
                                 onChange={(e) => setLocationSearchQuery(e.target.value)}
                             />
@@ -496,7 +496,7 @@ function ComponentAdd() {
                         </Card>
 
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
-                            <CardTitle>Kratak opis</CardTitle>
+                            <CardTitle>Opis</CardTitle>
                             <Textarea
                                 id="opis"
                                 placeholder="Unesite kratak opis"
