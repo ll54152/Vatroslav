@@ -148,18 +148,6 @@ function ComponentEdit() {
         ? URL.createObjectURL(newProfileImage)
         : null;
 
-    const newGalleryPreviews = newOtherImages.map(file => ({
-        file,
-        url: URL.createObjectURL(file),
-    }));
-
-    const toggleImage = (id) => {
-        setKeepImages((prev) =>
-            prev.includes(id)
-                ? prev.filter((x) => x !== id)
-                : [...prev, id]
-        );
-    };
 
     const gridGallery = useMemo(() => {
         const profile = profileImageFile && (profileImageUrl || newProfilePreview)
@@ -196,13 +184,10 @@ function ComponentEdit() {
 
     const viewerGallery = useMemo(() => {
         return gridGallery.filter(item => {
-            // keep all new images
             if (item.type === "new") return true;
 
-            // keep profile always
             if (item.type === "profile") return true;
 
-            // ONLY keep existing if NOT deleted
             return item.id ? keepFileIds.includes(item.id) : true;
         });
     }, [gridGallery, keepFileIds]);
@@ -350,7 +335,6 @@ function ComponentEdit() {
     const handleDownloadImages = async (file) => {
         if (!file) return;
 
-        // NEW FILES (not uploaded yet)
         if (file.type === "new") {
             const a = document.createElement("a");
             a.href = file.url;
@@ -361,7 +345,6 @@ function ComponentEdit() {
             return;
         }
 
-        // EXISTING FILES (backend)
         const token = localStorage.getItem("jwt");
 
         const res = await fetch(`/vatroslav/api/files/image/${file.id}`, {
@@ -720,7 +703,7 @@ function ComponentEdit() {
                                 {(profileImageFile || newProfilePreview) && (
                                     <div
                                         className={`flex gap-3 items-center mt-2 p-2 rounded border
-        ${profileImageFile && !keepFileIds.includes(profileImageFile.id)
+                                            ${profileImageFile && !keepFileIds.includes(profileImageFile.id)
                                             ? "border-red-500 bg-red-50"
                                             : "border-gray-200"
                                         }`}
@@ -827,7 +810,7 @@ function ComponentEdit() {
                                             <div
                                                 key={file.id}
                                                 className={`flex justify-between items-center border p-2 rounded
-                        ${keepFileIds.includes(file.id)
+                                                    ${keepFileIds.includes(file.id)
                                                     ? "border-gray-300"
                                                     : "border-red-500 bg-red-50"
                                                 }`}
