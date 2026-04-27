@@ -176,7 +176,8 @@ export default function Components() {
         <div className="min-h-screen flex flex-col items-center justify-center">
             <div className="w-full max-w-8xl px-4 text-left">
 
-                <header className="fixed top-0 left-0 w-full bg-pink-500 text-white py-4 text-center text-2xl font-bold z-50">
+                <header
+                    className="fixed top-0 left-0 w-full bg-pink-500 text-white py-4 text-center text-2xl font-bold z-50">
                     Lista Komponenata
                 </header>
 
@@ -221,16 +222,31 @@ export default function Components() {
                                     </button>
 
                                     {isAdmin ? (
-                                        <button
-                                            className="bg-red-500 text-white px-3 py-1 rounded"
-                                            onClick={() => handleDeleteComponent(comp.id)}
-                                        >
-                                            Delete
-                                        </button>
+                                        <>
+                                            <Link
+                                                to={`/component/edit/${comp.id}`}
+                                                className="bg-yellow-500 text-white px-3 py-1 rounded"
+                                            >
+                                                Edit
+                                            </Link>
+                                            <button
+                                                className="bg-red-500 text-white px-3 py-1 rounded"
+                                                onClick={() => handleDeleteComponent(comp.id)}
+                                            >
+                                                Delete
+                                            </button>
+                                        </>
                                     ) : (
-                                        <button className="bg-red-500 text-white px-3 py-1 rounded opacity-50 cursor-not-allowed">
-                                            Delete
-                                        </button>
+                                        <>
+                                            <button
+                                                className="bg-yellow-500 text-white px-3 py-1 rounded opacity-50 cursor-not-allowed">
+                                                Edit
+                                            </button>
+                                            <button
+                                                className="bg-red-500 text-white px-3 py-1 rounded opacity-50 cursor-not-allowed">
+                                                Delete
+                                            </button>
+                                        </>
                                     )}
                                 </div>
                             </div>
@@ -262,12 +278,14 @@ export default function Components() {
                                         <div className="mt-3 flex flex-wrap gap-2">
                                             {keywordsArray.length > 0 ? (
                                                 keywordsArray.map((k, i) => (
-                                                    <span key={i} className="bg-gray-300 px-2 py-1 rounded-full text-xs">
+                                                    <span key={i}
+                                                          className="bg-gray-300 px-2 py-1 rounded-full text-xs">
                             <HighlightedText text={k} highlight={searchTerm}/>
                         </span>
                                                 ))
                                             ) : (
-                                                <span className="text-gray-500 italic text-xs">Nema ključnih riječi</span>
+                                                <span
+                                                    className="text-gray-500 italic text-xs">Nema ključnih riječi</span>
                                             )}
                                         </div>
                                     );

@@ -336,7 +336,32 @@ function ComponentEdit() {
         }
     };
 
-    const handleDownload = async (file) => {
+    const handleDownloadImages = async (file) => {
+        const token = localStorage.getItem("jwt");
+
+        const res = await fetch(`/vatroslav/api/files/image/${file.id}`, {
+            headers: {Authorization: `${token}`},
+        });
+
+        if (!res.ok) {
+            alert("Ne mogu preuzeti datoteku");
+            return;
+        }
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = file.name || "file";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(url);
+    };
+
+    const handleDownloadFiles = async (file) => {
         const token = localStorage.getItem("jwt");
 
         const res = await fetch(`/vatroslav/api/files/download/${file.id}`, {
@@ -710,7 +735,7 @@ function ComponentEdit() {
                                         <div
                                             key={img.id}
                                             className={`border p-2 rounded transition
-        ${keepFileIds.includes(img.id)
+                                            ${keepFileIds.includes(img.id)
                                                 ? "border-gray-300"
                                                 : "border-red-500 bg-red-50"
                                             }`}
@@ -787,7 +812,7 @@ function ComponentEdit() {
                                                     <Button
                                                         className="bg-pink-500 text-white"
                                                         type="button"
-                                                        onClick={() => handleDownload(file)}
+                                                        onClick={() => handleDownloadFiles(file)}
                                                     >
                                                         Preuzmi
                                                     </Button>
@@ -804,7 +829,7 @@ function ComponentEdit() {
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="text-sm text-gray-500">Nema dokumenata</p>
+                                    <p className="text-sm text-gray-500 mt-2">Nema dokumenata</p>
                                 )}
 
                                 <Input
@@ -893,11 +918,10 @@ function ComponentEdit() {
                             href={combinedGallery[activeImageIndex]?.url}
                             download={combinedGallery[activeImageIndex]?.name}
                             className="bg-pink-500 text-white px-3 py-1 rounded"
-                            onClick={(e) => e.stopPropagation()}
+                            //onClick={() => handleDownloadImages(activeImageIndex)}
                         >
                             Download
                         </a>
-
                         {combinedGallery[activeImageIndex]?.type !== "new" && (
                             <button
                                 onClick={(e) => {
