@@ -340,7 +340,8 @@ function ComponentEdit() {
 
         if (res.ok) {
             alert("Komponenta ažurirana");
-            navigate("/components");
+            navigate(`/component/view/${id}`);
+
         } else {
             alert(await res.text());
         }
