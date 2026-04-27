@@ -48,6 +48,7 @@ function ComponentEdit() {
     const [existingFiles, setExistingFiles] = useState([]);
     const [keepFileIds, setKeepFileIds] = useState([]);
 
+    const [newImagePreviews, setNewImagePreviews] = useState([]);
     const [newProfileImage, setNewProfileImage] = useState(null);
     const [newOtherImages, setNewOtherImages] = useState([]);
     const [newDocuments, setNewDocuments] = useState([]);
@@ -179,10 +180,10 @@ function ComponentEdit() {
                 name: img.name
             }));
 
-        const fresh = newOtherImages.map(file => ({
+        const fresh = newImagePreviews.map(img => ({
             type: "new",
-            url: URL.createObjectURL(file),
-            name: file.name
+            url: img.url,
+            name: img.file.name
         }));
 
         return [...profile, ...existing, ...fresh];
@@ -237,6 +238,24 @@ function ComponentEdit() {
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [activeImageIndex, combinedGallery.length]);
+
+    useEffect(() => {
+        if (!newOtherImages.length) {
+            setNewImagePreviews([]);
+            return;
+        }
+
+        const previews = newOtherImages.map(file => ({
+            file,
+            url: URL.createObjectURL(file)
+        }));
+
+        setNewImagePreviews(previews);
+
+        return () => {
+            previews.forEach(p => URL.revokeObjectURL(p.url));
+        };
+    }, [newOtherImages]);
 
     useEffect(() => {
         const loadGalleryImages = async () => {
@@ -315,6 +334,31 @@ function ComponentEdit() {
         } else {
             alert(await res.text());
         }
+    };
+
+    const handleDownload = async (file) => {
+        const token = localStorage.getItem("jwt");
+
+        const res = await fetch(`/vatroslav/api/files/download/${file.id}`, {
+            headers: {Authorization: `${token}`},
+        });
+
+        if (!res.ok) {
+            alert("Ne mogu preuzeti datoteku");
+            return;
+        }
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = file.name || "file";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(url);
     };
 
     const handleDeleteLocation = async (locationId) => {
@@ -624,7 +668,13 @@ function ComponentEdit() {
                                 <h3 className="font-semibold">Profilna slika</h3>
 
                                 {(profileImageFile || newProfilePreview) && (
-                                    <div className="flex gap-3 items-center mt-2">
+                                    <div
+                                        className={`flex gap-3 items-center mt-2 p-2 rounded border
+        ${profileImageFile && !keepFileIds.includes(profileImageFile.id)
+                                            ? "border-red-500 bg-red-50"
+                                            : "border-gray-200"
+                                        }`}
+                                    >
                                         <img
                                             src={newProfilePreview || profileImageUrl}
                                             className="w-32 h-32 object-cover rounded-lg border cursor-pointer"
@@ -632,9 +682,9 @@ function ComponentEdit() {
                                         />
 
                                         {profileImageFile && (
-                                            <Button
-                                                type="button"
-                                                onClick={() => toggleFile(profileImageFile.id)}
+                                            <Button className="bg-red-500 text-white hover:bg-red-600"
+                                                    type="button"
+                                                    onClick={() => toggleFile(profileImageFile.id)}
                                             >
                                                 {keepFileIds.includes(profileImageFile.id) ? "Obriši" : "Vrati"}
                                             </Button>
@@ -656,7 +706,15 @@ function ComponentEdit() {
                                 <div className="grid grid-cols-3 gap-3 mt-2">
 
                                     {otherImages.map(img => (
-                                        <div key={img.id} className="border p-2 rounded">
+
+                                        <div
+                                            key={img.id}
+                                            className={`border p-2 rounded transition
+        ${keepFileIds.includes(img.id)
+                                                ? "border-gray-300"
+                                                : "border-red-500 bg-red-50"
+                                            }`}
+                                        >
                                             {galleryImageUrls[img.id] ? (
                                                 <img
                                                     src={galleryImageUrls[img.id]}
@@ -670,9 +728,10 @@ function ComponentEdit() {
                                                 <div className="h-24 bg-gray-200 animate-pulse rounded"></div>
                                             )}
 
+
                                             <Button
+                                                className="mt-1 w-full bg-red-500 text-white hover:bg-red-600"
                                                 type="button"
-                                                className="mt-1 w-full"
                                                 onClick={() => toggleFile(img.id)}
                                             >
                                                 {keepFileIds.includes(img.id) ? "Obriši" : "Vrati"}
@@ -680,19 +739,22 @@ function ComponentEdit() {
                                         </div>
                                     ))}
 
-                                    {newGalleryPreviews.map((img, idx) => (
-                                        <div key={idx} className="border p-2 rounded border-green-400">
-                                            <img
-                                                src={img.url}
-                                                className="w-full h-24 object-cover rounded cursor-pointer"
-                                                onClick={() => {
-                                                    const index = combinedGallery.findIndex(i => i.url === img.url);
-                                                    setActiveImageIndex(index);
-                                                }}
-                                            />
-                                            <span className="text-xs text-green-600">Novi</span>
-                                        </div>
-                                    ))}
+                                    {newImagePreviews.map((img, idx) => {
+                                        const indexInGallery = combinedGallery.findIndex(
+                                            i => i.url === img.url
+                                        );
+
+                                        return (
+                                            <div key={idx} className="border p-2 rounded border-green-400">
+                                                <img
+                                                    src={img.url}
+                                                    className="w-full h-24 object-cover rounded cursor-pointer"
+                                                    onClick={() => setActiveImageIndex(indexInGallery)}
+                                                />
+                                                <span className="text-xs text-green-600">Nova fotografija</span>
+                                            </div>
+                                        );
+                                    })}
 
                                 </div>
 
@@ -708,17 +770,42 @@ function ComponentEdit() {
                             <div>
                                 <h3 className="font-semibold">Dokumenti</h3>
 
-                                {documents.map(file => (
-                                    <div key={file.id} className="flex justify-between mt-2 border p-2 rounded">
-                                        <span>{file.name}</span>
-                                        <Button
-                                            type="button"
-                                            onClick={() => toggleFile(file.id)}
-                                        >
-                                            {keepFileIds.includes(file.id) ? "Obriši" : "Vrati"}
-                                        </Button>
+                                {documents.length > 0 ? (
+                                    <div className="space-y-2 mt-2">
+                                        {documents.map(file => (
+                                            <div
+                                                key={file.id}
+                                                className={`flex justify-between items-center border p-2 rounded
+                        ${keepFileIds.includes(file.id)
+                                                    ? "border-gray-300"
+                                                    : "border-red-500 bg-red-50"
+                                                }`}
+                                            >
+                                                <span className="text-sm truncate">{file.name}</span>
+
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        className="bg-pink-500 text-white"
+                                                        type="button"
+                                                        onClick={() => handleDownload(file)}
+                                                    >
+                                                        Preuzmi
+                                                    </Button>
+
+                                                    <Button
+                                                        className="bg-red-500 text-white hover:bg-red-600"
+                                                        type="button"
+                                                        onClick={() => toggleFile(file.id)}
+                                                    >
+                                                        {keepFileIds.includes(file.id) ? "Obriši" : "Vrati"}
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
+                                ) : (
+                                    <p className="text-sm text-gray-500">Nema dokumenata</p>
+                                )}
 
                                 <Input
                                     type="file"
@@ -764,10 +851,12 @@ function ComponentEdit() {
             </div>
 
             {activeImageIndex !== null && (
+
                 <div
                     className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
                     onClick={() => setActiveImageIndex(null)}
                 >
+
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
@@ -798,15 +887,43 @@ function ComponentEdit() {
                         ›
                     </button>
 
-                    <div className="absolute bottom-4 right-4">
+                    <div className="absolute bottom-4 right-4 flex gap-2">
+
                         <a
                             href={combinedGallery[activeImageIndex]?.url}
                             download={combinedGallery[activeImageIndex]?.name}
-                            className="bg-pink-500 text-white px-3 py-2 rounded"
+                            className="bg-pink-500 text-white px-3 py-1 rounded"
+                            onClick={(e) => e.stopPropagation()}
                         >
                             Download
                         </a>
+
+                        {combinedGallery[activeImageIndex]?.type !== "new" && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+
+                                    const item = combinedGallery[activeImageIndex];
+
+                                    if (item?.id) {
+                                        toggleFile(item.id);
+                                    }
+                                }}
+                                className={`px-3 py-1 rounded text-white ${
+                                    combinedGallery[activeImageIndex] &&
+                                    keepFileIds.includes(combinedGallery[activeImageIndex].id)
+                                        ? "bg-red-600"
+                                        : "bg-green-600"
+                                }`}
+                            >
+                                {combinedGallery[activeImageIndex] &&
+                                keepFileIds.includes(combinedGallery[activeImageIndex].id)
+                                    ? "Delete"
+                                    : "Restore"}
+                            </button>
+                        )}
                     </div>
+
                 </div>
             )}
         </Card>
