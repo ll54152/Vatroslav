@@ -161,7 +161,7 @@ function ComponentEdit() {
         );
     };
 
-    const combinedGallery = useMemo(() => {
+    const gridGallery = useMemo(() => {
         const profile = profileImageFile && (profileImageUrl || newProfilePreview)
             ? [{
                 type: "profile",
@@ -171,14 +171,12 @@ function ComponentEdit() {
             }]
             : [];
 
-        const existing = otherImages
-            .filter(img => keepFileIds.includes(img.id))
-            .map(img => ({
-                type: "existing",
-                id: img.id,
-                url: galleryImageUrls[img.id],
-                name: img.name
-            }));
+        const existing = otherImages.map(img => ({
+            type: "existing",
+            id: img.id,
+            url: galleryImageUrls[img.id],
+            name: img.name
+        }));
 
         const fresh = newImagePreviews.map(img => ({
             type: "new",
@@ -192,10 +190,22 @@ function ComponentEdit() {
         profileImageUrl,
         newProfilePreview,
         otherImages,
-        newOtherImages,
-        galleryImageUrls,
-        keepFileIds
+        newImagePreviews,
+        galleryImageUrls
     ]);
+
+    const viewerGallery = useMemo(() => {
+        return gridGallery.filter(item => {
+            // keep all new images
+            if (item.type === "new") return true;
+
+            // keep profile always
+            if (item.type === "profile") return true;
+
+            // ONLY keep existing if NOT deleted
+            return item.id ? keepFileIds.includes(item.id) : true;
+        });
+    }, [gridGallery, keepFileIds]);
 
     useEffect(() => {
         const loadProfileImage = async () => {
@@ -224,11 +234,11 @@ function ComponentEdit() {
         const handleKeyDown = (e) => {
             if (e.key === "ArrowRight") {
                 setActiveImageIndex(prev =>
-                    prev === combinedGallery.length - 1 ? 0 : prev + 1
+                    prev === viewerGallery.length - 1 ? 0 : prev + 1
                 );
             } else if (e.key === "ArrowLeft") {
                 setActiveImageIndex(prev =>
-                    prev === 0 ? combinedGallery.length - 1 : prev - 1
+                    prev === 0 ? viewerGallery.length - 1 : prev - 1
                 );
             } else if (e.key === "Escape") {
                 setActiveImageIndex(null);
@@ -237,7 +247,7 @@ function ComponentEdit() {
 
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [activeImageIndex, combinedGallery.length]);
+    }, [activeImageIndex, viewerGallery.length]);
 
     useEffect(() => {
         if (!newOtherImages.length) {
@@ -337,14 +347,28 @@ function ComponentEdit() {
     };
 
     const handleDownloadImages = async (file) => {
+        if (!file) return;
+
+        // NEW FILES (not uploaded yet)
+        if (file.type === "new") {
+            const a = document.createElement("a");
+            a.href = file.url;
+            a.download = file.name;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            return;
+        }
+
+        // EXISTING FILES (backend)
         const token = localStorage.getItem("jwt");
 
         const res = await fetch(`/vatroslav/api/files/image/${file.id}`, {
-            headers: {Authorization: `${token}`},
+            headers: {Authorization: token},
         });
 
         if (!res.ok) {
-            alert("Ne mogu preuzeti datoteku");
+            alert("Download failed");
             return;
         }
 
@@ -702,19 +726,20 @@ function ComponentEdit() {
                                     >
                                         <img
                                             src={newProfilePreview || profileImageUrl}
-                                            className="w-32 h-32 object-cover rounded-lg border cursor-pointer"
                                             onClick={() => setActiveImageIndex(0)}
                                         />
 
-                                        {profileImageFile && (
-                                            <Button className="bg-red-500 text-white hover:bg-red-600"
-                                                    type="button"
-                                                    onClick={() => toggleFile(profileImageFile.id)}
-                                            >
-                                                {keepFileIds.includes(profileImageFile.id) ? "Obriši" : "Vrati"}
-                                            </Button>
-                                        )}
+
                                     </div>
+
+                                )}
+                                {profileImageFile && (
+                                    <Button className="bg-red-500 text-white hover:bg-red-600 mt-1 w-full"
+                                            type="button"
+                                            onClick={() => toggleFile(profileImageFile.id)}
+                                    >
+                                        {keepFileIds.includes(profileImageFile.id) ? "Obriši" : "Vrati"}
+                                    </Button>
                                 )}
 
                                 <Input
@@ -745,7 +770,7 @@ function ComponentEdit() {
                                                     src={galleryImageUrls[img.id]}
                                                     className="w-full h-24 object-cover rounded cursor-pointer"
                                                     onClick={() => {
-                                                        const index = combinedGallery.findIndex(i => i.id === img.id);
+                                                        const index = viewerGallery.findIndex(i => i.id === img.id);
                                                         setActiveImageIndex(index);
                                                     }}
                                                 />
@@ -765,16 +790,16 @@ function ComponentEdit() {
                                     ))}
 
                                     {newImagePreviews.map((img, idx) => {
-                                        const indexInGallery = combinedGallery.findIndex(
-                                            i => i.url === img.url
-                                        );
 
                                         return (
                                             <div key={idx} className="border p-2 rounded border-green-400">
                                                 <img
                                                     src={img.url}
                                                     className="w-full h-24 object-cover rounded cursor-pointer"
-                                                    onClick={() => setActiveImageIndex(indexInGallery)}
+                                                    onClick={() => {
+                                                        const index = viewerGallery.findIndex(i => i.url === img.url);
+                                                        setActiveImageIndex(index);
+                                                    }}
                                                 />
                                                 <span className="text-xs text-green-600">Nova fotografija</span>
                                             </div>
@@ -886,7 +911,7 @@ function ComponentEdit() {
                         onClick={(e) => {
                             e.stopPropagation();
                             setActiveImageIndex(prev =>
-                                prev === 0 ? combinedGallery.length - 1 : prev - 1
+                                prev === 0 ? viewerGallery.length - 1 : prev - 1
                             );
                         }}
                         className="absolute left-4 text-white text-4xl"
@@ -895,7 +920,7 @@ function ComponentEdit() {
                     </button>
 
                     <img
-                        src={combinedGallery[activeImageIndex]?.url}
+                        src={viewerGallery[activeImageIndex]?.url}
                         className="max-h-[85vh] max-w-[95vw] object-contain rounded-lg"
                         onClick={(e) => e.stopPropagation()}
                     />
@@ -904,7 +929,7 @@ function ComponentEdit() {
                         onClick={(e) => {
                             e.stopPropagation();
                             setActiveImageIndex(prev =>
-                                prev === combinedGallery.length - 1 ? 0 : prev + 1
+                                prev === viewerGallery.length - 1 ? 0 : prev + 1
                             );
                         }}
                         className="absolute right-4 text-white text-4xl"
@@ -914,36 +939,37 @@ function ComponentEdit() {
 
                     <div className="absolute bottom-4 right-4 flex gap-2">
 
-                        <a
-                            href={combinedGallery[activeImageIndex]?.url}
-                            download={combinedGallery[activeImageIndex]?.name}
+
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleDownloadImages(viewerGallery[activeImageIndex]);
+                            }}
                             className="bg-pink-500 text-white px-3 py-1 rounded"
-                            //onClick={() => handleDownloadImages(activeImageIndex)}
                         >
-                            Download
-                        </a>
-                        {combinedGallery[activeImageIndex]?.type !== "new" && (
+                            Preuzmi
+                        </button>
+                        {viewerGallery[activeImageIndex]?.type !== "new" && (
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
 
-                                    const item = combinedGallery[activeImageIndex];
+                                    const item = viewerGallery[activeImageIndex];
 
                                     if (item?.id) {
                                         toggleFile(item.id);
                                     }
                                 }}
                                 className={`px-3 py-1 rounded text-white ${
-                                    combinedGallery[activeImageIndex] &&
-                                    keepFileIds.includes(combinedGallery[activeImageIndex].id)
+                                    viewerGallery[activeImageIndex] &&
+                                    keepFileIds.includes(viewerGallery[activeImageIndex].id)
                                         ? "bg-red-600"
                                         : "bg-green-600"
                                 }`}
                             >
-                                {combinedGallery[activeImageIndex] &&
-                                keepFileIds.includes(combinedGallery[activeImageIndex].id)
-                                    ? "Delete"
-                                    : "Restore"}
+                                {viewerGallery[activeImageIndex] &&
+                                    keepFileIds.includes(viewerGallery[activeImageIndex].id)
+                                } Obriši
                             </button>
                         )}
                     </div>
