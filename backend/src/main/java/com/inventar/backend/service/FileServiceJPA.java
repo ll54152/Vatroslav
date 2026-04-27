@@ -157,6 +157,25 @@ public class FileServiceJPA {
     }
 
     @Transactional
+    public void syncExperimentFiles(Experiment experiment, List<Long> existingFileIds, MultipartFile[] files, MultipartFile profileImage, MultipartFile[] otherImages, User user) {
+        List<File> currentFiles = experiment.getFileList() != null
+                ? experiment.getFileList()
+                : new ArrayList<>();
+
+        for (File file : new ArrayList<>(currentFiles)) {
+
+            if (existingFileIds == null || !existingFileIds.contains(file.getId())) {
+
+                fileRepo.delete(file);
+
+                logServiceJPA.fileExperimentDeletion(experiment, file, user);
+            }
+        }
+
+        handleExperimentFiles(experiment, files, profileImage, otherImages, user);
+    }
+
+    @Transactional
     public void handleExperimentFiles(Experiment experiment, MultipartFile[] files, MultipartFile profileImage, MultipartFile[] otherImages, User user) {
         List<MultipartFile> multipartFiles = new ArrayList<>();
 
@@ -238,4 +257,6 @@ public class FileServiceJPA {
             return fileShowDTOList;
         }
     }
+
+
 }

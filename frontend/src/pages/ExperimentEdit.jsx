@@ -1,306 +1,766 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {useParams, useNavigate} from "react-router-dom";
 import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
 import {Button} from "@/components/ui/button";
 import {ScrollArea} from "@/components/ui/scroll-area";
+import ComponentEdit from "@/pages/ComponentEdit.jsx";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.jsx";
 
-export default function ExperimentEdit() {
+function ExperimentEdit() {
     const {id} = useParams();
     const navigate = useNavigate();
 
-    const [experiment, setExperiment] = useState(null);
-    const [component, setComponent] = useState([]);
-    const [allComponents, setAllComponents] = useState([]);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [searchResults, setSearchResults] = useState([]);
-    const [logs, setLogs] = useState([]);
-    const [files, setFiles] = useState([]);
-    const [newFiles, setNewFiles] = useState([]);
-    const [deletedFileIds, setDeletedFileIds] = useState([]);
+    const [validationMessage, setValidationMessage] = useState();
+
+    const [experimentName, setExperimentName] = useState("");
+    const [internalCode, setInternalCode] = useState("");
+
+    const [description, setDescription] = useState("");
+    const [keywords, setKeywords] = useState("");
+
+    const [subject, setSubject] = useState("");
+    const [field, setField] = useState("");
+
+    const [materials, setMaterials] = useState("");
+
+    const [experiments, setExperiments] = useState([]);
+
+    const [components, setComponents] = useState([]);
+    const [componentSearchQuery, setComponentSearchQuery] = useState("");
+    const [componentSearchResults, setComponentSearchResults] = useState([]);
+    const [selectedComponents, setSelectedComponents] = useState([]);
 
 
-    const [formData, setFormData] = useState({
-        name: "",
-        field: "",
-        subject: "",
-        description: "",
-        materials: "",
-    });
+    const [existingImages, setExistingImages] = useState([]);
+    const [keepImages, setKeepImages] = useState([]);
+
+    const [existingFiles, setExistingFiles] = useState([]);
+    const [keepFileIds, setKeepFileIds] = useState([]);
+
+    const [newImagePreviews, setNewImagePreviews] = useState([]);
+    const [newProfileImage, setNewProfileImage] = useState(null);
+    const [newOtherImages, setNewOtherImages] = useState([]);
+    const [newDocuments, setNewDocuments] = useState([]);
+
+    const [profileImageUrl, setProfileImageUrl] = useState(null);
+    const [galleryImageUrls, setGalleryImageUrls] = useState({});
+
+    const [activeImageIndex, setActiveImageIndex] = useState(null);
+
+    const profileImage = useMemo(
+        () => existingFiles.find(f => f.fileCategory === "profileImage"),
+        [existingFiles]
+    );
+
+    const otherImages = useMemo(
+        () => existingFiles.filter(f => f.fileCategory === "otherImage"),
+        [existingFiles]
+    );
+
+    const documents = useMemo(
+        () => existingFiles.filter(f => f.fileCategory === "general"),
+        [existingFiles]
+    );
+
+    const profileImageFile = useMemo(
+        () => existingFiles.find(f => f.fileCategory === "profileImage"),
+        [existingFiles]
+    );
 
     useEffect(() => {
         const token = localStorage.getItem("jwt");
 
         const fetchExperiment = async () => {
-            try {
-                const response = await fetch(`/vatroslav/api/experiment/get/${id}`, {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `${token}`,
-                    },
-                });
+            const res = await fetch(`/vatroslav/api/experiment/get/${id}`, {
+                headers: {Authorization: token},
+            });
 
-                if (response.ok) {
-                    const data = await response.json();
-                    setExperiment(data);
-                    setFormData({
-                        name: data.name || "",
-                        field: data.field || "",
-                        subject: data.subject || "",
-                        description: data.description || "",
-                        materials: data.materials || "",
-                    });
-                    setComponent(data.komponente || []);
-                    setLogs(data.logs || []);
-                    setFiles(data.files || []);
-                } else {
-                    console.error("Greška pri dohvaćanju eksperimenta", await response.text());
-                }
-            } catch (error) {
-                console.error("Greška u fetch pozivu:", error);
-            }
+            if (!res.ok) return;
+
+            const data = await res.json();
+
+            setExperimentName(data.name);
+            setInternalCode(data.zpf);
+
+            setDescription(data.description);
+            setKeywords((data.keywords || []).join("; "));
+
+            setSubject(data.subject);
+            setField(data.field);
+
+            setMaterials(data.materials);
+
+            setSelectedComponents(data.componentDTOList || []);
+
+            setExistingImages(data.images || []);
+            setKeepImages((data.images || []).map(img => img.id));
+
+            setExistingFiles(data.fileShowDTOList || []);
+            setKeepFileIds((data.fileShowDTOList || []).map(f => f.id));
         };
 
         const fetchComponents = async () => {
-            const response = await fetch("/vatroslav/api/component/getAll", {
-                headers: {
-                    Authorization: `${token}`,
-                },
+            const res = await fetch("/vatroslav/api/component/getAll", {
+                headers: {Authorization: token},
             });
-            if (response.ok) {
-                const data = await response.json();
-                setAllComponents(data);
+
+            if (res.ok) {
+                setComponents(await res.json());
             }
         };
 
-        fetchExperiment();
         fetchComponents();
+        fetchExperiment();
     }, [id]);
 
-    const handleInputChange = (e) => {
-        const {id, value} = e.target;
-        setFormData((prev) => ({...prev, [id]: value}));
-    };
-
-    const removeFile = (fileId) => {
-        setDeletedFileIds((prev) => [...prev, fileId]);
-        setFiles((prev) => prev.filter((f) => f.id !== fileId));
-    };
+    useEffect(() => {
+        return () => {
+            if (profileImageUrl) URL.revokeObjectURL(profileImageUrl);
+            Object.values(galleryImageUrls).forEach(URL.revokeObjectURL);
+        };
+    }, [profileImageUrl, galleryImageUrls]);
 
 
-    const handleSearchChange = (e) => {
-        const query = e.target.value.toLowerCase();
-        setSearchQuery(query);
-        if (!query) {
-            setSearchResults([]);
+    useEffect(() => {
+        return () => {
+            if (profileImageUrl) URL.revokeObjectURL(profileImageUrl);
+            Object.values(galleryImageUrls).forEach(URL.revokeObjectURL);
+        };
+    }, [profileImageUrl, galleryImageUrls]);
+
+    const newProfilePreview = newProfileImage
+        ? URL.createObjectURL(newProfileImage)
+        : null;
+
+    const gridGallery = useMemo(() => {
+        const profile = profileImageFile && (profileImageUrl || newProfilePreview)
+            ? [{
+                type: "profile",
+                id: profileImageFile.id,
+                url: newProfilePreview || profileImageUrl,
+                name: profileImageFile.name
+            }]
+            : [];
+
+        const existing = otherImages.map(img => ({
+            type: "existing",
+            id: img.id,
+            url: galleryImageUrls[img.id],
+            name: img.name
+        }));
+
+        const fresh = newImagePreviews.map(img => ({
+            type: "new",
+            url: img.url,
+            name: img.file.name
+        }));
+
+        return [...profile, ...existing, ...fresh];
+    }, [
+        profileImageFile,
+        profileImageUrl,
+        newProfilePreview,
+        otherImages,
+        newImagePreviews,
+        galleryImageUrls
+    ]);
+
+    const viewerGallery = useMemo(() => {
+        return gridGallery.filter(item => {
+            if (item.type === "new") return true;
+
+            if (item.type === "profile") return true;
+
+            return item.id ? keepFileIds.includes(item.id) : true;
+        });
+    }, [gridGallery, keepFileIds]);
+
+    useEffect(() => {
+        const loadProfileImage = async () => {
+            if (!profileImageFile) return;
+
+            const token = localStorage.getItem("jwt");
+
+            const res = await fetch(`/vatroslav/api/files/image/${profileImageFile.id}`, {
+                headers: {Authorization: `${token}`},
+            });
+
+            if (!res.ok) return;
+
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+
+            setProfileImageUrl(url);
+        };
+
+        loadProfileImage();
+    }, [profileImageFile]);
+
+    useEffect(() => {
+        if (activeImageIndex === null) return;
+
+        const handleKeyDown = (e) => {
+            if (e.key === "ArrowRight") {
+                setActiveImageIndex(prev =>
+                    prev === viewerGallery.length - 1 ? 0 : prev + 1
+                );
+            } else if (e.key === "ArrowLeft") {
+                setActiveImageIndex(prev =>
+                    prev === 0 ? viewerGallery.length - 1 : prev - 1
+                );
+            } else if (e.key === "Escape") {
+                setActiveImageIndex(null);
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [activeImageIndex, viewerGallery.length]);
+
+    useEffect(() => {
+        if (!newOtherImages.length) {
+            setNewImagePreviews([]);
             return;
         }
-        const filtered = allComponents.filter((comp) =>
-            comp.name.toLowerCase().includes(query)
-        );
-        setSearchResults(filtered);
-    };
 
-    const addComponent = (component, e) => {
-        e.preventDefault();
-        if (!component.some((k) => k.id === component.id)) {
-            setComponent([...component, component]);
-        }
-    };
+        const previews = newOtherImages.map(file => ({
+            file,
+            url: URL.createObjectURL(file)
+        }));
 
-    const removeComponent = (index) => {
-        setComponent((prev) => prev.filter((_, i) => i !== index));
-    };
+        setNewImagePreviews(previews);
 
-    const removeLog = (index) => {
-        setLogs((prev) => prev.filter((_, i) => i !== index));
-    };
+        return () => {
+            previews.forEach(p => URL.revokeObjectURL(p.url));
+        };
+    }, [newOtherImages]);
 
-    const removeExistingFile = (index) => {
-        setFiles((prev) => prev.filter((_, i) => i !== index));
-    };
+    useEffect(() => {
+        const loadGalleryImages = async () => {
+            const token = localStorage.getItem("jwt");
 
-    const handleFileChange = (e) => {
-        const selectedFiles = Array.from(e.target.files);
-        setNewFiles(selectedFiles);
-    };
+            const urls = await Promise.all(
+                otherImages.map(async (img) => {
+                    if (!galleryImageUrls[img.id]) {
+                        const res = await fetch(`/vatroslav/api/files/image/${img.id}`, {
+                            headers: {Authorization: `${token}`},
+                        });
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+                        if (!res.ok) return null;
+
+                        const blob = await res.blob();
+                        return {id: img.id, url: URL.createObjectURL(blob)};
+                    }
+                    return null;
+                })
+            );
+
+            const urlMap = urls.reduce((acc, cur) => {
+                if (cur) acc[cur.id] = cur.url;
+                return acc;
+            }, {...galleryImageUrls});
+
+            setGalleryImageUrls(urlMap);
+        };
+
+        if (otherImages.length > 0) loadGalleryImages();
+    }, [galleryImageUrls, otherImages]);
+
+    const handleUpdate = async () => {
         const token = localStorage.getItem("jwt");
 
-        const data = new FormData();
-        data.append("name", formData.name);
-        data.append("field", formData.field);
-        data.append("subject", formData.subject);
-        data.append("description", formData.description);
-        data.append("materials", formData.materials);
-        data.append("komponente", JSON.stringify(component.map((k) => k.id)));
-        data.append("logovi", JSON.stringify(logs.map((log) => log.id)));
-        data.append("deletedFileIds", JSON.stringify(deletedFileIds));
 
-        if (newFiles.length > 0) {
-            newFiles.forEach((file) => {
-                if (file instanceof File) {
-                    data.append("files", file);
-                }
-            });
-        } else {
-            const empty = new Blob([], {type: "application/octet-stream"});
-            data.append("files", empty, "");
-        }
+        const dto = {
+            name: experimentName,
+            zpf: internalCode,
+            subject: subject,
+            field: field,
+            description,
+            keywords: keywords ? keywords.split(";").map(k => k.trim()).filter(k => k !== "") : [],
+            materials: materials,
+            componentIds: selectedComponents.map(comp => comp.id),
+            existingFileIds: keepFileIds,
+        };
 
-        const response = await fetch(`/vatroslav/api/experiment/update/${id}`, {
+        const formData = new FormData();
+        formData.append(
+            "data",
+            new Blob([JSON.stringify(dto)], {type: "application/json"})
+        );
+
+        if (newProfileImage) formData.append("profileImage", newProfileImage);
+        newOtherImages.forEach(f => formData.append("otherImages", f));
+        newDocuments.forEach(f => formData.append("files", f));
+
+        const res = await fetch(`/vatroslav/api/experiment/edit/${id}`, {
             method: "PUT",
             headers: {
                 Authorization: `${token}`,
             },
-            body: data,
+            body: formData,
         });
 
-        if (response.ok) {
-            navigate("/experiment/view/" + id);
+        if (res.ok) {
+            alert("Eksperiment ažuriran");
+            navigate(`/experiment/view/${id}`);
+
         } else {
-            const text = await response.text();
-            console.error("Greška:", text);
-            alert("Greška pri ažuriranju eksperimenta.");
+            alert(await res.text());
         }
     };
 
+    const handleDownloadImages = async (file) => {
+        if (!file) return;
 
-    if (!experiment) return <div>Učitavanje...</div>;
+        if (file.type === "new") {
+            const a = document.createElement("a");
+            a.href = file.url;
+            a.download = file.name;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            return;
+        }
+
+        const token = localStorage.getItem("jwt");
+
+        const res = await fetch(`/vatroslav/api/files/image/${file.id}`, {
+            headers: {Authorization: token},
+        });
+
+        if (!res.ok) {
+            alert("Download failed");
+            return;
+        }
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = file.name || "file";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(url);
+    };
+
+    const handleDownloadFiles = async (file) => {
+        const token = localStorage.getItem("jwt");
+
+        const res = await fetch(`/vatroslav/api/files/download/${file.id}`, {
+            headers: {Authorization: `${token}`},
+        });
+
+        if (!res.ok) {
+            alert("Ne mogu preuzeti datoteku");
+            return;
+        }
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = file.name || "file";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(url);
+    };
+
+    const toggleFile = (fileId) => {
+        setKeepFileIds(prev =>
+            prev.includes(fileId)
+                ? prev.filter(id => id !== fileId)
+                : [...prev, fileId]
+        );
+    };
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Uredi eksperiment</CardTitle>
-                {/* Add profile picture display here, centered below the title */}
-                {experiment.files && experiment.files.find(file => file.fileCategory === "profileImage") && (
-                    <div className="flex justify-center mt-4">
-                        <img
-                            src={`data:image/*;base64,${experiment.files.find(file => file.fileCategory === "profileImage").fileByte}`}
-                            alt="Profile Image"
-                            className="w-2/4"
-                        />
-                    </div>
-                )}
+        <Card className="w-full p-2 lg:p-4">
+            <CardHeader className="flex flex-col items-center p-3 lg:p-6">
+                <CardTitle className="text-4xl font-bold mb-4">
+                    Uredi eksperiment
+                </CardTitle>
+
+                <Input
+                    placeholder="Unesite naziv eksperimenta"
+                    value={experimentName}
+                    onChange={(e) => setExperimentName(e.target.value)}
+                />
             </CardHeader>
-            <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <CardTitle className="text-left text-[20px]">Naziv</CardTitle>
-                    <Input id="name" placeholder="Naziv" value={formData.name} onChange={handleInputChange}/>
-                    <br></br>
-                    <CardTitle className="text-left text-[20px]">Područje fizike</CardTitle>
-                    <Input id="field" placeholder="Područje fizike" value={formData.field}
-                           onChange={handleInputChange}/>
-                    <CardTitle className="text-left text-[20px]">Nastavni predmet</CardTitle>
-                    <Input id="subject" placeholder="Nastavni predmet" value={formData.subject}
-                           onChange={handleInputChange}/>
-                    <br></br>
-                    <CardTitle className="text-left text-[20px]">Opis</CardTitle>
-                    <Textarea id="description" placeholder="Opis" value={formData.description}
-                              onChange={handleInputChange}/>
-                    <br></br>
-                    <CardTitle className="text-left text-[20px]">Pribor i potrošni materijal</CardTitle>
-                    <Textarea id="materials" placeholder="Pribor i potrošni materijal" value={formData.materials}
-                              onChange={handleInputChange}/>
 
-                    {/* Komponente */}
-                    <div>
-                        <h3 className="font-semibold mb-2">Komponente</h3>
-                        <Input placeholder="Pretraži komponente" value={searchQuery} onChange={handleSearchChange}/>
-                        <ScrollArea className="h-40 mt-2 border rounded">
-                            {searchResults.map((comp) => (
-                                <div key={comp.id} className="flex justify-between p-2 border-b">
-                                    <span>{comp.name}</span>
-                                    <Button size="sm" onClick={(e) => addComponent(comp, e)}>Dodaj</Button>
-                                </div>
-                            ))}
-                        </ScrollArea>
-                        <div className="mt-4">
-                            <h4 className="font-semibold">Odabrane komponente:</h4>
-                            {component.map((comp, index) => (
-                                <div key={index} className="flex justify-between p-2 border-b">
-                                    <span>{comp.name}</span>
-                                    <Button size="sm" variant="destructive"
-                                            onClick={() => removeComponent(index)}>Ukloni</Button>
-                                </div>
-                            ))}
-                        </div>
+            <CardContent className="w-full p-2 lg:p-6">
+                <form className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-6 w-full">
+                    <div className="flex flex-col space-y-6">
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>ZPF inventarna oznaka</CardTitle>
+                            <Input placeholder="Unesite 5 velikih slova (obavezno)" value={internalCode}
+                                   onChange={(e) => {
+                                       const value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 5);
+                                       setInternalCode(value);
+                                       if (value.length === 5 && /^[A-Z]{5}$/.test(value)) {
+                                           setValidationMessage("Ispravno");
+                                       } else {
+                                           setValidationMessage("Neispravno: Točno 5 velikih slova!");
+                                       }
+                                   }}/>
+                            {validationMessage && (
+                                <p className={`text-sm ${validationMessage === "Ispravno" ? "text-green-600" : "text-red-600"}`}>
+                                    {validationMessage}
+                                </p>
+                            )}
+                        </Card>
+
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>Nastavni predmet</CardTitle>
+                            <Input
+                                placeholder="Unesite nastavni predmet"
+                                value={subject}
+                                onChange={(e) => setSubject(e.target.value)}
+                            />
+                        </Card>
+
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>Područje fizike</CardTitle>
+                            <Input
+                                placeholder="Unesite područje fizike"
+                                value={field}
+                                onChange={(e) => setField(e.target.value)}
+                            />
+                        </Card>
+
                     </div>
 
-                    {/* Logovi */}
-                    <div className="mt-6">
-                        <h3 className="text-xl font-bold">Logovi</h3>
-                        {logs.length > 0 ? (
-                            <ul className="mt-2 space-y-2">
-                                {logs.map((log, index) => (
-                                    <li key={log.id || index} className="border p-3 rounded-md">
-                                        <p><strong>Bilješka:</strong> {log.note}</p>
-                                        <p><strong>Korisnik:</strong> {log.user?.username || "Nepoznato"}</p>
-                                        <p><strong>Vrijeme:</strong> {new Date(log.timestamp).toLocaleString()}</p>
-                                        <Button variant="destructive" size="sm"
-                                                onClick={() => removeLog(index)}>Obriši</Button>
-                                    </li>
+                    <div className="flex flex-col space-y-6">
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>Komponente</CardTitle>
+
+                            <Input
+                                placeholder="Pretražite komponente"
+                                value={componentSearchQuery}
+                                onChange={(e) => {
+                                    const query = e.target.value.toLowerCase();
+                                    setComponentSearchQuery(query);
+                                    if (!query) {
+                                        setComponentSearchResults([]);
+                                        return;
+                                    }
+                                    const filtered = experiments.filter((comp) =>
+                                        comp.name.toLowerCase().includes(query)
+                                    );
+                                    setComponentSearchResults(filtered);
+                                }}
+                            />
+                            {componentSearchResults.map((comp) => (
+                                <div key={comp.id} className="w-full flex flex-col space-y-1.5">
+                                    <span>{comp.name}</span>
+                                    <Button
+                                        type="button"
+                                        onClick={() => {
+                                            if (!selectedComponents.some(c => c.id === comp.id)) {
+                                                setSelectedComponents([...selectedComponents, comp]);
+                                            }
+                                        }}
+                                        className="bg-blue-500 text-white hover:bg-blue-600"
+                                    >
+                                        Dodaj
+                                    </Button>
+                                </div>
+                            ))}
+
+                            <div className="mt-2">
+                                <h4 className="text-sm font-medium">Odabrane komponente:</h4>
+                                {selectedComponents.map((comp, index) => (
+                                    <div key={comp.id} className="flex justify-between items-center border-b py-1">
+                                        <span>{comp.name}</span>
+                                        <Button
+                                            type="button"
+                                            onClick={() =>
+                                                setSelectedComponents(selectedComponents.filter((_, i) => i !== index))
+                                            }
+                                            className="bg-red-500 text-white hover:bg-red-600"
+                                        >
+                                            Ukloni
+                                        </Button>
+                                    </div>
                                 ))}
-                            </ul>
-                        ) : (
-                            <p className="text-sm text-gray-600">Nema logova za ovaj eksperiment.</p>
-                        )}
-                    </div>
+                            </div>
+                        </Card>
 
-                    {/* Dokumentacija */}
-                    <div className="mt-6">
-                        <h3 className="text-xl font-bold">Dokumentacija</h3>
-                        {files.length > 0 ? (
-                            <ul className="mt-2 space-y-2">
-                                {files.map((file) => (
-                                    <li key={file.id}
-                                        className="border p-3 rounded-md flex justify-between items-center">
-                                        <span>{file.name}</span>
-                                        <div className="flex gap-3">
-                                            <a
-                                                href={`data:application/octet-stream;base64,${file.fileByte}`}
-                                                download={file.name}
-                                                className="text-blue-600 hover:underline"
-                                            >
-                                                Preuzmi
-                                            </a>
+                        <Card className="p-4 space-y-6">
+                            <CardTitle>Datoteke</CardTitle>
+
+                            <div>
+                                <h3 className="font-semibold">Profilna slika</h3>
+
+                                {(profileImageFile || newProfilePreview) && (
+                                    <div
+                                        className={`flex gap-3 items-center mt-2 p-2 rounded border
+                                            ${profileImageFile && !keepFileIds.includes(profileImageFile.id)
+                                            ? "border-red-500 bg-red-50"
+                                            : "border-gray-200"
+                                        }`}
+                                    >
+                                        <img
+                                            src={newProfilePreview || profileImageUrl}
+                                            onClick={() => setActiveImageIndex(0)}
+                                        />
+
+
+                                    </div>
+
+                                )}
+                                {profileImageFile && (
+                                    <Button className="bg-red-500 text-white hover:bg-red-600 mt-1 w-full"
+                                            type="button"
+                                            onClick={() => toggleFile(profileImageFile.id)}
+                                    >
+                                        {keepFileIds.includes(profileImageFile.id) ? "Obriši" : "Vrati"}
+                                    </Button>
+                                )}
+
+                                <Input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => setNewProfileImage(e.target.files[0])}
+                                    className="mt-2"
+                                />
+                            </div>
+
+                            <div>
+                                <h3 className="font-semibold">Galerija</h3>
+
+                                <div className="grid grid-cols-3 gap-3 mt-2">
+
+                                    {otherImages.map(img => (
+
+                                        <div
+                                            key={img.id}
+                                            className={`border p-2 rounded transition
+                                            ${keepFileIds.includes(img.id)
+                                                ? "border-gray-300"
+                                                : "border-red-500 bg-red-50"
+                                            }`}
+                                        >
+                                            {galleryImageUrls[img.id] ? (
+                                                <img
+                                                    src={galleryImageUrls[img.id]}
+                                                    className="w-full h-24 object-cover rounded cursor-pointer"
+                                                    onClick={() => {
+                                                        const index = viewerGallery.findIndex(i => i.id === img.id);
+                                                        setActiveImageIndex(index);
+                                                    }}
+                                                />
+                                            ) : (
+                                                <div className="h-24 bg-gray-200 animate-pulse rounded"></div>
+                                            )}
+
+
                                             <Button
-                                                size="sm"
-                                                variant="destructive"
-                                                onClick={() => removeFile(file.id)}
+                                                className="mt-1 w-full bg-red-500 text-white hover:bg-red-600"
+                                                type="button"
+                                                onClick={() => toggleFile(img.id)}
                                             >
-                                                Ukloni
+                                                {keepFileIds.includes(img.id) ? "Obriši" : "Vrati"}
                                             </Button>
                                         </div>
-                                    </li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p className="text-sm text-gray-600">Nema dokumentacije za ovaj eksperiment.</p>
-                        )}
-
-
-                        {/* Novi fajlovi za upload */}
-                        <div className="mt-4">
-                            <label htmlFor="fileUpload" className="font-semibold">Dodaj nove datoteke:</label>
-                            <Input id="fileUpload" type="file" multiple onChange={handleFileChange}/>
-                            {newFiles.length > 0 && (
-                                <ul className="mt-2 list-disc ml-4 text-sm text-gray-700">
-                                    {newFiles.map((file, idx) => (
-                                        <li key={idx}>{file.name}</li>
                                     ))}
-                                </ul>
-                            )}
-                        </div>
+
+                                    {newImagePreviews.map((img, idx) => {
+
+                                        return (
+                                            <div key={idx} className="border p-2 rounded border-green-400">
+                                                <img
+                                                    src={img.url}
+                                                    className="w-full h-24 object-cover rounded cursor-pointer"
+                                                    onClick={() => {
+                                                        const index = viewerGallery.findIndex(i => i.url === img.url);
+                                                        setActiveImageIndex(index);
+                                                    }}
+                                                />
+                                                <span className="text-xs text-green-600">Nova fotografija</span>
+                                            </div>
+                                        );
+                                    })}
+
+                                </div>
+
+                                <Input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={(e) => setNewOtherImages(Array.from(e.target.files))}
+                                    className="mt-2"
+                                />
+                            </div>
+
+                            <div>
+                                <h3 className="font-semibold">Dokumenti</h3>
+
+                                {documents.length > 0 ? (
+                                    <div className="space-y-2 mt-2">
+                                        {documents.map(file => (
+                                            <div
+                                                key={file.id}
+                                                className={`flex justify-between items-center border p-2 rounded
+                                                    ${keepFileIds.includes(file.id)
+                                                    ? "border-gray-300"
+                                                    : "border-red-500 bg-red-50"
+                                                }`}
+                                            >
+                                                <span className="text-sm truncate">{file.name}</span>
+
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        className="bg-pink-500 text-white"
+                                                        type="button"
+                                                        onClick={() => handleDownloadFiles(file)}
+                                                    >
+                                                        Preuzmi
+                                                    </Button>
+
+                                                    <Button
+                                                        className="bg-red-500 text-white hover:bg-red-600"
+                                                        type="button"
+                                                        onClick={() => toggleFile(file.id)}
+                                                    >
+                                                        {keepFileIds.includes(file.id) ? "Obriši" : "Vrati"}
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-gray-500 mt-2">Nema dokumenata</p>
+                                )}
+
+                                <Input
+                                    type="file"
+                                    multiple
+                                    onChange={(e) => setNewDocuments(Array.from(e.target.files))}
+                                    className="mt-2"
+                                />
+                            </div>
+                        </Card>
+                    </div>
+
+                    <div className="flex flex-col space-y-6">
+
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>Opis</CardTitle>
+                            <Textarea placeholder="Unesite kratak opis" value={description}
+                                      onChange={(e) => setDescription(e.target.value)}/>
+                        </Card>
+
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>Ključne riječi</CardTitle>
+                            <Textarea
+                                placeholder="Unesite ključne riječi odvojene točkom-zarezom (;). Npr. Uređaj; Laptop"
+                                value={keywords} onChange={(e) => setKeywords(e.target.value)}/>
+                        </Card>
+
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>Pribor i potrošni materijal</CardTitle>
+                            <Textarea placeholder="Unesite pribor i potrošni materijal" value={materials}
+                                      onChange={(e) => setMaterials(e.target.value)}/>
+                        </Card>
                     </div>
                 </form>
+
             </CardContent>
-            <CardFooter className="justify-end">
-                <Button type="submit" onClick={handleSubmit}>Spremi promjene</Button>
-            </CardFooter>
+
+            <div className="flex justify-center">
+                <Button className="m-5 bg-pink-500 text-white"
+                        onClick={handleUpdate}>
+                    Spremi izmjene
+                </Button>
+            </div>
+
+
+            {activeImageIndex !== null && (
+
+                <div
+                    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+                    onClick={() => setActiveImageIndex(null)}
+                >
+
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveImageIndex(prev =>
+                                prev === 0 ? viewerGallery.length - 1 : prev - 1
+                            );
+                        }}
+                        className="absolute left-4 text-white text-4xl"
+                    >
+                        ‹
+                    </button>
+
+                    <img
+                        src={viewerGallery[activeImageIndex]?.url}
+                        className="max-h-[85vh] max-w-[95vw] object-contain rounded-lg"
+                        onClick={(e) => e.stopPropagation()}
+                    />
+
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveImageIndex(prev =>
+                                prev === viewerGallery.length - 1 ? 0 : prev + 1
+                            );
+                        }}
+                        className="absolute right-4 text-white text-4xl"
+                    >
+                        ›
+                    </button>
+
+                    <div className="absolute bottom-4 right-4 flex gap-2">
+
+
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleDownloadImages(viewerGallery[activeImageIndex]);
+                            }}
+                            className="bg-pink-500 text-white px-3 py-1 rounded"
+                        >
+                            Preuzmi
+                        </button>
+                        {viewerGallery[activeImageIndex]?.type !== "new" && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+
+                                    const item = viewerGallery[activeImageIndex];
+
+                                    if (item?.id) {
+                                        toggleFile(item.id);
+                                    }
+                                }}
+                                className={`px-3 py-1 rounded text-white ${
+                                    viewerGallery[activeImageIndex] &&
+                                    keepFileIds.includes(viewerGallery[activeImageIndex].id)
+                                        ? "bg-red-600"
+                                        : "bg-green-600"
+                                }`}
+                            >
+                                {viewerGallery[activeImageIndex] &&
+                                    keepFileIds.includes(viewerGallery[activeImageIndex].id)
+                                } Obriši
+                            </button>
+                        )}
+                    </div>
+
+                </div>
+            )}
         </Card>
     );
 }
+
+export default ExperimentEdit;

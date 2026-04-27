@@ -137,12 +137,32 @@ public class LogServiceJPA {
     }
 
     @Transactional
+    public void fileExperimentDeletion(Experiment experiment, File file, User user) {
+        Log log = new Log();
+        log.setTimestamp(LocalDateTime.now());
+        log.setUser(user);
+        log.setExperiment(experiment);
+        log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je izbrisao datoteku '" + file.getName() + "' iz eksperimenta '" + experiment.getName() + "'");
+        logRepo.save(log);
+    }
+
+    @Transactional
     public void experimentCreation(Experiment experiment, User user) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
         log.setUser(user);
         log.setExperiment(experiment);
         log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao eksperiment '" + experiment.getName() + "' u bazu podataka");
+        logRepo.save(log);
+    }
+
+    @Transactional
+    public void experimentUpdated(Experiment experiment, User user) {
+        Log log = new Log();
+        log.setTimestamp(LocalDateTime.now());
+        log.setUser(user);
+        log.setExperiment(experiment);
+        log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je ažurirao eksperiment '" + experiment.getName() + "' u bazi podataka");
         logRepo.save(log);
     }
 
