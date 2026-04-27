@@ -5,14 +5,14 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {Textarea} from "@/components/ui/textarea";
 
-function ComponentUpdate() {
+function ComponentEdit() {
     const {id} = useParams();
     const navigate = useNavigate();
 
@@ -42,13 +42,41 @@ function ComponentUpdate() {
     const [experimentSearchResults, setExperimentSearchResults] = useState([]);
     const [selectedExperiments, setSelectedExperiments] = useState([]);
 
-    const [profileImage, setProfileImage] = useState(null);
-    const [otherImages, setOtherImages] = useState([]);
-    const [documents, setDocuments] = useState([]);
-
-    // existing images (IMPORTANT)
     const [existingImages, setExistingImages] = useState([]);
     const [keepImages, setKeepImages] = useState([]);
+
+    const [existingFiles, setExistingFiles] = useState([]);
+    const [keepFileIds, setKeepFileIds] = useState([]);
+
+    const [newProfileImage, setNewProfileImage] = useState(null);
+    const [newOtherImages, setNewOtherImages] = useState([]);
+    const [newDocuments, setNewDocuments] = useState([]);
+
+    const [profileImageUrl, setProfileImageUrl] = useState(null);
+    const [galleryImageUrls, setGalleryImageUrls] = useState({});
+
+    const [activeImageIndex, setActiveImageIndex] = useState(null);
+
+    const profileImage = useMemo(
+        () => existingFiles.find(f => f.fileCategory === "profileImage"),
+        [existingFiles]
+    );
+
+    const otherImages = useMemo(
+        () => existingFiles.filter(f => f.fileCategory === "otherImage"),
+        [existingFiles]
+    );
+
+    const documents = useMemo(
+        () => existingFiles.filter(f => f.fileCategory === "general"),
+        [existingFiles]
+    );
+
+    const profileImageFile = useMemo(
+        () => existingFiles.find(f => f.fileCategory === "profileImage"),
+        [existingFiles]
+    );
+
 
     useEffect(() => {
         const token = localStorage.getItem("jwt");
@@ -78,6 +106,9 @@ function ComponentUpdate() {
 
             setExistingImages(data.images || []);
             setKeepImages((data.images || []).map(img => img.id));
+
+            setExistingFiles(data.fileShowDTOList || []);
+            setKeepFileIds((data.fileShowDTOList || []).map(f => f.id));
         };
 
         const fetchLocations = async () => {
@@ -105,6 +136,22 @@ function ComponentUpdate() {
         fetchExperiments();
     }, [id]);
 
+    useEffect(() => {
+        return () => {
+            if (profileImageUrl) URL.revokeObjectURL(profileImageUrl);
+            Object.values(galleryImageUrls).forEach(URL.revokeObjectURL);
+        };
+    }, [profileImageUrl, galleryImageUrls]);
+
+    const newProfilePreview = newProfileImage
+        ? URL.createObjectURL(newProfileImage)
+        : null;
+
+    const newGalleryPreviews = newOtherImages.map(file => ({
+        file,
+        url: URL.createObjectURL(file),
+    }));
+
     const toggleImage = (id) => {
         setKeepImages((prev) =>
             prev.includes(id)
@@ -113,10 +160,119 @@ function ComponentUpdate() {
         );
     };
 
+    const combinedGallery = useMemo(() => {
+        const profile = profileImageFile && (profileImageUrl || newProfilePreview)
+            ? [{
+                type: "profile",
+                id: profileImageFile.id,
+                url: newProfilePreview || profileImageUrl,
+                name: profileImageFile.name
+            }]
+            : [];
+
+        const existing = otherImages
+            .filter(img => keepFileIds.includes(img.id))
+            .map(img => ({
+                type: "existing",
+                id: img.id,
+                url: galleryImageUrls[img.id],
+                name: img.name
+            }));
+
+        const fresh = newOtherImages.map(file => ({
+            type: "new",
+            url: URL.createObjectURL(file),
+            name: file.name
+        }));
+
+        return [...profile, ...existing, ...fresh];
+    }, [
+        profileImageFile,
+        profileImageUrl,
+        newProfilePreview,
+        otherImages,
+        newOtherImages,
+        galleryImageUrls,
+        keepFileIds
+    ]);
+
+    useEffect(() => {
+        const loadProfileImage = async () => {
+            if (!profileImageFile) return;
+
+            const token = localStorage.getItem("jwt");
+
+            const res = await fetch(`/vatroslav/api/files/image/${profileImageFile.id}`, {
+                headers: {Authorization: `${token}`},
+            });
+
+            if (!res.ok) return;
+
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+
+            setProfileImageUrl(url);
+        };
+
+        loadProfileImage();
+    }, [profileImageFile]);
+
+    useEffect(() => {
+        if (activeImageIndex === null) return;
+
+        const handleKeyDown = (e) => {
+            if (e.key === "ArrowRight") {
+                setActiveImageIndex(prev =>
+                    prev === combinedGallery.length - 1 ? 0 : prev + 1
+                );
+            } else if (e.key === "ArrowLeft") {
+                setActiveImageIndex(prev =>
+                    prev === 0 ? combinedGallery.length - 1 : prev - 1
+                );
+            } else if (e.key === "Escape") {
+                setActiveImageIndex(null);
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [activeImageIndex, combinedGallery.length]);
+
+    useEffect(() => {
+        const loadGalleryImages = async () => {
+            const token = localStorage.getItem("jwt");
+
+            const urls = await Promise.all(
+                otherImages.map(async (img) => {
+                    if (!galleryImageUrls[img.id]) {
+                        const res = await fetch(`/vatroslav/api/files/image/${img.id}`, {
+                            headers: {Authorization: `${token}`},
+                        });
+
+                        if (!res.ok) return null;
+
+                        const blob = await res.blob();
+                        return {id: img.id, url: URL.createObjectURL(blob)};
+                    }
+                    return null;
+                })
+            );
+
+            const urlMap = urls.reduce((acc, cur) => {
+                if (cur) acc[cur.id] = cur.url;
+                return acc;
+            }, {...galleryImageUrls});
+
+            setGalleryImageUrls(urlMap);
+        };
+
+        if (otherImages.length > 0) loadGalleryImages();
+    }, [galleryImageUrls, otherImages]);
+
+
     const handleUpdate = async () => {
         const token = localStorage.getItem("jwt");
 
-        // Ensure locationID is a valid number
         const locationID = isNaN(Number(location.id)) ? null : Number(location.id);
 
         const dto = {
@@ -128,31 +284,29 @@ function ComponentUpdate() {
                 ? deprecatedMarks.split(";").map(k => k.trim()).filter(k => k !== "")
                 : [],
             quantity: Number(quantity),
-            locationID: locationID,  // Use the validated locationID
+            locationID: locationID,
             description,
             keywords: keywords ? keywords.split(";").map(k => k.trim()).filter(k => k !== "") : [],
-            experimentIds: selectedExperiments.map(exp => exp.id),  // Ensure experimentIds is an array of Long values
-            keepExistingImageIds: keepImages,
+            experimentIds: selectedExperiments.map(exp => exp.id),
+            existingFileIds: keepFileIds,
         };
 
         const formData = new FormData();
-
         formData.append(
             "data",
             new Blob([JSON.stringify(dto)], {type: "application/json"})
         );
 
-        if (profileImage) formData.append("profileImage", profileImage);
-        otherImages.forEach(f => formData.append("otherImages", f));
-        documents.forEach(f => formData.append("files", f));
+        if (newProfileImage) formData.append("profileImage", newProfileImage);
+        newOtherImages.forEach(f => formData.append("otherImages", f));
+        newDocuments.forEach(f => formData.append("files", f));
 
-        const res = await fetch(`/vatroslav/api/component/update/${id}`, {
+        const res = await fetch(`/vatroslav/api/component/edit/${id}`, {
             method: "PUT",
             headers: {
                 Authorization: `${token}`,
-                // Don't manually set Content-Type for FormData; the browser will do this for you.
             },
-            body: formData,  // Let the browser set Content-Type to multipart/form-data
+            body: formData,
         });
 
         if (res.ok) {
@@ -189,6 +343,14 @@ function ComponentUpdate() {
         } catch (e) {
             console.error(e);
         }
+    };
+
+    const toggleFile = (fileId) => {
+        setKeepFileIds(prev =>
+            prev.includes(fileId)
+                ? prev.filter(id => id !== fileId)
+                : [...prev, fileId]
+        );
     };
 
     const handleAddLocation = async (event) => {
@@ -455,8 +617,116 @@ function ComponentUpdate() {
                         </Card>
 
 
-                        <Card className="p-2">
-                            <CardTitle>DATOTEKE TODO</CardTitle>
+                        <Card className="p-4 space-y-6">
+                            <CardTitle>Datoteke</CardTitle>
+
+                            <div>
+                                <h3 className="font-semibold">Profilna slika</h3>
+
+                                {(profileImageFile || newProfilePreview) && (
+                                    <div className="flex gap-3 items-center mt-2">
+                                        <img
+                                            src={newProfilePreview || profileImageUrl}
+                                            className="w-32 h-32 object-cover rounded-lg border cursor-pointer"
+                                            onClick={() => setActiveImageIndex(0)}
+                                        />
+
+                                        {profileImageFile && (
+                                            <Button
+                                                type="button"
+                                                onClick={() => toggleFile(profileImageFile.id)}
+                                            >
+                                                {keepFileIds.includes(profileImageFile.id) ? "Obriši" : "Vrati"}
+                                            </Button>
+                                        )}
+                                    </div>
+                                )}
+
+                                <Input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => setNewProfileImage(e.target.files[0])}
+                                    className="mt-2"
+                                />
+                            </div>
+
+                            <div>
+                                <h3 className="font-semibold">Galerija</h3>
+
+                                <div className="grid grid-cols-3 gap-3 mt-2">
+
+                                    {otherImages.map(img => (
+                                        <div key={img.id} className="border p-2 rounded">
+                                            {galleryImageUrls[img.id] ? (
+                                                <img
+                                                    src={galleryImageUrls[img.id]}
+                                                    className="w-full h-24 object-cover rounded cursor-pointer"
+                                                    onClick={() => {
+                                                        const index = combinedGallery.findIndex(i => i.id === img.id);
+                                                        setActiveImageIndex(index);
+                                                    }}
+                                                />
+                                            ) : (
+                                                <div className="h-24 bg-gray-200 animate-pulse rounded"></div>
+                                            )}
+
+                                            <Button
+                                                type="button"
+                                                className="mt-1 w-full"
+                                                onClick={() => toggleFile(img.id)}
+                                            >
+                                                {keepFileIds.includes(img.id) ? "Obriši" : "Vrati"}
+                                            </Button>
+                                        </div>
+                                    ))}
+
+                                    {newGalleryPreviews.map((img, idx) => (
+                                        <div key={idx} className="border p-2 rounded border-green-400">
+                                            <img
+                                                src={img.url}
+                                                className="w-full h-24 object-cover rounded cursor-pointer"
+                                                onClick={() => {
+                                                    const index = combinedGallery.findIndex(i => i.url === img.url);
+                                                    setActiveImageIndex(index);
+                                                }}
+                                            />
+                                            <span className="text-xs text-green-600">Novi</span>
+                                        </div>
+                                    ))}
+
+                                </div>
+
+                                <Input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={(e) => setNewOtherImages(Array.from(e.target.files))}
+                                    className="mt-2"
+                                />
+                            </div>
+
+                            <div>
+                                <h3 className="font-semibold">Dokumenti</h3>
+
+                                {documents.map(file => (
+                                    <div key={file.id} className="flex justify-between mt-2 border p-2 rounded">
+                                        <span>{file.name}</span>
+                                        <Button
+                                            type="button"
+                                            onClick={() => toggleFile(file.id)}
+                                        >
+                                            {keepFileIds.includes(file.id) ? "Obriši" : "Vrati"}
+                                        </Button>
+                                    </div>
+                                ))}
+
+                                <Input
+                                    type="file"
+                                    multiple
+                                    onChange={(e) => setNewDocuments(Array.from(e.target.files))}
+                                    className="mt-2"
+                                />
+                            </div>
                         </Card>
 
                     </div>
@@ -492,8 +762,57 @@ function ComponentUpdate() {
                     Spremi izmjene
                 </Button>
             </div>
+
+            {activeImageIndex !== null && (
+                <div
+                    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+                    onClick={() => setActiveImageIndex(null)}
+                >
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveImageIndex(prev =>
+                                prev === 0 ? combinedGallery.length - 1 : prev - 1
+                            );
+                        }}
+                        className="absolute left-4 text-white text-4xl"
+                    >
+                        ‹
+                    </button>
+
+                    <img
+                        src={combinedGallery[activeImageIndex]?.url}
+                        className="max-h-[85vh] max-w-[95vw] object-contain rounded-lg"
+                        onClick={(e) => e.stopPropagation()}
+                    />
+
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveImageIndex(prev =>
+                                prev === combinedGallery.length - 1 ? 0 : prev + 1
+                            );
+                        }}
+                        className="absolute right-4 text-white text-4xl"
+                    >
+                        ›
+                    </button>
+
+                    <div className="absolute bottom-4 right-4">
+                        <a
+                            href={combinedGallery[activeImageIndex]?.url}
+                            download={combinedGallery[activeImageIndex]?.name}
+                            className="bg-pink-500 text-white px-3 py-2 rounded"
+                        >
+                            Download
+                        </a>
+                    </div>
+                </div>
+            )}
         </Card>
+
     );
+
 }
 
-export default ComponentUpdate;
+export default ComponentEdit;

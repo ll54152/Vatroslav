@@ -2,6 +2,7 @@ package com.inventar.backend.controller;
 
 import com.inventar.backend.DTO.ComponentAddDTO;
 import com.inventar.backend.DTO.ComponentDTO;
+import com.inventar.backend.DTO.ComponentEditDTO;
 import com.inventar.backend.DTO.ComponentShowDTO;
 import com.inventar.backend.domain.Component;
 import com.inventar.backend.service.ComponentServiceJPA;
@@ -41,15 +42,15 @@ public class ComponentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(componentId);
     }
 
-    @PutMapping(value = "/update/{id}")
-    public ResponseEntity<String> updateComponent(
+    @PutMapping(value = "/edit/{id}")
+    public ResponseEntity<String> editComponent(
             @PathVariable Long id,
-            @RequestPart("data") ComponentAddDTO dto,
+            @RequestPart("data") ComponentEditDTO componentEditDTO,
             @RequestPart(value = "files", required = false) MultipartFile[] files,
             @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
             @RequestPart(value = "otherImages", required = false) MultipartFile[] otherImages
     ) {
-        componentServiceJPA.update(id, dto, files, profileImage, otherImages);
+        componentServiceJPA.edit(id, componentEditDTO, files, profileImage, otherImages);
         return ResponseEntity.ok("Komponenta ažurirana");
     }
 

@@ -1,10 +1,10 @@
 package com.inventar.backend.service;
 
 import com.inventar.backend.DTO.ComponentAddDTO;
+import com.inventar.backend.DTO.ComponentEditDTO;
 import com.inventar.backend.DTO.ComponentShowDTO;
 import com.inventar.backend.domain.Component;
 import com.inventar.backend.domain.Experiment;
-import com.inventar.backend.domain.File;
 import com.inventar.backend.domain.Location;
 import com.inventar.backend.domain.User;
 import com.inventar.backend.mapper.ExperimentMapper;
@@ -70,24 +70,20 @@ public class ComponentServiceJPA {
     }
 
     @Transactional
-    public void update(Long id, ComponentAddDTO componentAddDTO, MultipartFile[] files, MultipartFile profileImage, MultipartFile[] otherImages) {
+    public void edit(Long id, ComponentEditDTO componentEditDTO, MultipartFile[] files, MultipartFile profileImage, MultipartFile[] otherImages) {
         User user = userServiceJPA.getAuthenticatedUser();
 
         Component component = componentRepo.findById(id).orElseThrow(() -> new RuntimeException("Component not found"));
 
-        Location location = locationRepo.findById(componentAddDTO.getLocationID()).orElseThrow(() -> new RuntimeException("Location not found"));
+        Location location = locationRepo.findById(componentEditDTO.getLocationID()).orElseThrow(() -> new RuntimeException("Location not found"));
 
-        List<Experiment> newExperiments = experimentRepo.findAllById(componentAddDTO.getExperimentIds());
+        List<Experiment> newExperiments = experimentRepo.findAllById(componentEditDTO.getExperimentIds());
 
-        updateBasicFields(component, componentAddDTO, location);
+        editBasicFields(component, componentEditDTO, location);
 
         syncExperimentsWithComponent(component, newExperiments, user);
 
-        List<Long> existingFileIds = component.getFileList() != null
-                ? component.getFileList().stream().map(File::getId).toList()
-                : new ArrayList<>();
-
-        fileServiceJPA.syncComponentFiles(component, existingFileIds, files, profileImage, otherImages, user);
+        fileServiceJPA.syncComponentFiles(component, componentEditDTO.getExistingFileIds(), files, profileImage, otherImages, user);
 
         logServiceJPA.componentUpdated(component, user);
 
@@ -120,33 +116,34 @@ public class ComponentServiceJPA {
         component.setExperimentList(new ArrayList<>(newExperiments));
     }
 
-     private void updateBasicFields(Component component, ComponentAddDTO componentAddDTO, Location location) {
+    private void editBasicFields(Component component, ComponentEditDTO componentEditDTO, Location location) {
 
-         component.setName(componentAddDTO.getName());
-         component.setQuantity(componentAddDTO.getQuantity());
-         component.setDescription(componentAddDTO.getDescription());
-         component.setLocation(location);
+        component.setName(componentEditDTO.getName());
+        component.setQuantity(componentEditDTO.getQuantity());
+        component.setDescription(componentEditDTO.getDescription());
+        component.setLocation(location);
+        component.setFerStatus(componentEditDTO.getFerStatus());
 
-         if (componentAddDTO.getKeywords() != null) {
-             component.setKeywords(componentAddDTO.getKeywords());
-         }
-
-        if (componentAddDTO.getDeprecatedInventoryMarks() != null) {
-            component.setDeprecatedInventoryMarks(componentAddDTO.getDeprecatedInventoryMarks());
+        if (componentEditDTO.getKeywords() != null) {
+            component.setKeywords(componentEditDTO.getKeywords());
         }
 
-        if (!component.getZpf().equals(componentAddDTO.getZpf())) {
-            if (componentRepo.findByZpf(componentAddDTO.getZpf()).isPresent()) {
-                throw new RuntimeException("Component with same code1 exists");
-            }
-            component.setZpf(componentAddDTO.getZpf());
+        if (componentEditDTO.getDeprecatedInventoryMarks() != null) {
+            component.setDeprecatedInventoryMarks(componentEditDTO.getDeprecatedInventoryMarks());
         }
 
-        if (!component.getFer().equals(componentAddDTO.getFer())) {
-            if (componentRepo.findByFer(componentAddDTO.getFer()).isPresent()) {
-                throw new RuntimeException("Component with same code1 exists");
+        if (component.getZpf() == null || !component.getZpf().equals(componentEditDTO.getZpf())) {
+            if (componentRepo.findByZpf(componentEditDTO.getZpf()).isPresent()) {
+                throw new RuntimeException("Component with same ZPF exists");
             }
-            component.setFer(componentAddDTO.getFer());
+            component.setZpf(componentEditDTO.getZpf());
+        }
+
+        if (component.getFer() == null || !component.getFer().equals(componentEditDTO.getFer())) {
+            if (componentRepo.findByFer(componentEditDTO.getFer()).isPresent()) {
+                throw new RuntimeException("Component with same FER exists");
+            }
+            component.setFer(componentEditDTO.getFer());
         }
     }
 
@@ -225,17 +222,17 @@ public class ComponentServiceJPA {
             throw new RuntimeException("Component with same ZPF already exists");
         }
 
-         Component component = new Component(
-                 componentAddDTO.getName(),
-                 componentAddDTO.getZpf(),
-                 componentAddDTO.getFer(),
-                 componentAddDTO.getFerStatus(),
-                 componentAddDTO.getDeprecatedInventoryMarks(),
-                 componentAddDTO.getQuantity(),
-                 componentAddDTO.getDescription(),
-                 componentAddDTO.getKeywords(),
-                 location
-         );
+        Component component = new Component(
+                componentAddDTO.getName(),
+                componentAddDTO.getZpf(),
+                componentAddDTO.getFer(),
+                componentAddDTO.getFerStatus(),
+                componentAddDTO.getDeprecatedInventoryMarks(),
+                componentAddDTO.getQuantity(),
+                componentAddDTO.getDescription(),
+                componentAddDTO.getKeywords(),
+                location
+        );
 
         if (experimentList != null && !experimentList.isEmpty()) {
             component.setExperimentList(experimentList);
