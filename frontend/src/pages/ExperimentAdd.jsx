@@ -235,18 +235,18 @@ function ExperimentAdd() {
 
                         <Card className="flex flex-col space-y-6">
                             <CardTitle>Datoteke:</CardTitle>
-                            <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                            <div className="w-full flex flex-col space-y-1.5">
                                 <CardTitle>Profilna slika</CardTitle>
-                                <input
+                                <Input
                                     type="file"
                                     accept="image/*"
                                     onChange={(e) => setProfileImage(e.target.files[0])}
                                 />
                             </div>
 
-                            <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                            <div className="w-full flex flex-col space-y-1.5">
                                 <CardTitle>Ostale slike</CardTitle>
-                                <input
+                                <Input
                                     type="file"
                                     multiple
                                     accept="image/*"
@@ -254,9 +254,9 @@ function ExperimentAdd() {
                                 />
                             </div>
 
-                            <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                            <div className="w-full flex flex-col space-y-1.5">
                                 <CardTitle>Dokumentacija</CardTitle>
-                                <input
+                                <Input
                                     type="file"
                                     multiple
                                     onChange={(e) => setDocuments(Array.from(e.target.files))}

@@ -627,7 +627,7 @@ function ComponentEdit() {
                                 </div>
                             )}
 
-                            <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                            <div className="w-full flex flex-col space-y-1.5">
                                 <input
                                     id="addLocationCheckbox"
                                     type="checkbox"
@@ -639,7 +639,7 @@ function ComponentEdit() {
                             </div>
 
                             {showAddLocation && (
-                                <div className="w-full max-w-4xl flex flex-col space-y-1.5">
+                                <div className="w-full  flex flex-col space-y-1.5">
                                     <CardTitle>Dodaj novu lokaciju</CardTitle>
                                     <Input
                                         id="newLocationAddress"
