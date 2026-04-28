@@ -2,6 +2,7 @@ import React, {useEffect, useMemo, useState} from "react";
 import {useParams, useNavigate} from "react-router-dom";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Link} from "react-router-dom";
+import {jwtDecode} from "jwt-decode";
 
 function ComponentView() {
     const {id} = useParams();
@@ -14,6 +15,8 @@ function ComponentView() {
     const [logs, setLogs] = useState([]);
     const [error, setError] = useState(null);
     const [logToDelete, setLogToDelete] = useState(null);
+    const [role, setRole] = useState(null);
+
 
     const [profileImageUrl, setProfileImageUrl] = useState(null);
     const [galleryImageUrls, setGalleryImageUrls] = useState({});
@@ -61,6 +64,17 @@ function ComponentView() {
         }
     };
 
+    const getUserRole = () => {
+        const token = localStorage.getItem("jwt");
+        if (!token) return null;
+        try {
+            const decoded = jwtDecode(token);
+            return decoded.role;
+        } catch {
+            return null;
+        }
+    };
+
     useEffect(() => {
         const load = async () => {
             const isValid = isTokenValid();
@@ -70,6 +84,8 @@ function ComponentView() {
                 navigate("/login");
                 return;
             }
+
+            setRole(getUserRole());
 
             const token = localStorage.getItem("jwt");
 
@@ -256,9 +272,60 @@ function ComponentView() {
         }
     }
 
+    const handleDeleteComponent = async (id) => {
+        const token = localStorage.getItem("jwt");
+        try {
+            const response = await fetch(`/vatroslav/api/component/delete/${id}`, {
+                method: "DELETE",
+                headers: {Authorization: `${token}`},
+            });
+
+            if (response.ok) {
+                alert("Lokacija izbrisana");
+                navigate("/components");
+            } else {
+                console.error("Neuspjelo brisanje komponente");
+            }
+
+        } catch (err) {
+            alert(err.message);
+        }
+    };
+
 
     return (
         <div className="min-h-screen p-6">
+            <div className="flex justify-end gap-2 mb-4">
+
+                {role === "ROLE_ADMIN" ? (
+                    <>
+                        <Link
+                            to={`/component/edit/${component.id}`}
+                            className="bg-yellow-500 text-white px-3 py-2 rounded text-sm hover:bg-yellow-600 disabled:opacity-50"
+
+                        >
+                            Edit
+                        </Link>
+                        <button
+                            className=" bg-red-500 text-white px-3 py-2 rounded text-sm hover:bg-red-600 disabled:opacity-50"
+                            onClick={() => handleDeleteComponent(component.id)}
+                        >
+                            Delete
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        <button
+                            className="bg-yellow-500 text-white px-3 py-2 rounded text-sm hover:bg-yellow-600 opacity-50 cursor-not-allowed">
+                            Edit
+                        </button>
+                        <button
+                            className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600 opacity-50 cursor-not-allowed">
+                            Delete
+                        </button>
+                    </>
+                )}
+            </div>
 
             <div className="flex flex-col items-center mb-10">
                 {profileImageFile ? (

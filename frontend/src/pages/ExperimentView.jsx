@@ -1,6 +1,6 @@
 import * as React from "react";
 import {useEffect, useMemo, useState} from "react";
-import {useParams, useNavigate} from "react-router-dom";
+import {useParams, useNavigate, Link} from "react-router-dom";
 
 import {
     Card,
@@ -8,6 +8,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
+import {jwtDecode} from "jwt-decode";
 
 function ExperimentView() {
     const {id} = useParams();
@@ -19,7 +20,7 @@ function ExperimentView() {
     const [logs, setLogs] = useState([]);
     const [error, setError] = useState(null);
     const [logToDelete, setLogToDelete] = useState(null);
-
+    const [role, setRole] = useState(null);
 
     const [profileImageUrl, setProfileImageUrl] = useState(null);
     const [galleryImageUrls, setGalleryImageUrls] = useState({});
@@ -66,6 +67,17 @@ function ExperimentView() {
         }
     };
 
+    const getUserRole = () => {
+        const token = localStorage.getItem("jwt");
+        if (!token) return null;
+        try {
+            const decoded = jwtDecode(token);
+            return decoded.role;
+        } catch {
+            return null;
+        }
+    };
+
     useEffect(() => {
         const fetchExperiment = async () => {
             const isValid = isTokenValid();
@@ -75,6 +87,8 @@ function ExperimentView() {
                 navigate("/login");
                 return;
             }
+
+            setRole(getUserRole());
 
             const token = localStorage.getItem("jwt");
 
@@ -264,8 +278,59 @@ function ExperimentView() {
         }
     }
 
+    const handleDeleteExperiment = async (id) => {
+        const token = localStorage.getItem("jwt");
+        try {
+            const response = await fetch(`/vatroslav/api/experiment/delete/${id}`, {
+                method: "DELETE",
+                headers: {Authorization: `${token}`},
+            });
+
+            if (response.ok) {
+                alert("Eksperiment izbrisan");
+                navigate("/experiments");
+            } else {
+                console.error("Neuspjelo brisanje eksperimenta");
+            }
+
+        } catch (err) {
+            alert(err.message);
+        }
+    };
+
     return (
         <div className="min-h-screen p-6">
+            <div className="flex justify-end gap-2 mb-4">
+
+                {role === "ROLE_ADMIN" ? (
+                    <>
+                        <Link
+                            to={`/experiment/edit/${experiment.id}`}
+                            className="bg-yellow-500 text-white px-3 py-2 rounded text-sm hover:bg-yellow-600 disabled:opacity-50"
+
+                        >
+                            Edit
+                        </Link>
+                        <button
+                            className=" bg-red-500 text-white px-3 py-2 rounded text-sm hover:bg-red-600 disabled:opacity-50"
+                            onClick={() => handleDeleteExperiment(experiment.id)}
+                        >
+                            Delete
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        <button
+                            className="bg-yellow-500 text-white px-3 py-2 rounded text-sm hover:bg-yellow-600 opacity-50 cursor-not-allowed">
+                            Edit
+                        </button>
+                        <button
+                            className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600 opacity-50 cursor-not-allowed">
+                            Delete
+                        </button>
+                    </>
+                )}
+            </div>
 
             <div className="flex flex-col items-center mb-10">
                 {profileImageFile ? (
