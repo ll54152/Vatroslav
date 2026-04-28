@@ -1,6 +1,7 @@
 package com.inventar.backend.service;
 
 import com.inventar.backend.DTO.ComponentAddDTO;
+import com.inventar.backend.DTO.ComponentDTO;
 import com.inventar.backend.DTO.ComponentEditDTO;
 import com.inventar.backend.DTO.ComponentShowDTO;
 import com.inventar.backend.domain.Component;
@@ -114,6 +115,18 @@ public class ComponentServiceJPA {
         }
 
         component.setExperimentList(new ArrayList<>(newExperiments));
+    }
+
+    public List<ComponentDTO> getComponentByLocationID(Long id) {
+        Location location = locationRepo.findById(id).orElseThrow(() -> new RuntimeException("Location not found"));
+
+        if (location.getComponentList() == null) {
+            return new ArrayList<>();
+        } else {
+            return location.getComponentList().stream()
+                    .map(component -> new ComponentDTO(component.getId(), component.getName(), component.getZpf(), component.getDescription(), component.getKeywords()))
+                    .toList();
+        }
     }
 
     private void editBasicFields(Component component, ComponentEditDTO componentEditDTO, Location location) {
@@ -267,4 +280,6 @@ public class ComponentServiceJPA {
     public void quickSave(Component component) {
         componentRepo.save(component);
     }
+
+
 }

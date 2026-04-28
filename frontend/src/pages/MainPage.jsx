@@ -89,6 +89,7 @@ export default function MainPage() {
         {path: "/components", label: "Komponente"},
         {path: "/experiment/add", label: "Dodaj eksperiment"},
         {path: "/component/add", label: "Dodaj komponentu"},
+        {path: "/locations", label: "Lokacije"},
         {path: "/account", label: "Račun"},
         {path: "/signup", label: "Dodaj korisnika", adminOnly: true},
     ];

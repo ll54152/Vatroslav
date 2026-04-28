@@ -16,6 +16,8 @@ import AccountManagement from "./pages/AccountManagement";
 import ComponentViewLog from "./pages/ComponentViewLog.jsx";
 import ExperimentViewLog from "./pages/ExperimentViewLog.jsx";
 import ComponentEdit from "./pages/ComponentEdit.jsx";
+import Locations from "./pages/Locations.jsx";
+import LocationView from "./pages/LocationView.jsx";
 
 function App() {
     return (
@@ -35,6 +37,8 @@ function App() {
             <Route path="/component/edit/:id" element={<ComponentEdit/>}/>
             <Route path="/component/add" element={<ComponentAdd/>}/>
             <Route path="/components" element={<Components/>}/>
+            <Route path="/locations" element={<Locations/>}/>
+            <Route path="/location/view/:id" element={<LocationView/>}/>
             <Route path="/forgot-password" element={<ForgotPassword/>}/>
             <Route path="/reset-password" element={<ResetPassword/>}/>
             <Route path="/account" element={<AccountManagement/>}/>

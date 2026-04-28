@@ -72,6 +72,16 @@ public class ComponentController {
         }
     }
 
+    @GetMapping("/getByLocationID/{id}")
+    public ResponseEntity<List<ComponentDTO>> getComponentByLocationID(@PathVariable Long id) {
+        List<ComponentDTO> componentDTOList = componentServiceJPA.getComponentByLocationID(id);
+        if (componentDTOList == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(componentDTOList, HttpStatus.OK);
+        }
+    }
+
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteComponent(@PathVariable Long id) {
