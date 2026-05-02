@@ -136,7 +136,7 @@ function ExperimentAdd() {
                     <div className="flex flex-col space-y-6">
 
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
-                            <CardTitle>ZPF Inventarna oznaka</CardTitle>
+                            <CardTitle>ZPF oznaka</CardTitle>
                             <Input
                                 id="intozn-letters"
                                 placeholder="Unesite 5 velikih slova (obavezno)"

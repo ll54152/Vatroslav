@@ -399,7 +399,7 @@ function ExperimentEdit() {
                 <form className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-6 w-full">
                     <div className="flex flex-col space-y-6">
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
-                            <CardTitle>ZPF inventarna oznaka</CardTitle>
+                            <CardTitle>ZPF oznaka</CardTitle>
                             <Input placeholder="Unesite 5 velikih slova (obavezno)" value={internalCode}
                                    onChange={(e) => {
                                        const value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 5);
