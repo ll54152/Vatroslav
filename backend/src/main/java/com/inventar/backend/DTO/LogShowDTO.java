@@ -7,12 +7,14 @@ public class LogShowDTO {
     private Long id;
     private String note;
     private LocalDateTime timestamp;
+    private boolean deletable;
     private UserShowDTO userShowDTO;
 
-    public LogShowDTO(Long id, String note, LocalDateTime timestamp, UserShowDTO userShowDTO) {
+    public LogShowDTO(Long id, String note, LocalDateTime timestamp, boolean deletable, UserShowDTO userShowDTO) {
         this.id = id;
         this.note = note;
         this.timestamp = timestamp;
+        this.deletable = deletable;
         this.userShowDTO = userShowDTO;
     }
 
@@ -49,5 +51,13 @@ public class LogShowDTO {
 
     public void setUserShowDTO(UserShowDTO userShowDTO) {
         this.userShowDTO = userShowDTO;
+    }
+
+    public boolean isDeletable() {
+        return deletable;
+    }
+
+    public void setDeletable(boolean deletable) {
+        this.deletable = deletable;
     }
 }

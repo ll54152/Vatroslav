@@ -28,6 +28,8 @@ public class Log {
 
     private LocalDateTime timestamp;
 
+    private boolean deletable;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -36,22 +38,25 @@ public class Log {
     public Log() {
     }
 
-    public Log(String note, LocalDateTime timestamp) {
+    public Log(String note, LocalDateTime timestamp, boolean deletable) {
         this.note = note;
         this.timestamp = timestamp;
+        this.deletable = deletable;
     }
 
-    public Log(Experiment experiment, String note, LocalDateTime timestamp, User user) {
+    public Log(Experiment experiment, String note, LocalDateTime timestamp, boolean deletable, User user) {
         this.experiment = experiment;
         this.note = note;
         this.timestamp = timestamp;
+        this.deletable = deletable;
         this.user = user;
     }
 
-    public Log(Component component, String note, LocalDateTime timestamp, User user) {
+    public Log(Component component, String note, LocalDateTime timestamp, boolean deletable, User user) {
         this.component = component;
         this.note = note;
         this.timestamp = timestamp;
+        this.deletable = deletable;
         this.user = user;
     }
 
@@ -101,5 +106,13 @@ public class Log {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public boolean isDeletable() {
+        return deletable;
+    }
+
+    public void setDeletable(boolean deletable) {
+        this.deletable = deletable;
     }
 }

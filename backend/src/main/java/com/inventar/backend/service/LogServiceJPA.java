@@ -39,6 +39,7 @@ public class LogServiceJPA {
     public void linkComponentAndExperiment(Component component, Experiment experiment, User user) {
         Log componentLog = new Log();
         componentLog.setTimestamp(LocalDateTime.now());
+        componentLog.setDeletable(false);
         componentLog.setUser(user);
         componentLog.setComponent(component);
         componentLog.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je povezao komponentu '" + component.getName() + "' sa eksperimentom '" + experiment.getName() + "'");
@@ -46,6 +47,7 @@ public class LogServiceJPA {
 
         Log experimentLog = new Log();
         experimentLog.setTimestamp(LocalDateTime.now());
+        experimentLog.setDeletable(false);
         experimentLog.setUser(user);
         experimentLog.setExperiment(experiment);
         experimentLog.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je povezao komponentu '" + component.getName() + "' sa eksperimentom '" + experiment.getName() + "'");
@@ -56,6 +58,7 @@ public class LogServiceJPA {
     public void unlinkComponentFromExperiment(Component component, Experiment experiment, User user) {
         Log componentLog = new Log();
         componentLog.setTimestamp(LocalDateTime.now());
+        componentLog.setDeletable(false);
         componentLog.setUser(user);
         componentLog.setComponent(component);
         componentLog.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio eksperiment '" + experiment.getName() + "' iz komponente '" + component.getName() + "'");
@@ -63,6 +66,7 @@ public class LogServiceJPA {
 
         Log experimentLog = new Log();
         experimentLog.setTimestamp(LocalDateTime.now());
+        experimentLog.setDeletable(false);
         experimentLog.setUser(user);
         experimentLog.setExperiment(null);
         experimentLog.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio komponentu '" + component.getName() + "' iz eksperimenta '" + experiment.getName() + "'");
@@ -73,6 +77,7 @@ public class LogServiceJPA {
     public void unlinkExperimentFromComponent(Experiment experiment, Component component, User user) {
         Log componentLog = new Log();
         componentLog.setTimestamp(LocalDateTime.now());
+        componentLog.setDeletable(false);
         componentLog.setUser(user);
         componentLog.setComponent(null);
         componentLog.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio eksperiment '" + experiment.getName() + "' iz komponente '" + component.getName() + "'");
@@ -80,6 +85,7 @@ public class LogServiceJPA {
 
         Log experimentLog = new Log();
         experimentLog.setTimestamp(LocalDateTime.now());
+        experimentLog.setDeletable(false);
         experimentLog.setUser(user);
         experimentLog.setExperiment(experiment);
         experimentLog.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio komponentu '" + component.getName() + "' iz eksperimenta '" + experiment.getName() + "'");
@@ -90,6 +96,7 @@ public class LogServiceJPA {
     public void componentCreation(Component component, User user) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
+        log.setDeletable(false);
         log.setUser(user);
         log.setComponent(component);
         log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao komponentu '" + component.getName() + "' u bazu podataka");
@@ -100,6 +107,7 @@ public class LogServiceJPA {
     public void componentDeletion(Component component, User user) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
+        log.setDeletable(false);
         log.setUser(user);
         log.setComponent(null);
         log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio komponentu '" + component.getName() + "' iz baze podataka");
@@ -110,6 +118,7 @@ public class LogServiceJPA {
     public void componentUpdated(Component component, User user) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
+        log.setDeletable(false);
         log.setUser(user);
         log.setComponent(component);
         log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je ažurirao komponentu '" + component.getName() + "' u bazi podataka");
@@ -120,6 +129,7 @@ public class LogServiceJPA {
     public void fileComponentCreation(Component component, File file, User user) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
+        log.setDeletable(false);
         log.setUser(user);
         log.setComponent(component);
         log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao datoteku '" + file.getName() + "' u komponentu '" + component.getName() + "'");
@@ -130,6 +140,7 @@ public class LogServiceJPA {
     public void fileComponentDeletion(Component component, File file, User user) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
+        log.setDeletable(false);
         log.setUser(user);
         log.setComponent(component);
         log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je izbrisao datoteku '" + file.getName() + "' iz komponente '" + component.getName() + "'");
@@ -140,6 +151,7 @@ public class LogServiceJPA {
     public void fileExperimentDeletion(Experiment experiment, File file, User user) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
+        log.setDeletable(false);
         log.setUser(user);
         log.setExperiment(experiment);
         log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je izbrisao datoteku '" + file.getName() + "' iz eksperimenta '" + experiment.getName() + "'");
@@ -150,6 +162,7 @@ public class LogServiceJPA {
     public void experimentCreation(Experiment experiment, User user) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
+        log.setDeletable(false);
         log.setUser(user);
         log.setExperiment(experiment);
         log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao eksperiment '" + experiment.getName() + "' u bazu podataka");
@@ -160,6 +173,7 @@ public class LogServiceJPA {
     public void experimentUpdated(Experiment experiment, User user) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
+        log.setDeletable(false);
         log.setUser(user);
         log.setExperiment(experiment);
         log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je ažurirao eksperiment '" + experiment.getName() + "' u bazi podataka");
@@ -170,6 +184,7 @@ public class LogServiceJPA {
     public void experimentDeletion(Experiment experiment, User user) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
+        log.setDeletable(false);
         log.setUser(user);
         log.setExperiment(null);
         log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio eksperiment '" + experiment.getName() + "' iz baze podataka");
@@ -180,6 +195,7 @@ public class LogServiceJPA {
     public void fileExperimentCreation(Experiment experiment, File file, User user) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
+        log.setDeletable(false);
         log.setUser(user);
         log.setExperiment(experiment);
         log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao datoteku '" + file.getName() + "' u eksperiment '" + experiment.getName() + "'");
@@ -190,6 +206,7 @@ public class LogServiceJPA {
     public Log save(LogAddDTO logAddDTO) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
+        log.setDeletable(true);
         log.setUser(userServiceJPA.getAuthenticatedUser());
         log.setNote(logAddDTO.getNote());
 
@@ -218,6 +235,12 @@ public class LogServiceJPA {
 
     @Transactional
     public void deleteById(Long id) {
+        Log logToDelete = logRepo.findById(id).orElseThrow(() -> new RuntimeException("Log not found"));
+        if (logToDelete.isDeletable()) {
+            logRepo.deleteById(id);
+        } else {
+            throw new RuntimeException("Log is not deletable");
+        }
         logRepo.deleteById(id);
     }
 
@@ -232,6 +255,7 @@ public class LogServiceJPA {
                 logShowDTO.setId(log.getId());
                 logShowDTO.setNote(log.getNote());
                 logShowDTO.setTimestamp(log.getTimestamp());
+                logShowDTO.setDeletable(log.isDeletable());
                 logShowDTO.setUserShowDTO(userServiceJPA.mapUserToDTO(log.getUser()));
 
                 logShowDTOList.add(logShowDTO);
