@@ -530,9 +530,9 @@ function ComponentEdit() {
                                     <SelectValue placeholder="Odaberite status FER inventarne oznake"/>
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="CATALOGED">Cataloged</SelectItem>
-                                    <SelectItem value="UNCATALOGED">Uncataloged</SelectItem>
-                                    <SelectItem value="UNKNOWN">Unknown</SelectItem>
+                                    <SelectItem value="CATALOGED">Na inventaru</SelectItem>
+                                    <SelectItem value="UNCATALOGED">Deinvetarizirano</SelectItem>
+                                    <SelectItem value="UNKNOWN">Nepoznato</SelectItem>
                                 </SelectContent>
                             </Select>
                         </Card>

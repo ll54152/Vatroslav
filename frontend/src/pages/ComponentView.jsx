@@ -382,7 +382,14 @@ function ComponentView() {
                         <CardContent className="space-y-2">
                             <div>
                                 <b>Status FER inventarne oznake: </b>
-                                {component.ferStatus || <EmptyValue text="Nema statusa FER inventarne oznake"/>}
+                                {component.ferStatus ? (
+                                    component.ferStatus === "CATALOGED" ? "Na inventaru" :
+                                        component.ferStatus === "UNCATALOGED" ? "Deinvetarizirano" :
+                                            component.ferStatus === "UNKNOWN" ? "Nepoznato" :
+                                                component.code
+                                ) : (
+                                    <EmptyValue text="Nema statusa FER inventarne oznake"/>
+                                )}
                             </div>
                             <div><b>FER Inventarna oznaka: </b> {component.fer || <EmptyValue text="Nema lokacije"/>}
                             </div>
