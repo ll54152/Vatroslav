@@ -127,7 +127,7 @@ function ComponentAdd() {
                     .map(k => k.trim())
                     .filter(k => k !== "")
                 : [],
-            zpf: internalCode + optionalNumbers,
+            zpf: internalCode + " " + optionalNumbers,
             quantity: Number(quantity),
             locationID: Number(location),
             description: description,
