@@ -459,35 +459,37 @@ function ComponentAdd() {
                             )}
                         </Card>
 
-                        <Card className="flex flex-col space-y-6">
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
                             <CardTitle>Datoteke</CardTitle>
-                            <div className="w-full flex flex-col space-y-1.5">
-                                <CardTitle>Profilna slika</CardTitle>
+                            <Card className="w-full flex flex-col space-y-2.5 p-2">
+                                <CardTitle>Profilna fotografija</CardTitle>
                                 <Input
                                     type="file"
                                     accept="image/*"
                                     onChange={(e) => setProfileImage(e.target.files[0])}
                                 />
-                            </div>
-
-                            <div className="w-full  flex flex-col space-y-1.5">
-                                <CardTitle>Ostale slike</CardTitle>
+                            </Card>
+                            <br/>
+                            <br/>
+                            <Card className="w-full flex flex-col space-y-2.5 p-2">
+                                <CardTitle>Ostale fotografije</CardTitle>
                                 <Input
                                     type="file"
                                     multiple
                                     accept="image/*"
                                     onChange={(e) => setOtherImages(Array.from(e.target.files))}
                                 />
-                            </div>
-
-                            <div className="w-full flex flex-col space-y-1.5">
+                            </Card>
+                            <br/>
+                            <br/>
+                            <Card className="w-full flex flex-col space-y-2.5 p-2">
                                 <CardTitle>Dokumentacija</CardTitle>
                                 <Input
                                     type="file"
                                     multiple
                                     onChange={(e) => setDocuments(Array.from(e.target.files))}
                                 />
-                            </div>
+                            </Card>
                         </Card>
                     </div>
 

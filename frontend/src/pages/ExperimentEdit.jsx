@@ -502,7 +502,7 @@ function ExperimentEdit() {
                             <CardTitle>Datoteke</CardTitle>
 
                             <div>
-                                <h3 className="font-semibold">Profilna slika</h3>
+                                <h3 className="font-semibold">Profilna fotografija</h3>
 
                                 {(profileImageFile || newProfilePreview) && (
                                     <div
