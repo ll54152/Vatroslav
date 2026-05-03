@@ -523,8 +523,8 @@ function ComponentEdit() {
                         </Card>
 
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
-                            <CardTitle>FER inventarska oznaka</CardTitle>
-                            <Input placeholder="Unesite FER inventarsku oznaku" value={fer}
+                            <CardTitle>FER inventarna oznaka</CardTitle>
+                            <Input placeholder="Unesite FER inventarnu oznaku" value={fer}
                                    onChange={(e) => setFer(e.target.value)}/>
                         </Card>
 
@@ -859,13 +859,6 @@ function ComponentEdit() {
 
 
                     <div className="flex flex-col space-y-6">
-
-                        <Card className="w-full flex flex-col space-y-2.5 p-2">
-                            <CardTitle>Količina</CardTitle>
-                            <Input placeholder="Unesite količinu" value={quantity}
-                                   onChange={(e) => setQuantity(e.target.value)}/>
-                        </Card>
-
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
                             <CardTitle>Opis</CardTitle>
                             <Textarea placeholder="Unesite kratak opis" value={description}
@@ -877,6 +870,12 @@ function ComponentEdit() {
                             <Textarea
                                 placeholder="Unesite ključne riječi odvojene točkom-zarezom (;). Npr. Uređaj; Laptop"
                                 value={keywords} onChange={(e) => setKeywords(e.target.value)}/>
+                        </Card>
+
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>Količina</CardTitle>
+                            <Input placeholder="Unesite količinu" value={quantity}
+                                   onChange={(e) => setQuantity(e.target.value)}/>
                         </Card>
                     </div>
                 </form>

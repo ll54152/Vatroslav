@@ -283,9 +283,9 @@ function ComponentAdd() {
                         </Card>
 
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
-                            <CardTitle>FER inventarska oznaka</CardTitle>
+                            <CardTitle>FER inventarna oznaka</CardTitle>
                             <Input
-                                placeholder="Unesite FER inventarsku oznaku"
+                                placeholder="Unesite FER inventarnu oznaku"
                                 value={fer}
                                 onChange={(e) => setFer(e.target.value)}
                             />
@@ -460,7 +460,7 @@ function ComponentAdd() {
                         </Card>
 
                         <Card className="flex flex-col space-y-6">
-                            <CardTitle>Datoteke:</CardTitle>
+                            <CardTitle>Datoteke</CardTitle>
                             <div className="w-full flex flex-col space-y-1.5">
                                 <CardTitle>Profilna slika</CardTitle>
                                 <Input
@@ -493,16 +493,6 @@ function ComponentAdd() {
 
                     <div className="flex flex-col space-y-6">
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
-                            <CardTitle>Količina</CardTitle>
-                            <Input
-                                id="kolicina"
-                                placeholder="Unesite količinu"
-                                value={quantity}
-                                onChange={(e) => setQuantity(e.target.value)}
-                            />
-                        </Card>
-
-                        <Card className="w-full flex flex-col space-y-2.5 p-2">
                             <CardTitle>Opis</CardTitle>
                             <Textarea
                                 id="opis"
@@ -522,6 +512,15 @@ function ComponentAdd() {
                             />
                         </Card>
 
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>Količina</CardTitle>
+                            <Input
+                                id="kolicina"
+                                placeholder="Unesite količinu"
+                                value={quantity}
+                                onChange={(e) => setQuantity(e.target.value)}
+                            />
+                        </Card>
                     </div>
                 </form>
             </CardContent>
