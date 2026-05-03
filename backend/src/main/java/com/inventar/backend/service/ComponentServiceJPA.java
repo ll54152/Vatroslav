@@ -145,18 +145,30 @@ public class ComponentServiceJPA {
             component.setDeprecatedInventoryMarks(componentEditDTO.getDeprecatedInventoryMarks());
         }
 
-        if (component.getZpf() == null || !component.getZpf().equals(componentEditDTO.getZpf())) {
-            if (componentRepo.findByZpf(componentEditDTO.getZpf()).isPresent()) {
-                throw new RuntimeException("Component with same ZPF exists");
+        if (componentEditDTO.getZpf() == null) {
+            component.setZpf(null);
+        } else if (componentEditDTO.getZpf().isEmpty()) {
+            component.setZpf(null);
+        } else {
+            if (component.getZpf() == null || !component.getZpf().equals(componentEditDTO.getZpf())) {
+                if (componentRepo.findByZpf(componentEditDTO.getZpf()).isPresent()) {
+                    throw new RuntimeException("Component with same ZPF exists");
+                }
+                component.setZpf(componentEditDTO.getZpf());
             }
-            component.setZpf(componentEditDTO.getZpf());
         }
 
-        if (component.getFer() == null || !component.getFer().equals(componentEditDTO.getFer())) {
-            if (componentRepo.findByFer(componentEditDTO.getFer()).isPresent()) {
-                throw new RuntimeException("Component with same FER exists");
+        if (componentEditDTO.getFer() == null) {
+            component.setFer(null);
+        } else if (componentEditDTO.getFer().isEmpty()) {
+            component.setFer(null);
+        } else {
+            if (component.getFer() == null || !component.getFer().equals(componentEditDTO.getFer())) {
+                if (componentRepo.findByFer(componentEditDTO.getFer()).isPresent()) {
+                    throw new RuntimeException("Component with same FER exists");
+                }
+                component.setFer(componentEditDTO.getFer());
             }
-            component.setFer(componentEditDTO.getFer());
         }
     }
 

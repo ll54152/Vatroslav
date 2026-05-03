@@ -114,11 +114,17 @@ public class ExperimentServiceJPA {
         experiment.setDescription(experimentEditDTO.getDescription());
         experiment.setKeywords(experimentEditDTO.getKeywords().stream().sorted().toList());
 
-        if (experiment.getZpf() == null || !experiment.getZpf().equals(experimentEditDTO.getZpf())) {
-            if (componentRepo.findByZpf(experimentEditDTO.getZpf()).isPresent()) {
-                throw new RuntimeException("Experiment with same ZPF exists");
+        if (experimentEditDTO.getZpf() == null) {
+            experiment.setZpf(null);
+        } else if (experimentEditDTO.getZpf().isEmpty()) {
+            experiment.setZpf(null);
+        } else {
+            if (experiment.getZpf() == null || !experiment.getZpf().equals(experimentEditDTO.getZpf())) {
+                if (componentRepo.findByZpf(experimentEditDTO.getZpf()).isPresent()) {
+                    throw new RuntimeException("Experiment with same ZPF exists");
+                }
+                experiment.setZpf(experimentEditDTO.getZpf());
             }
-            experiment.setZpf(experimentEditDTO.getZpf());
         }
     }
 

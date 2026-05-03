@@ -391,7 +391,7 @@ function ComponentView() {
                                     <EmptyValue text="Nema statusa FER inventarne oznake"/>
                                 )}
                             </div>
-                            <div><b>FER Inventarna oznaka: </b> {component.fer || <EmptyValue text="Nema lokacije"/>}
+                            <div><b>FER Inventarna oznaka: </b> {component.fer || <EmptyValue text="Nema FER inventarne oznake"/>}
                             </div>
                             <div><b>Zastarjele inventarne oznake: </b>
                                 {component.deprecatedInventoryMarks?.length ? (
