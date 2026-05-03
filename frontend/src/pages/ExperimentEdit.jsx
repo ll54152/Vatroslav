@@ -384,15 +384,20 @@ function ExperimentEdit() {
     return (
         <Card className="w-full p-2 lg:p-4">
             <CardHeader className="flex flex-col items-center p-3 lg:p-6">
-                <CardTitle className="text-4xl font-bold mb-4">
-                    Uredi eksperiment
-                </CardTitle>
+                <CardTitle className="text-4xl font-bold mb-4">Uredite eksperiment</CardTitle>
+                <br/>
+                <br/>
+                <br/>
 
-                <Input
-                    placeholder="Unesite naziv eksperimenta"
-                    value={experimentName}
-                    onChange={(e) => setExperimentName(e.target.value)}
-                />
+                <Card className="w-full flex flex-col space-y-2.5 p-2">
+                    <CardTitle>Naziv eksperimenta</CardTitle>
+                    <Input
+                        placeholder="Unesite naziv eksperimenta"
+                        value={experimentName}
+                        onChange={(e) => setExperimentName(e.target.value)}
+                    />
+                </Card>
+
             </CardHeader>
 
             <CardContent className="w-full p-2 lg:p-6">

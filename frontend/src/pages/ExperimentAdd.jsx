@@ -118,15 +118,21 @@ function ExperimentAdd() {
     return (
         <Card className="w-full p-2 lg:p-4">
             <CardHeader className="flex flex-col items-center p-3 lg:p-6">
-                <CardTitle className="text-4xl font-bold mb-4">Naziv eksperimenta</CardTitle>
-                <div className="w-full flex flex-col space-y-1.5">
+                <CardTitle className="text-4xl font-bold mb-4">Unos novog eksperimenta</CardTitle>
+                <br/>
+                <br/>
+                <br/>
+
+                <Card className="w-full flex flex-col space-y-2.5 p-2">
+                    <CardTitle>Naziv eksperimenta</CardTitle>
                     <Input
                         id="nazivEksperimenta"
                         placeholder="Unesite naziv eksperimenta"
                         value={experimentName}
                         onChange={(e) => setExperimentName(e.target.value)}
                     />
-                </div>
+                </Card>
+
             </CardHeader>
 
             <CardContent className="w-full p-2 lg:p-6">

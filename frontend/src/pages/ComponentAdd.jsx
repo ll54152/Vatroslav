@@ -229,16 +229,23 @@ function ComponentAdd() {
     return (
         <Card className="w-full p-2 lg:p-4">
             <CardHeader className="flex flex-col items-center p-3 lg:p-6">
-                <CardTitle className="text-4xl font-bold mb-4">Naziv komponente</CardTitle>
-                <div className="w-full flex flex-col space-y-1.5">
+                <CardTitle className="text-4xl font-bold mb-4">Unos nove komponente</CardTitle>
+                <br/>
+                <br/>
+                <br/>
+
+                <Card className="w-full flex flex-col space-y-2.5 p-2">
+                    <CardTitle>Naziv komponente</CardTitle>
                     <Input
                         id="nazivkomponente"
                         placeholder="Unesite naziv komponente"
                         value={componentName}
                         onChange={(e) => setComponentName(e.target.value)}
                     />
-                </div>
+                </Card>
+
             </CardHeader>
+
 
             <CardContent className="w-full p-2 lg:p-6">
                 <form className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-6 w-full">
