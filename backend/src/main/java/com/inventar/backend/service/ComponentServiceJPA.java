@@ -10,6 +10,7 @@ import com.inventar.backend.domain.Location;
 import com.inventar.backend.domain.User;
 import com.inventar.backend.mapper.ExperimentMapper;
 import com.inventar.backend.mapper.LocationMapper;
+import com.inventar.backend.mapper.LogMapper;
 import com.inventar.backend.repo.ComponentRepo;
 import com.inventar.backend.repo.ExperimentRepo;
 import com.inventar.backend.repo.LocationRepo;
@@ -35,10 +36,12 @@ public class ComponentServiceJPA {
     private final LocationRepo locationRepo;
 
     private final LogServiceJPA logServiceJPA;
+    private final LogMapper logMapper;
+
     private final FileServiceJPA fileServiceJPA;
 
     @Autowired
-    public ComponentServiceJPA(ComponentRepo componentRepo, ExperimentRepo experimentRepo, ExperimentMapper experimentMapper, UserServiceJPA userServiceJPA, LocationMapper locationMapper, LocationRepo locationRepo, LogServiceJPA logServiceJPA, FileServiceJPA fileServiceJPA) {
+    public ComponentServiceJPA(ComponentRepo componentRepo, ExperimentRepo experimentRepo, ExperimentMapper experimentMapper, UserServiceJPA userServiceJPA, LocationMapper locationMapper, LocationRepo locationRepo, LogServiceJPA logServiceJPA, LogMapper logMapper, FileServiceJPA fileServiceJPA) {
         this.componentRepo = componentRepo;
         this.experimentRepo = experimentRepo;
         this.experimentMapper = experimentMapper;
@@ -46,6 +49,7 @@ public class ComponentServiceJPA {
         this.locationMapper = locationMapper;
         this.locationRepo = locationRepo;
         this.logServiceJPA = logServiceJPA;
+        this.logMapper = logMapper;
         this.fileServiceJPA = fileServiceJPA;
     }
 
@@ -206,7 +210,7 @@ public class ComponentServiceJPA {
 
             componentShowDTO.setLocationDTO(locationMapper.mapLocationToDTO(component.getLocation()));
             componentShowDTO.setExperimentDTOList(experimentMapper.mapExperimentsToDTOs(component.getExperimentList()));
-            componentShowDTO.setLogShowDTOList(logServiceJPA.mapLogsToDTOs(component.getLogList()));
+            componentShowDTO.setLogShowDTOList(logMapper.mapLogsToShowDTOs(component.getLogList()));
             componentShowDTO.setFileShowDTOList(fileServiceJPA.mapFilesToDTOs(component.getFileList()));
 
             return componentShowDTO;

@@ -83,13 +83,13 @@ export default function MainPage() {
         return <p>Loading...</p>;
     }
 
-    // 🔹 osnovne kartice
     const items = [
         {path: "/experiments", label: "Eksperimenti"},
         {path: "/components", label: "Komponente"},
         {path: "/experiment/add", label: "Dodaj eksperiment"},
         {path: "/component/add", label: "Dodaj komponentu"},
         {path: "/locations", label: "Lokacije"},
+        {path: "/logs", label: "Logovi"},
         {path: "/account", label: "Račun"},
         {path: "/signup", label: "Dodaj korisnika", adminOnly: true},
     ];

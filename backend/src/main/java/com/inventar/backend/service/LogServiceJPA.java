@@ -1,12 +1,14 @@
 package com.inventar.backend.service;
 
 import com.inventar.backend.DTO.LogAddDTO;
+import com.inventar.backend.DTO.LogShowAllDTO;
 import com.inventar.backend.DTO.LogShowDTO;
 import com.inventar.backend.domain.Component;
 import com.inventar.backend.domain.Experiment;
 import com.inventar.backend.domain.File;
 import com.inventar.backend.domain.Log;
 import com.inventar.backend.domain.User;
+import com.inventar.backend.mapper.LogMapper;
 import com.inventar.backend.repo.ComponentRepo;
 import com.inventar.backend.repo.ExperimentRepo;
 import com.inventar.backend.repo.LogRepo;
@@ -15,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,13 +26,16 @@ public class LogServiceJPA {
 
     private final ComponentRepo componentRepo;
     private final ExperimentRepo experimentRepo;
+
+    private final LogMapper logMapper;
     private final LogRepo logRepo;
 
     @Autowired
-    public LogServiceJPA(UserServiceJPA userServiceJPA, ComponentRepo componentRepo, ExperimentRepo experimentRepo, LogRepo logRepo) {
+    public LogServiceJPA(UserServiceJPA userServiceJPA, ComponentRepo componentRepo, ExperimentRepo experimentRepo, LogMapper logMapper, LogRepo logRepo) {
         this.userServiceJPA = userServiceJPA;
         this.componentRepo = componentRepo;
         this.experimentRepo = experimentRepo;
+        this.logMapper = logMapper;
         this.logRepo = logRepo;
     }
 
@@ -210,10 +214,14 @@ public class LogServiceJPA {
         log.setUser(userServiceJPA.getAuthenticatedUser());
         log.setNote(logAddDTO.getNote());
 
-        if (logAddDTO.getEntityType().equals("experiment")) {
-            log.setExperiment(experimentRepo.findById(logAddDTO.getEntityId()).orElseThrow(() -> new RuntimeException("Experiment not found")));
-        } else if (logAddDTO.getEntityType().equals("component")) {
-            log.setComponent(componentRepo.findById(logAddDTO.getEntityId()).orElseThrow(() -> new RuntimeException("Component not found")));
+        if (logAddDTO.getEntityType() != null) {
+            if (logAddDTO.getEntityType().equals("experiment")) {
+                log.setExperiment(experimentRepo.findById(logAddDTO.getEntityId()).orElseThrow(() -> new RuntimeException("Experiment not found")));
+            } else if (logAddDTO.getEntityType().equals("component")) {
+                log.setComponent(componentRepo.findById(logAddDTO.getEntityId()).orElseThrow(() -> new RuntimeException("Component not found")));
+            } else {
+                throw new RuntimeException("Invalid entity type");
+            }
         }
 
         return logRepo.save(log);
@@ -234,36 +242,16 @@ public class LogServiceJPA {
     }
 
     @Transactional
-    public void deleteById(Long id) {
+    public boolean deleteById(Long id) {
         Log logToDelete = logRepo.findById(id).orElseThrow(() -> new RuntimeException("Log not found"));
         if (logToDelete.isDeletable()) {
             logRepo.deleteById(id);
+            return true;
         } else {
             throw new RuntimeException("Log is not deletable");
         }
-        logRepo.deleteById(id);
     }
 
-    public List<LogShowDTO> mapLogsToDTOs(List<Log> logList) {
-        if (logList == null) {
-            return List.of();
-        } else {
-            List<LogShowDTO> logShowDTOList = new ArrayList<>();
-
-            for (Log log : logList) {
-                LogShowDTO logShowDTO = new LogShowDTO();
-                logShowDTO.setId(log.getId());
-                logShowDTO.setNote(log.getNote());
-                logShowDTO.setTimestamp(log.getTimestamp());
-                logShowDTO.setDeletable(log.isDeletable());
-                logShowDTO.setUserShowDTO(userServiceJPA.mapUserToDTO(log.getUser()));
-
-                logShowDTOList.add(logShowDTO);
-            }
-
-            return logShowDTOList;
-        }
-    }
 
     @Transactional
     public void deleteLogs(List<Log> logList) {
@@ -272,12 +260,18 @@ public class LogServiceJPA {
         }
     }
 
-    public List<Log> findAll() {
-        return logRepo.findAll();
+    public List<LogShowAllDTO> findAll() {
+        return logMapper.mapLogsToShowAllDTOs(logRepo.findAll());
     }
 
-    public Log findById(Long id) {
-        return logRepo.findById(id).orElse(null);
+    public LogShowDTO findById(Long id) {
+        Log log = logRepo.findById(id).orElse(null);
+
+        if (log != null) {
+            return logMapper.mapLogsToShowDTOs(List.of(log)).getFirst();
+        } else {
+            return null;
+        }
     }
 
     public void quickSave(Log log) {

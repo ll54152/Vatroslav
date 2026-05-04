@@ -1,7 +1,8 @@
 package com.inventar.backend.controller;
 
 import com.inventar.backend.DTO.LogAddDTO;
-import com.inventar.backend.domain.Log;
+import com.inventar.backend.DTO.LogShowAllDTO;
+import com.inventar.backend.DTO.LogShowDTO;
 import com.inventar.backend.service.LogServiceJPA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/log")
@@ -27,12 +30,10 @@ public class LogController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteLog(@PathVariable Long id) {
-        Log log = logServiceJPA.findById(id);
-        if (log != null) {
-            logServiceJPA.deleteById(id);
+        if (logServiceJPA.deleteById(id)) {
             return new ResponseEntity<>("Log obrisan uspešno", HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("Log nije pronađen", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Greška prilikom brisanja loga", HttpStatus.NOT_FOUND);
         }
     }
 
@@ -42,10 +43,15 @@ public class LogController {
         return new ResponseEntity<>("Log dodat uspešno", HttpStatus.CREATED);
     }
 
+    @GetMapping("/getAll")
+    public ResponseEntity<List<LogShowAllDTO>> getAllLogs() {
+        List<LogShowAllDTO> logs = logServiceJPA.findAll();
+        return new ResponseEntity<>(logs, HttpStatus.OK);
+    }
+
     @GetMapping("/get/{id}")
-    public ResponseEntity<Log> getLog(@PathVariable Long id) {
-        //Todo: možda je bolje koristiti neki DTO kod vraćanja logova
-        Log log = logServiceJPA.findById(id);
+    public ResponseEntity<LogShowDTO> getLog(@PathVariable Long id) {
+        LogShowDTO log = logServiceJPA.findById(id);
         if (log != null) {
             return new ResponseEntity<>(log, HttpStatus.OK);
         } else {

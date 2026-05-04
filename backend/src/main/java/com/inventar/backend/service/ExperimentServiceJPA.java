@@ -7,6 +7,7 @@ import com.inventar.backend.domain.Component;
 import com.inventar.backend.domain.Experiment;
 import com.inventar.backend.domain.User;
 import com.inventar.backend.mapper.ComponentMapper;
+import com.inventar.backend.mapper.LogMapper;
 import com.inventar.backend.repo.ComponentRepo;
 import com.inventar.backend.repo.ExperimentRepo;
 import jakarta.transaction.Transactional;
@@ -28,17 +29,19 @@ public class ExperimentServiceJPA {
     private final UserServiceJPA userServiceJPA;
 
     private final LogServiceJPA logServiceJPA;
+    private final LogMapper logMapper;
+
     private final FileServiceJPA fileServiceJPA;
 
-
     @Autowired
-    public ExperimentServiceJPA(UserServiceJPA userServiceJPA, LogServiceJPA logServiceJPA, FileServiceJPA fileServiceJPA, ComponentMapper componentMapper, ComponentRepo componentRepo, ExperimentRepo experimentRepo) {
+    public ExperimentServiceJPA(ExperimentRepo experimentRepo, ComponentRepo componentRepo, ComponentMapper componentMapper, UserServiceJPA userServiceJPA, LogServiceJPA logServiceJPA, LogMapper logMapper, FileServiceJPA fileServiceJPA) {
+        this.experimentRepo = experimentRepo;
+        this.componentRepo = componentRepo;
+        this.componentMapper = componentMapper;
         this.userServiceJPA = userServiceJPA;
         this.logServiceJPA = logServiceJPA;
+        this.logMapper = logMapper;
         this.fileServiceJPA = fileServiceJPA;
-        this.componentMapper = componentMapper;
-        this.componentRepo = componentRepo;
-        this.experimentRepo = experimentRepo;
     }
 
     @Transactional
@@ -160,7 +163,7 @@ public class ExperimentServiceJPA {
             experimentShowDTO.setMaterials(experiment.getMaterials());
 
             experimentShowDTO.setComponentDTOList(componentMapper.mapComponentsToDTOs(experiment.getComponentList()));
-            experimentShowDTO.setLogShowDTOList(logServiceJPA.mapLogsToDTOs(experiment.getLogList()));
+            experimentShowDTO.setLogShowDTOList(logMapper.mapLogsToShowDTOs(experiment.getLogList()));
             experimentShowDTO.setFileShowDTOList(fileServiceJPA.mapFilesToDTOs(experiment.getFileList()));
 
             return experimentShowDTO;
