@@ -14,6 +14,47 @@ function Logs() {
     const [logToDelete, setLogToDelete] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    const [searchText, setSearchText] = useState("");
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [userSearch, setUserSearch] = useState("");
+    const [dateFrom, setDateFrom] = useState("");
+    const [dateTo, setDateTo] = useState("");
+
+    const users = Array.from(
+        new Map(
+            logs.map(log => [log.userShowDTO.id, log.userShowDTO])
+        ).values()
+    );
+
+    const filteredUsers = users.filter(user =>
+        `${user.firstName} ${user.lastName}`
+            .toLowerCase()
+            .includes(userSearch.toLowerCase())
+    );
+
+    const filteredLogs = logs
+        .filter(log => {
+            const fullName = `${log.userShowDTO.firstName} ${log.userShowDTO.lastName}`.toLowerCase();
+
+            const matchesText =
+                log.note.toLowerCase().includes(searchText.toLowerCase()) ||
+                fullName.includes(searchText.toLowerCase());
+
+            const matchesUser =
+                !selectedUser || log.userShowDTO.id === selectedUser.id;
+
+            const logDate = new Date(log.timestamp);
+
+            const matchesFrom =
+                !dateFrom || logDate >= new Date(dateFrom);
+
+            const matchesTo =
+                !dateTo || logDate <= new Date(dateTo + "T23:59:59");
+
+            return matchesText && matchesUser && matchesFrom && matchesTo;
+        })
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
 
     const isTokenValid = () => {
         const token = localStorage.getItem("jwt");
@@ -177,8 +218,63 @@ function Logs() {
                             </button>
                         </form>
 
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+
+                            <input
+                                type="text"
+                                placeholder="Pretražite logove..."
+                                value={searchText}
+                                onChange={(e) => setSearchText(e.target.value)}
+                                className="border rounded px-3 py-2 text-sm"
+                            />
+
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Pretražite osobu..."
+                                    value={userSearch}
+                                    onChange={(e) => setUserSearch(e.target.value)}
+                                    className="border rounded px-3 py-2 text-sm w-full"
+                                />
+
+                                {userSearch && (
+                                    <div className="absolute bg-white border w-full max-h-40 overflow-y-auto z-10">
+                                        {filteredUsers.map(user => (
+                                            <div
+                                                key={user.id}
+                                                onClick={() => {
+                                                    setSelectedUser(user);
+                                                    setUserSearch("");
+                                                }}
+                                                className="p-2 hover:bg-gray-100 cursor-pointer"
+                                            >
+                                                {user.firstName} {user.lastName}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            <input
+                                type="date"
+                                title="Od (datum)"
+                                value={dateFrom}
+                                onChange={(e) => setDateFrom(e.target.value)}
+                                className="border rounded px-3 py-2 text-sm"
+                            />
+
+                            <input
+                                type="date"
+                                title="Do (datum)"
+                                value={dateTo}
+                                onChange={(e) => setDateTo(e.target.value)}
+                                className="border rounded px-3 py-2 text-sm"
+                            />
+
+                        </div>
+
                         <div className="space-y-3">
-                            {latestLogs.length ? latestLogs.map(log => (
+                            {filteredLogs.length ? filteredLogs.map(log => (
                                 <div key={log.id} className="relative border-b pb-2 pr-24 text-sm text-center">
 
                                     <div>
@@ -268,6 +364,23 @@ function Logs() {
                     </CardContent>
                 </Card>
             </div>
+            {selectedUser && (
+                <div className="mb-2 text-sm">
+                    Filtrirano po: {selectedUser.firstName} {selectedUser.lastName}
+                    <button
+                        onClick={() => setSelectedUser(null)}
+                        className="ml-2 text-red-500"
+                    >
+                        ✕
+                    </button>
+                </div>
+            )}
+
+            {(dateFrom || dateTo) && (
+                <div className="text-sm text-gray-600 mt-2">
+                    Datum: {dateFrom || "∞"} → {dateTo || "∞"}
+                </div>
+            )}
 
         </div>
 
