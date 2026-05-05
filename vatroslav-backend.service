@@ -1,0 +1,26 @@
+[Unit]
+Description=Vatroslav Backend
+After=network.target
+
+[Service]
+#Change username
+User=luka
+
+#Location of Spring Boot application (backend)
+WorkingDirectory=/home/luka/Vatroslav/backend
+
+#Location of Java executable and Spring Boot application JAR file
+ExecStart=/home/luka/.sdkman/candidates/java/current/bin/java -jar target/backend-0.0.1-SNAPSHOT.jar
+
+#Graceful shutdown settings
+SuccessExitStatus=143
+
+Restart=always
+RestartSec=5
+
+#Logging settings
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
