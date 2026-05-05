@@ -35,7 +35,7 @@ export default function MainPage() {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `${token}`, // FIX
+                    Authorization: `${token}`,
                 },
             });
 
@@ -86,8 +86,8 @@ export default function MainPage() {
     const items = [
         {path: "/experiments", label: "Eksperimenti"},
         {path: "/components", label: "Komponente"},
-        {path: "/experiment/add", label: "Dodaj eksperiment"},
-        {path: "/component/add", label: "Dodaj komponentu"},
+        //{path: "/experiment/add", label: "Dodaj eksperiment"},
+        //{path: "/component/add", label: "Dodaj komponentu"},
         {path: "/locations", label: "Lokacije"},
         {path: "/logs", label: "Logovi"},
         {path: "/account", label: "Račun"},

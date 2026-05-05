@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useNavigate, Link} from "react-router-dom";
 import {jwtDecode} from "jwt-decode";
+import {Card, CardContent} from "@/components/ui/card";
 
 export default function Experiments() {
     const [experiments, setExperiments] = useState([]);
@@ -164,17 +165,27 @@ export default function Experiments() {
 
                 <header
                     className="fixed top-0 left-0 w-full bg-pink-500 text-white py-4 text-center text-2xl font-bold z-50">
-                    Lista Eksperimenata
+                    Lista eksperimenata
                 </header>
 
-                <div className="pt-28 mb-4">
+                <div className="pt-28 mb-4 flex gap-4 items-center">
                     <input
                         type="text"
-                        placeholder="Pretraži po imenu, ZPF, opisu ili ključnim riječima..."
+                        placeholder="Pretražite po imenu, ZPF oznaci, opisu ili ključnim riječima"
                         value={searchTerm}
                         onChange={handleSearch}
-                        className="w-full p-2 rounded border border-gray-300 bg-white text-black focus:outline-none focus:ring-2 focus:ring-pink-500"
+                        className="flex-1 p-2 rounded border border-gray-300 bg-white text-black focus:outline-none focus:ring-2 focus:ring-pink-500"
                     />
+
+                    {role === "ROLE_ADMIN" && (
+                        <Link to="/experiment/add">
+                            <Card className="bg-pink-500 hover:bg-pink-800  text-white transition duration-300 cursor-pointer">
+                                <CardContent className="px-4 py-2">
+                                    <span className="font-semibold">Dodajte eksperiment</span>
+                                </CardContent>
+                            </Card>
+                        </Link>
+                    )}
                 </div>
 
                 {loading && <p>Učitavanje...</p>}
