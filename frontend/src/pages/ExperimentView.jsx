@@ -358,7 +358,9 @@ function ExperimentView() {
 
                 <div className="flex flex-col gap-6">
                     <Card>
-                        <CardHeader><CardTitle>Osnovno</CardTitle></CardHeader>
+                        <CardHeader className="bg-gray-50 border-b">
+                            <CardTitle className="text-gray-800">Osnovno</CardTitle>
+                        </CardHeader>
                         <CardContent className="space-y-2">
                             <div><b>Nastavni predmet: </b> {experiment.subject ||
                                 <EmptyValue text="Nema nastavnog predmeta"/>}</div>
@@ -376,12 +378,14 @@ function ExperimentView() {
                     </Card>
 
                     <Card>
-                        <CardHeader><CardTitle>Opis</CardTitle></CardHeader>
+                        <CardHeader className="bg-gray-50 border-b">
+                            <CardTitle className="text-gray-800">Opis</CardTitle></CardHeader>
                         <CardContent>{experiment.description || <EmptyValue text="Nema opisa"/>}</CardContent>
                     </Card>
 
                     <Card>
-                        <CardHeader><CardTitle>Pribor i potrošni materijal</CardTitle></CardHeader>
+                        <CardHeader className="bg-gray-50 border-b">
+                            <CardTitle className="text-gray-800">Pribor i potrošni materijal</CardTitle></CardHeader>
                         <CardContent>{experiment.materials ||
                             <EmptyValue text="Nema pribora i potrošnog materijala"/>}</CardContent>
                     </Card>
@@ -389,7 +393,8 @@ function ExperimentView() {
 
                 <div className="flex flex-col gap-6">
                     <Card>
-                        <CardHeader><CardTitle>Komponente</CardTitle></CardHeader>
+                        <CardHeader className="bg-gray-50 border-b">
+                            <CardTitle className="text-gray-800">Komponente</CardTitle></CardHeader>
                         <CardContent>
                             {experiment.componentDTOList?.length ? (
                                 experiment.componentDTOList.map(comp => (
@@ -406,8 +411,8 @@ function ExperimentView() {
                     </Card>
 
                     <Card>
-                        <CardHeader>
-                            <CardTitle>Zadnji logovi</CardTitle>
+                        <CardHeader className="bg-gray-50 border-b">
+                            <CardTitle className="text-gray-800">Zadnji logovi</CardTitle>
                         </CardHeader>
 
                         <CardContent className="space-y-4">
@@ -514,8 +519,8 @@ function ExperimentView() {
 
                 <div className="flex flex-col gap-6">
                     <Card>
-                        <CardHeader>
-                            <CardTitle>Galerija</CardTitle>
+                        <CardHeader className="bg-gray-50 border-b">
+                            <CardTitle className="text-gray-800">Galerija</CardTitle>
                         </CardHeader>
                         <CardContent className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-2">
                             {galleryImages.length > 0 ? (
@@ -539,8 +544,8 @@ function ExperimentView() {
                     </Card>
 
                     <Card>
-                        <CardHeader>
-                            <CardTitle>Dokumenti</CardTitle>
+                        <CardHeader className="bg-gray-50 border-b">
+                            <CardTitle className="text-gray-800">Dokumenti</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-2">
                             {generalFiles.length > 0 ? (
