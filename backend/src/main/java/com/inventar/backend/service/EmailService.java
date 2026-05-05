@@ -1,6 +1,7 @@
 package com.inventar.backend.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -10,15 +11,16 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
+    @Value("${app.frontend.url}")
+    private String FRONTEND_URL;
+
     @Autowired
     public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
 
-    private static final String FRONTEND_DEV_URL = "http://localhost:5173";
-
     public void sendResetEmail(String toEmail, String token) {
-        String resetLink = FRONTEND_DEV_URL + "/reset-password?token=" + token;
+        String resetLink = FRONTEND_URL + "/reset-password?token=" + token;
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
