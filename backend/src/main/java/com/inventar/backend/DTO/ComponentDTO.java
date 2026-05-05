@@ -6,14 +6,14 @@ public class ComponentDTO {
 
     private Long id;
     private String name;
-    private String ZPF;
+    private String zpf;
     private String description;
     private List<String> keywords;
 
-    public ComponentDTO(Long id, String name, String ZPF, String description, List<String> keywords) {
+    public ComponentDTO(Long id, String name, String zpf, String description, List<String> keywords) {
         this.id = id;
         this.name = name;
-        this.ZPF = ZPF;
+        this.zpf = zpf;
         this.description = description;
         this.keywords = keywords;
     }
@@ -45,12 +45,12 @@ public class ComponentDTO {
         this.name = name;
     }
 
-    public String getZPF() {
-        return ZPF;
+    public String getZpf() {
+        return zpf;
     }
 
-    public void setZPF(String ZPF) {
-        this.ZPF = ZPF;
+    public void setZpf(String zpf) {
+        this.zpf = zpf;
     }
 
     public String getDescription() {

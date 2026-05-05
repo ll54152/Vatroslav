@@ -78,7 +78,7 @@ export default function LocationView() {
 
         const autoExpanded = components
             .filter(c =>
-                (c.ZPF || "").toLowerCase().includes(term) ||
+                (c.zpf || "").toLowerCase().includes(term) ||
                 (c.description || "").toLowerCase().includes(term) ||
                 (c.keywords || []).some(k =>
                     k.toLowerCase().includes(term)
@@ -91,7 +91,7 @@ export default function LocationView() {
 
     const filteredComponents = components.filter(c =>
         c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        c.ZPF?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        c.zpf?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         c.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         c.keywords?.some(k => k.toLowerCase().includes(searchTerm.toLowerCase()))
     );

@@ -21,7 +21,7 @@ public class ComponentMapper {
                 ComponentDTO componentDTO = new ComponentDTO();
                 componentDTO.setId(component.getId());
                 componentDTO.setName(component.getName());
-                componentDTO.setZPF(component.getZpf());
+                componentDTO.setZpf(component.getZpf());
                 componentDTO.setDescription(component.getDescription());
                 componentDTO.setKeywords(component.getKeywords().stream().sorted().toList());
 

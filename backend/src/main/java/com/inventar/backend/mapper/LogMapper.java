@@ -60,7 +60,7 @@ public class LogMapper {
                     ComponentDTO componentDTO = new ComponentDTO();
                     componentDTO.setId(log.getComponent().getId());
                     componentDTO.setName(log.getComponent().getName());
-                    componentDTO.setZPF(log.getComponent().getZpf());
+                    componentDTO.setZpf(log.getComponent().getZpf());
                     componentDTO.setDescription(log.getComponent().getDescription());
                     componentDTO.setKeywords(log.getComponent().getKeywords());
                     logShowAllDTO.setComponentDTO(componentDTO);
