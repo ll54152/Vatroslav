@@ -3,7 +3,6 @@
 set -e
 
 echo "Pulling latest code..."
-cd ~/Vatroslav
 git pull
 
 echo "Building frontend..."
