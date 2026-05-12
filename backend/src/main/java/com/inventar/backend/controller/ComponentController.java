@@ -42,6 +42,7 @@ public class ComponentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(componentId);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PutMapping(value = "/edit/{id}")
     public ResponseEntity<String> editComponent(
             @PathVariable Long id,
