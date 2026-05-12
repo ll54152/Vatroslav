@@ -318,18 +318,7 @@ function ExperimentView() {
                             Delete
                         </button>
                     </>
-                ) : (
-                    <>
-                        <button
-                            className="bg-yellow-500 text-white px-3 py-2 rounded text-sm hover:bg-yellow-600 opacity-50 cursor-not-allowed">
-                            Edit
-                        </button>
-                        <button
-                            className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600 opacity-50 cursor-not-allowed">
-                            Delete
-                        </button>
-                    </>
-                )}
+                ) : null}
             </div>
 
             <div className="flex flex-col items-center mb-10">
@@ -460,14 +449,7 @@ function ExperimentView() {
                                                     Izbriši
                                                 </button>
                                             </>
-                                        ) : (
-                                            <>
-                                                <button
-                                                    className="absolute right-0 top-1/2 -translate-y-1/2 bg-red-500 text-white px-3 py-2 rounded text-sm opacity-50 cursor-not-allowed">
-                                                    Izbriši
-                                                </button>
-                                            </>
-                                        )}
+                                        ) : null}
 
                                     </div>
                                 )) : (

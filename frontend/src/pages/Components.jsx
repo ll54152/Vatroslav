@@ -248,18 +248,7 @@ export default function Components() {
                                                 Delete
                                             </button>
                                         </>
-                                    ) : (
-                                        <>
-                                            <button
-                                                className="bg-yellow-500 text-white px-3 py-1 rounded opacity-50 cursor-not-allowed">
-                                                Edit
-                                            </button>
-                                            <button
-                                                className="bg-red-500 text-white px-3 py-1 rounded opacity-50 cursor-not-allowed">
-                                                Delete
-                                            </button>
-                                        </>
-                                    )}
+                                    ) : null}
                                 </div>
                             </div>
 

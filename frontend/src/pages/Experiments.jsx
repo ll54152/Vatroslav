@@ -179,7 +179,8 @@ export default function Experiments() {
 
                     {role === "ROLE_ADMIN" && (
                         <Link to="/experiment/add">
-                            <Card className="bg-pink-500 hover:bg-pink-800  text-white transition duration-300 cursor-pointer">
+                            <Card
+                                className="bg-pink-500 hover:bg-pink-800  text-white transition duration-300 cursor-pointer">
                                 <CardContent className="px-4 py-2">
                                     <span className="font-semibold">Dodajte eksperiment</span>
                                 </CardContent>
@@ -232,18 +233,7 @@ export default function Experiments() {
                                                 Delete
                                             </button>
                                         </>
-                                    ) : (
-                                        <>
-                                            <button
-                                                className="bg-yellow-500 text-white px-3 py-1 rounded opacity-50 cursor-not-allowed">
-                                                Edit
-                                            </button>
-                                            <button
-                                                className="bg-red-500 text-white px-3 py-1 rounded opacity-50 cursor-not-allowed">
-                                                Delete
-                                            </button>
-                                        </>
-                                    )}
+                                    ) : null}
                                 </div>
                             </div>
 
