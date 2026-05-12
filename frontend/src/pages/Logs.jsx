@@ -320,14 +320,7 @@ function Logs() {
                                                 Izbriši
                                             </button>
                                         </>
-                                    ) : (
-                                        <>
-                                            <button
-                                                className="absolute right-0 top-1/2 -translate-y-1/2 bg-red-500 text-white px-3 py-2 rounded text-sm opacity-50 cursor-not-allowed">
-                                                Izbriši
-                                            </button>
-                                        </>
-                                    )}
+                                    ) : null}
 
                                 </div>
                             )) : (

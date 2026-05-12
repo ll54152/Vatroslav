@@ -342,9 +342,8 @@ function ComponentView() {
 
                 <div className="flex flex-col gap-6">
                     <Card>
-                        <CardHeader className="border-b pl-4 relative">
-                            <div className="absolute left-0 top-0 h-full w-1 bg-pink-500 rounded-l"></div>
-                            <CardTitle>Osnovno</CardTitle>
+                        <CardHeader className="bg-gray-50 border-b">
+                            <CardTitle className="text-gray-800">Osnovno</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-2">
                             <div>
@@ -365,16 +364,14 @@ function ComponentView() {
                     </Card>
 
                     <Card>
-                        <CardHeader className="border-b pl-4 relative">
-                            <div className="absolute left-0 top-0 h-full w-1 bg-pink-500 rounded-l"></div>
-                            <CardTitle>Opis</CardTitle></CardHeader>
+                        <CardHeader className="bg-gray-50 border-b">
+                            <CardTitle className="text-gray-800">Opis</CardTitle></CardHeader>
                         <CardContent>{component.description || <EmptyValue text="Nema opisa"/>}</CardContent>
                     </Card>
 
                     <Card>
-                        <CardHeader className="border-b pl-4 relative">
-                            <div className="absolute left-0 top-0 h-full w-1 bg-pink-500 rounded-l"></div>
-                            <CardTitle>Inventarske oznake</CardTitle></CardHeader>
+                        <CardHeader className="bg-gray-50 border-b">
+                            <CardTitle className="text-gray-800">Inventarske oznake</CardTitle></CardHeader>
                         <CardContent className="space-y-2">
                             <div>
                                 <b>Status FER inventarne oznake: </b>
@@ -404,9 +401,8 @@ function ComponentView() {
 
                 <div className="flex flex-col gap-6">
                     <Card>
-                        <CardHeader className="border-b pl-4 relative">
-                            <div className="absolute left-0 top-0 h-full w-1 bg-pink-500 rounded-l"></div>
-                            <CardTitle>Eksperimenti</CardTitle></CardHeader>
+                        <CardHeader className="bg-gray-50 border-b">
+                            <CardTitle className="text-gray-800">Eksperimenti</CardTitle></CardHeader>
                         <CardContent>
                             {component.experimentDTOList?.length ? (
                                 component.experimentDTOList.map(exp => (
@@ -423,9 +419,8 @@ function ComponentView() {
                     </Card>
 
                     <Card>
-                        <CardHeader className="border-b pl-4 relative">
-                            <div className="absolute left-0 top-0 h-full w-1 bg-pink-500 rounded-l"></div>
-                            <CardTitle>Zadnji logovi</CardTitle>
+                        <CardHeader className="bg-gray-50 border-b">
+                            <CardTitle className="text-gray-800">Zadnji logovi</CardTitle>
                         </CardHeader>
 
                         <CardContent className="space-y-4">
@@ -525,9 +520,8 @@ function ComponentView() {
 
                 <div className="flex flex-col gap-6">
                     <Card>
-                        <CardHeader className="border-b pl-4 relative">
-                            <div className="absolute left-0 top-0 h-full w-1 bg-pink-500 rounded-l"></div>
-                            <CardTitle>Galerija</CardTitle>
+                        <CardHeader className="bg-gray-50 border-b">
+                            <CardTitle className="text-gray-800">Galerija</CardTitle>
                         </CardHeader>
                         <CardContent className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-2">
                             {galleryImages.length > 0 ? (
@@ -551,9 +545,8 @@ function ComponentView() {
                     </Card>
 
                     <Card>
-                        <CardHeader className="border-b pl-4 relative">
-                            <div className="absolute left-0 top-0 h-full w-1 bg-pink-500 rounded-l"></div>
-                            <CardTitle>Dokumenti</CardTitle>
+                        <CardHeader className="bg-gray-50 border-b">
+                            <CardTitle className="text-gray-800">Dokumenti</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-2">
                             {generalFiles.length > 0 ? (
