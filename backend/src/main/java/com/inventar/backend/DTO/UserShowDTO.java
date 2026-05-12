@@ -3,9 +3,7 @@ package com.inventar.backend.DTO;
 public class UserShowDTO {
 
     private String email;
-
     private String firstName;
-
     private String lastName;
 
     public UserShowDTO(String email, String firstName, String lastName) {

@@ -1,13 +1,21 @@
 package com.inventar.backend.controller;
 
 import com.inventar.backend.DTO.UserShowDTO;
+import com.inventar.backend.DTO.UserUpdateDTO;
 import com.inventar.backend.domain.User;
 import com.inventar.backend.service.UserServiceJPA;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Map;
 
@@ -17,6 +25,7 @@ public class UserController {
 
     private final UserServiceJPA userServiceJPA;
 
+    @Autowired
     public UserController(UserServiceJPA userServiceJPA) {
         this.userServiceJPA = userServiceJPA;
     }
@@ -45,19 +54,19 @@ public class UserController {
         }
 
         if (userServiceJPA.register(user)) {
-            return new ResponseEntity<>("Korisnik registriran uspješno!", HttpStatus.CREATED);
+            return new ResponseEntity<>("Korisnik ažuriran uspješno!", HttpStatus.CREATED);
         } else {
-            return new ResponseEntity<>("Greška prilikom registracije korisnika!", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Neuspjelo ažuriranje korisnika!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("/updateUser")
-    public ResponseEntity<String> updateUser(@RequestBody User user) {
+    public ResponseEntity<String> updateUser(@RequestBody UserUpdateDTO userUpdateDTO) {
         if (!userServiceJPA.doesUserExists()) {
             return new ResponseEntity<>("Korisnik ne postoji!", HttpStatus.BAD_REQUEST);
         }
 
-        if (userServiceJPA.updateUser(user)) {
+        if (userServiceJPA.updateUser(userUpdateDTO)) {
             return new ResponseEntity<>("Korisnik ažuriran uspješno!", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Greška prilikom ažuriranja korisnika!", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -115,5 +124,4 @@ public class UserController {
             return new ResponseEntity<>("Invalid or expired token.", HttpStatus.BAD_REQUEST);
         }
     }
-
 }

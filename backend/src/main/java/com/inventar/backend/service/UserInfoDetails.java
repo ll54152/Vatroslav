@@ -17,7 +17,7 @@ public class UserInfoDetails implements UserDetails {
     private List<GrantedAuthority> authorities;
 
     public UserInfoDetails(User user) {
-        this.email = user.getEmail(); // Use email as username
+        this.email = user.getEmail();
         this.password = user.getPassword();
         this.authorities = Stream.of(user.getRole().split(","))
                 .map(SimpleGrantedAuthority::new)
@@ -37,25 +37,5 @@ public class UserInfoDetails implements UserDetails {
     @Override
     public String getUsername() {
         return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
     }
 }

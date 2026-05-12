@@ -35,7 +35,7 @@ export default function MainPage() {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `${token}`, // FIX
+                    Authorization: `${token}`,
                 },
             });
 
@@ -83,14 +83,16 @@ export default function MainPage() {
         return <p>Loading...</p>;
     }
 
-    // 🔹 osnovne kartice
     const items = [
-        {path: "/experimenti", label: "Eksperimenti"},
-        {path: "/komponente", label: "Komponente"},
-        {path: "/experimentunos", label: "Dodaj eksperiment"},
-        {path: "/komponenteunos", label: "Dodaj komponentu"},
-        {path: "/account", label: "Račun"},
-        {path: "/signup", label: "Dodaj korisnika", adminOnly: true},
+        {path: "/experiments", label: "Eksperimenti"},
+        {path: "/components", label: "Komponente"},
+        //{path: "/experiment/add", label: "Dodaj eksperiment"},
+        //{path: "/component/add", label: "Dodaj komponentu"},
+        {path: "/locations", label: "Lokacije"},
+        {path: "/logs", label: "Logovi"},
+        {path: "/users", label: "Korisnici"},
+        //{path: "/account", label: "Račun"},
+        //{path: "/signup", label: "Dodaj korisnika", adminOnly: true},
     ];
 
 

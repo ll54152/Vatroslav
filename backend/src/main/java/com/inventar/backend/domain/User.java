@@ -1,9 +1,11 @@
 package com.inventar.backend.domain;
 
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Table;
+import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
@@ -13,8 +15,10 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 public class User {
-
     @Id
+    @GeneratedValue
+    private Long id;
+
     @Column(unique = true, nullable = false)
     @Email
     private String email;
@@ -30,10 +34,10 @@ public class User {
     private String role;
 
     @OneToMany(mappedBy = "user")
-    private List<Log> logs;
+    private List<Log> logList;
 
     @OneToMany(mappedBy = "user")
-    private List<Files> files;
+    private List<File> fileList;
 
     public User(String email, String password) {
         this.email = email;
@@ -83,28 +87,36 @@ public class User {
         this.lastName = lastName;
     }
 
-    public List<Log> getLogs() {
-        return logs;
-    }
-
-    public void setLogs(List<Log> logs) {
-        this.logs = logs;
-    }
-
-    public List<Files> getFiles() {
-        return files;
-    }
-
-    public void setFiles(List<Files> files) {
-        this.files = files;
-    }
-
     public String getRole() {
         return role;
     }
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public List<Log> getLogList() {
+        return logList;
+    }
+
+    public void setLogList(List<Log> logList) {
+        this.logList = logList;
+    }
+
+    public List<File> getFileList() {
+        return fileList;
+    }
+
+    public void setFileList(List<File> fileList) {
+        this.fileList = fileList;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
 

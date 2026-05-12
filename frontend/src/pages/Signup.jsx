@@ -77,7 +77,7 @@ function Signup() {
     const token = localStorage.getItem("jwt");
     if (!token) {
         return (
-            <Card className="w-[350px]">
+            <Card className="w-full max-w-md mx-auto mt-10 p-4">
                 <CardHeader>
                     <CardTitle>Niste prijavljeni</CardTitle>
                     <CardDescription>
@@ -93,7 +93,7 @@ function Signup() {
         );
     } else {
         return (
-            <Card className="w-[350px]">
+            <Card className="w-full max-w-md mx-auto mt-10 p-4">
                 <CardHeader>
                     <CardTitle>Registracija</CardTitle>
                     <CardDescription>Registracija u bazu podataka.</CardDescription>
@@ -135,13 +135,13 @@ function Signup() {
                                         <SelectValue placeholder="Odaberi ulogu"/>
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="ROLE_USER">USER</SelectItem>
                                         <SelectItem value="ROLE_ADMIN">Admin</SelectItem>
+                                        <SelectItem value="ROLE_USER">User</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
                         </div>
-                        <CardFooter className="flex justify-between">
+                        <CardFooter className="flex flex-col items-center gap-2">
                             <Button type="submit" className="m-5 bg-pink-500 text-white">Registriraj se</Button>
                             <Link to="/home">
                                 <Button className="m-5 bg-pink-500 text-white">Nazad</Button>

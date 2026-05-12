@@ -1,15 +1,14 @@
 package com.inventar.backend.DTO;
 
 public class LocationDTO {
+
     private Long id;
-
-    private String adress;
-
+    private String address;
     private String room;
 
-    public LocationDTO(Long id, String adress, String room) {
+    public LocationDTO(Long id, String address, String room) {
         this.id = id;
-        this.adress = adress;
+        this.address = address;
         this.room = room;
     }
 
@@ -24,19 +23,19 @@ public class LocationDTO {
         this.id = id;
     }
 
-    public String getAdress() {
-        return adress;
-    }
-
-    public void setAdress(String adress) {
-        this.adress = adress;
-    }
-
     public String getRoom() {
         return room;
     }
 
     public void setRoom(String room) {
         this.room = room;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

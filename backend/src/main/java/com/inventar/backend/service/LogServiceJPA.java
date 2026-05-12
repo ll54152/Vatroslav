@@ -1,80 +1,280 @@
 package com.inventar.backend.service;
 
 import com.inventar.backend.DTO.LogAddDTO;
-import com.inventar.backend.domain.*;
-import com.inventar.backend.repo.*;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.stereotype.*;
+import com.inventar.backend.DTO.LogShowAllDTO;
+import com.inventar.backend.DTO.LogShowDTO;
+import com.inventar.backend.domain.Component;
+import com.inventar.backend.domain.Experiment;
+import com.inventar.backend.domain.File;
+import com.inventar.backend.domain.Log;
+import com.inventar.backend.domain.User;
+import com.inventar.backend.mapper.LogMapper;
+import com.inventar.backend.repo.ComponentRepo;
+import com.inventar.backend.repo.ExperimentRepo;
+import com.inventar.backend.repo.LogRepo;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class LogServiceJPA {
 
-    @Autowired
-    private AuthenticationServiceJPA authenticationServiceJPA;
+    private final UserServiceJPA userServiceJPA;
+
+    private final ComponentRepo componentRepo;
+    private final ExperimentRepo experimentRepo;
+
+    private final LogMapper logMapper;
+    private final LogRepo logRepo;
 
     @Autowired
-    private LogRepo logRepo;
+    public LogServiceJPA(UserServiceJPA userServiceJPA, ComponentRepo componentRepo, ExperimentRepo experimentRepo, LogMapper logMapper, LogRepo logRepo) {
+        this.userServiceJPA = userServiceJPA;
+        this.componentRepo = componentRepo;
+        this.experimentRepo = experimentRepo;
+        this.logMapper = logMapper;
+        this.logRepo = logRepo;
+    }
 
-    @Autowired
-    private UserRepo userRepo;
+    @Transactional
+    public void linkComponentAndExperiment(Component component, Experiment experiment, User user) {
+        Log componentLog = new Log();
+        componentLog.setTimestamp(LocalDateTime.now());
+        componentLog.setDeletable(false);
+        componentLog.setUser(user);
+        componentLog.setComponent(component);
+        componentLog.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je povezao komponentu '" + component.getName() + "' sa eksperimentom '" + experiment.getName() + "'");
+        logRepo.save(componentLog);
 
-    @Autowired
-    private HttpServletRequest request;
+        Log experimentLog = new Log();
+        experimentLog.setTimestamp(LocalDateTime.now());
+        experimentLog.setDeletable(false);
+        experimentLog.setUser(user);
+        experimentLog.setExperiment(experiment);
+        experimentLog.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je povezao komponentu '" + component.getName() + "' sa eksperimentom '" + experiment.getName() + "'");
+        logRepo.save(experimentLog);
+    }
 
-    @Autowired
-    private EksperimentRepo eksperimentRepo;
+    @Transactional
+    public void unlinkComponentFromExperiment(Component component, Experiment experiment, User user) {
+        Log componentLog = new Log();
+        componentLog.setTimestamp(LocalDateTime.now());
+        componentLog.setDeletable(false);
+        componentLog.setUser(user);
+        componentLog.setComponent(component);
+        componentLog.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio eksperiment '" + experiment.getName() + "' iz komponente '" + component.getName() + "'");
+        logRepo.save(componentLog);
 
-    @Autowired
-    private KomponentaRepo komponentaRepo;
+        Log experimentLog = new Log();
+        experimentLog.setTimestamp(LocalDateTime.now());
+        experimentLog.setDeletable(false);
+        experimentLog.setUser(user);
+        experimentLog.setExperiment(null);
+        experimentLog.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio komponentu '" + component.getName() + "' iz eksperimenta '" + experiment.getName() + "'");
+        logRepo.save(experimentLog);
+    }
 
-    public Log save(LogAddDTO logAddDTO) {
+    @Transactional
+    public void unlinkExperimentFromComponent(Experiment experiment, Component component, User user) {
+        Log componentLog = new Log();
+        componentLog.setTimestamp(LocalDateTime.now());
+        componentLog.setDeletable(false);
+        componentLog.setUser(user);
+        componentLog.setComponent(null);
+        componentLog.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio eksperiment '" + experiment.getName() + "' iz komponente '" + component.getName() + "'");
+        logRepo.save(componentLog);
 
-        String email = authenticationServiceJPA.getEmailFromToken(request.getHeader("Authorization"));
+        Log experimentLog = new Log();
+        experimentLog.setTimestamp(LocalDateTime.now());
+        experimentLog.setDeletable(false);
+        experimentLog.setUser(user);
+        experimentLog.setExperiment(experiment);
+        experimentLog.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio komponentu '" + component.getName() + "' iz eksperimenta '" + experiment.getName() + "'");
+        logRepo.save(experimentLog);
+    }
 
+    @Transactional
+    public void componentCreation(Component component, User user) {
         Log log = new Log();
         log.setTimestamp(LocalDateTime.now());
-        log.setUser(userRepo.findByEmail(email).get());
+        log.setDeletable(false);
+        log.setUser(user);
+        log.setComponent(component);
+        log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao komponentu '" + component.getName() + "' u bazu podataka");
+        logRepo.save(log);
+    }
+
+    @Transactional
+    public void componentDeletion(Component component, User user) {
+        Log log = new Log();
+        log.setTimestamp(LocalDateTime.now());
+        log.setDeletable(false);
+        log.setUser(user);
+        log.setComponent(null);
+        log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio komponentu '" + component.getName() + "' iz baze podataka");
+        logRepo.save(log);
+    }
+
+    @Transactional
+    public void componentUpdated(Component component, User user) {
+        Log log = new Log();
+        log.setTimestamp(LocalDateTime.now());
+        log.setDeletable(false);
+        log.setUser(user);
+        log.setComponent(component);
+        log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je ažurirao komponentu '" + component.getName() + "' u bazi podataka");
+        logRepo.save(log);
+    }
+
+    @Transactional
+    public void fileComponentCreation(Component component, File file, User user) {
+        Log log = new Log();
+        log.setTimestamp(LocalDateTime.now());
+        log.setDeletable(false);
+        log.setUser(user);
+        log.setComponent(component);
+        log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao datoteku '" + file.getName() + "' u komponentu '" + component.getName() + "'");
+        logRepo.save(log);
+    }
+
+    @Transactional
+    public void fileComponentDeletion(Component component, File file, User user) {
+        Log log = new Log();
+        log.setTimestamp(LocalDateTime.now());
+        log.setDeletable(false);
+        log.setUser(user);
+        log.setComponent(component);
+        log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je izbrisao datoteku '" + file.getName() + "' iz komponente '" + component.getName() + "'");
+        logRepo.save(log);
+    }
+
+    @Transactional
+    public void fileExperimentDeletion(Experiment experiment, File file, User user) {
+        Log log = new Log();
+        log.setTimestamp(LocalDateTime.now());
+        log.setDeletable(false);
+        log.setUser(user);
+        log.setExperiment(experiment);
+        log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je izbrisao datoteku '" + file.getName() + "' iz eksperimenta '" + experiment.getName() + "'");
+        logRepo.save(log);
+    }
+
+    @Transactional
+    public void experimentCreation(Experiment experiment, User user) {
+        Log log = new Log();
+        log.setTimestamp(LocalDateTime.now());
+        log.setDeletable(false);
+        log.setUser(user);
+        log.setExperiment(experiment);
+        log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao eksperiment '" + experiment.getName() + "' u bazu podataka");
+        logRepo.save(log);
+    }
+
+    @Transactional
+    public void experimentUpdated(Experiment experiment, User user) {
+        Log log = new Log();
+        log.setTimestamp(LocalDateTime.now());
+        log.setDeletable(false);
+        log.setUser(user);
+        log.setExperiment(experiment);
+        log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je ažurirao eksperiment '" + experiment.getName() + "' u bazi podataka");
+        logRepo.save(log);
+    }
+
+    @Transactional
+    public void experimentDeletion(Experiment experiment, User user) {
+        Log log = new Log();
+        log.setTimestamp(LocalDateTime.now());
+        log.setDeletable(false);
+        log.setUser(user);
+        log.setExperiment(null);
+        log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je uklonio eksperiment '" + experiment.getName() + "' iz baze podataka");
+        logRepo.save(log);
+    }
+
+    @Transactional
+    public void fileExperimentCreation(Experiment experiment, File file, User user) {
+        Log log = new Log();
+        log.setTimestamp(LocalDateTime.now());
+        log.setDeletable(false);
+        log.setUser(user);
+        log.setExperiment(experiment);
+        log.setNote("Korisnik '" + user.getFirstName() + " " + user.getLastName() + "' je dodao datoteku '" + file.getName() + "' u eksperiment '" + experiment.getName() + "'");
+        logRepo.save(log);
+    }
+
+    @Transactional
+    public Log save(LogAddDTO logAddDTO) {
+        Log log = new Log();
+        log.setTimestamp(LocalDateTime.now());
+        log.setDeletable(true);
+        log.setUser(userServiceJPA.getAuthenticatedUser());
         log.setNote(logAddDTO.getNote());
 
-        if (logAddDTO.getEntityType().equals("eksperiment")) {
-            Optional<Eksperiment> eksperiment = eksperimentRepo.findById(logAddDTO.getEntityId());
-            log.setEksperiment(eksperiment.get());
-        } else if (logAddDTO.getEntityType().equals("komponenta")) {
-            Optional<Komponenta> komponenta = komponentaRepo.findById(logAddDTO.getEntityId());
-            log.setKomponenta(komponenta.get());
+        if (logAddDTO.getEntityType() != null) {
+            if (logAddDTO.getEntityType().equals("experiment")) {
+                log.setExperiment(experimentRepo.findById(logAddDTO.getEntityId()).orElseThrow(() -> new RuntimeException("Experiment not found")));
+            } else if (logAddDTO.getEntityType().equals("component")) {
+                log.setComponent(componentRepo.findById(logAddDTO.getEntityId()).orElseThrow(() -> new RuntimeException("Component not found")));
+            } else {
+                throw new RuntimeException("Invalid entity type");
+            }
         }
 
         return logRepo.save(log);
     }
 
-    public List<Log> findAll() {
-        return logRepo.findAll();
-    }
-
-    public Log findById(Long id) {
-        return logRepo.findById(id).orElse(null);
-    }
-
-    public List<Log> findByEksperimentId(Long eksperimentId) {
+    public List<Log> findByExperimentId(Long experimentId) {
         List<Log> logs = logRepo.findAll();
         return logs.stream()
-                .filter(log -> log.getEksperiment().getId().equals(eksperimentId))
+                .filter(log -> log.getExperiment().getId().equals(experimentId))
                 .toList();
     }
 
-    public List<Log> findByKomponentaId(int komponentaId) {
+    public List<Log> findByComponentId(Long componentId) {
         List<Log> logs = logRepo.findAll();
         return logs.stream()
-                .filter(log -> log.getKomponenta().getId().equals(komponentaId))
+                .filter(log -> log.getComponent().getId().equals(componentId))
                 .toList();
     }
 
-    public void deleteById(Long id) {
-        logRepo.deleteById(id);
+    @Transactional
+    public boolean deleteById(Long id) {
+        Log logToDelete = logRepo.findById(id).orElseThrow(() -> new RuntimeException("Log not found"));
+        if (logToDelete.isDeletable()) {
+            logRepo.deleteById(id);
+            return true;
+        } else {
+            throw new RuntimeException("Log is not deletable");
+        }
+    }
+
+
+    @Transactional
+    public void deleteLogs(List<Log> logList) {
+        if (logList != null && !logList.isEmpty()) {
+            logRepo.deleteAll(logList);
+        }
+    }
+
+    public List<LogShowAllDTO> findAll() {
+        return logMapper.mapLogsToShowAllDTOs(logRepo.findAll());
+    }
+
+    public LogShowDTO findById(Long id) {
+        Log log = logRepo.findById(id).orElse(null);
+
+        if (log != null) {
+            return logMapper.mapLogsToShowDTOs(List.of(log)).getFirst();
+        } else {
+            return null;
+        }
+    }
+
+    public void quickSave(Log log) {
+        logRepo.save(log);
     }
 }
