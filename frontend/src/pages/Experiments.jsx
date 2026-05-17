@@ -1,7 +1,6 @@
-import React, {useEffect, useState} from "react";
-import {useNavigate, Link} from "react-router-dom";
+import {useEffect, useState} from "react";
+import {Link, useNavigate} from "react-router-dom";
 import {jwtDecode} from "jwt-decode";
-import {Card, CardContent} from "@/components/ui/card";
 
 export default function Experiments() {
     const [experiments, setExperiments] = useState([]);
@@ -160,34 +159,35 @@ export default function Experiments() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center">
-            <div className="w-full max-w-8xl px-4 text-left">
-
-                <header
-                    className="fixed top-0 left-0 w-full bg-pink-500 text-white py-4 text-center text-2xl font-bold z-50">
-                    Lista eksperimenata
-                </header>
-
-                <div className="pt-28 mb-4 flex gap-4 items-center">
-                    <input
-                        type="text"
-                        placeholder="Pretražite po imenu, ZPF oznaci, opisu ili ključnim riječima"
-                        value={searchTerm}
-                        onChange={handleSearch}
-                        className="flex-1 p-2 rounded border border-gray-300 bg-white text-black focus:outline-none focus:ring-2 focus:ring-pink-500"
-                    />
-
-                    {role === "ROLE_ADMIN" && (
-                        <Link to="/experiment/add">
-                            <Card
-                                className="bg-pink-500 hover:bg-pink-800  text-white transition duration-300 cursor-pointer">
-                                <CardContent className="px-4 py-2">
-                                    <span className="font-semibold">Dodajte eksperiment</span>
-                                </CardContent>
-                            </Card>
-                        </Link>
-                    )}
+        <div className="min-h-screen flex flex-col">
+            <div>
+                <div className="max-w-8xl mx-auto px-3 sm:px-4 py-3 sm:py-6">
+                    <div className="flex flex-col gap-3 sm:gap-4">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">
+                                Eksperimenti
+                            </h1>
+                            {role === "ROLE_ADMIN" && (
+                                <Link to="/experiment/add">
+                                    <button
+                                        className="px-3 sm:px-4 md:px-6 py-2 bg-pink-500 hover:bg-pink-600 text-white font-semibold text-sm sm:text-base rounded-lg transition duration-200 shadow-md hover:shadow-lg w-full sm:w-auto">
+                                        Dodajte eksperiment
+                                    </button>
+                                </Link>
+                            )}
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Pretražite po imenu, ZPF oznaci, opisu ili ključnim riječima"
+                            value={searchTerm}
+                            onChange={handleSearch}
+                            className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border-2 border-gray-200 bg-white text-black text-sm sm:text-base placeholder-gray-500 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition duration-200"
+                        />
+                    </div>
                 </div>
+            </div>
+
+            <div className="flex-1 max-w-8xl mx-auto w-full px-4 py-6 text-left">
 
                 {loading && <p>Učitavanje...</p>}
                 {error && <p className="text-red-500">{error}</p>}

@@ -352,7 +352,7 @@ function ComponentView() {
                                     ? `${component.locationDTO.address}, ${component.locationDTO.room}`
                                     : <EmptyValue text="Nema lokacije"/>}
                             </div>
-                            <div><b>Količina:</b> {component.quantity}</div>
+                            <div><b>Količina: </b>{component.quantity}</div>
                             <div><b>Ključne riječi: </b>
                                 {component.keywords?.length ? (
                                     component.keywords.map((k, i) => (

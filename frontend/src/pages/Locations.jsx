@@ -69,22 +69,26 @@ export default function Locations() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center">
-            <div className="w-full max-w-8xl px-4 text-left">
-
-                <header
-                    className="fixed top-0 left-0 w-full bg-pink-500 text-white py-4 text-center text-2xl font-bold z-50">
-                    Lokacije
-                </header>
-
-                <div className="pt-28 mb-4">
-                    <input
-                        placeholder="Pretražite adresu ili prostoriju..."
-                        value={search}
-                        onChange={handleSearch}
-                        className="w-full p-2 border rounded"
-                    />
+        <div className="min-h-screen flex flex-col">
+            <div>
+                <div className="max-w-8xl mx-auto px-3 sm:px-4 py-3 sm:py-6">
+                    <div className="flex flex-col gap-3 sm:gap-4">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">
+                                Lokacije
+                            </h1>
+                        </div>
+                        <input
+                            placeholder="Pretražite adresu ili prostoriju..."
+                            value={search}
+                            onChange={handleSearch}
+                            className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border-2 border-gray-200 bg-white text-black text-sm sm:text-base placeholder-gray-500 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition duration-200"
+                        />
+                    </div>
                 </div>
+            </div>
+
+            <div className="flex-1 max-w-8xl mx-auto w-full px-3 sm:px-4 py-4 sm:py-6">
 
                 {loading && <p>Učitavanje...</p>}
 
