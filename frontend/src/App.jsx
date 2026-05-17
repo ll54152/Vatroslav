@@ -5,6 +5,8 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import MainPage from './pages/MainPage';
 import Experiments from './pages/Experiments.jsx';
+import ExperimentsPublic from './pages/ExperimentsPublic.jsx';
+import ExperimentPublicView from './pages/ExperimentPublicView.jsx';
 import ExperimentView from './pages/ExperimentView.jsx';
 import ComponentView from './pages/ComponentView';
 import ExperimentEdit from "./pages/ExperimentEdit";
@@ -33,6 +35,8 @@ function App() {
                 <Route path="/signup" element={<Signup/>}/>
                 <Route path="/mainpage" element={<MainPage/>}/>
                 <Route path="/experiments" element={<Experiments/>}/>
+                <Route path="/experiments/public" element={<ExperimentsPublic/>}/>
+                <Route path="/experiments/public/:id" element={<ExperimentPublicView/>}/>
                 <Route path="/experiment/view/:id" element={<ExperimentView/>}/>
                 <Route path="/experiment/view-log/:id" element={<ExperimentViewLog/>}/>
                 <Route path="/experiment/edit/:id" element={<ExperimentEdit/>}/>

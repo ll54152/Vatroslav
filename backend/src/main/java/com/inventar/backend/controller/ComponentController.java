@@ -57,10 +57,7 @@ public class ComponentController {
 
     @GetMapping("/getAll")
     public ResponseEntity<List<ComponentDTO>> getAllComponents() {
-        List<ComponentDTO> componentDTOList = componentServiceJPA.findAll().stream()
-                .map(component -> new ComponentDTO(component.getId(), component.getName(), component.getZpf(), component.getDescription(), component.getKeywords()))
-                .toList();
-        return new ResponseEntity<>(componentDTOList, HttpStatus.OK);
+        return new ResponseEntity<>(componentServiceJPA.findAll(), HttpStatus.OK);
     }
 
     @GetMapping("/get/{id}")

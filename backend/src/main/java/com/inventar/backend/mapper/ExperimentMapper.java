@@ -1,8 +1,10 @@
 package com.inventar.backend.mapper;
 
 import com.inventar.backend.DTO.ExperimentDTO;
+import com.inventar.backend.DTO.ExperimentPublicShowDTO;
 import com.inventar.backend.DTO.ExperimentShowDTO;
 import com.inventar.backend.domain.Experiment;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -10,6 +12,29 @@ import java.util.List;
 
 @Component
 public class ExperimentMapper {
+
+    private final ComponentMapper componentMapper;
+
+    @Autowired
+    public ExperimentMapper(ComponentMapper componentMapper) {
+        this.componentMapper = componentMapper;
+    }
+
+    public ExperimentDTO mapExperimentToDTO(Experiment experiment) {
+        if (experiment == null) {
+            return null;
+        } else {
+            ExperimentDTO experimentDTO = new ExperimentDTO();
+            experimentDTO.setId(experiment.getId());
+            experimentDTO.setName(experiment.getName());
+            experimentDTO.setZpf(experiment.getZpf());
+            experimentDTO.setDescription(experiment.getDescription());
+            experimentDTO.setKeywords(experiment.getKeywords().stream().sorted().toList());
+            experimentDTO.setItPublic(experiment.isItPublic());
+
+            return experimentDTO;
+        }
+    }
 
     public List<ExperimentDTO> mapExperimentsToDTOs(List<Experiment> experimentList) {
         if (experimentList == null) {
@@ -55,6 +80,26 @@ public class ExperimentMapper {
             }
 
             return experimentShowDTOList;
+        }
+    }
+
+    public ExperimentPublicShowDTO mapExperimentToPublicShowDTO(Experiment experiment) {
+        if (experiment == null || !experiment.isItPublic()) {
+            return null;
+        } else {
+            ExperimentPublicShowDTO experimentPublicShowDTO = new ExperimentPublicShowDTO();
+            experimentPublicShowDTO.setId(experiment.getId());
+            experimentPublicShowDTO.setName(experiment.getName());
+            experimentPublicShowDTO.setZpf(experiment.getZpf());
+            experimentPublicShowDTO.setField(experiment.getField());
+            experimentPublicShowDTO.setSubject(experiment.getSubject());
+            experimentPublicShowDTO.setDescription(experiment.getDescription());
+            experimentPublicShowDTO.setKeywords(experiment.getKeywords().stream().sorted().toList());
+            experimentPublicShowDTO.setMaterials(experiment.getMaterials());
+
+            experimentPublicShowDTO.setComponentDTOList(componentMapper.mapComponentsToDTOs(experiment.getComponentList()));
+
+            return experimentPublicShowDTO;
         }
     }
 }

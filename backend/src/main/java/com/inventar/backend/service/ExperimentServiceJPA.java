@@ -1,12 +1,11 @@
 package com.inventar.backend.service;
 
-import com.inventar.backend.DTO.ExperimentAddDTO;
-import com.inventar.backend.DTO.ExperimentShowDTO;
-import com.inventar.backend.DTO.ExperimentEditDTO;
+import com.inventar.backend.DTO.*;
 import com.inventar.backend.domain.Component;
 import com.inventar.backend.domain.Experiment;
 import com.inventar.backend.domain.User;
 import com.inventar.backend.mapper.ComponentMapper;
+import com.inventar.backend.mapper.ExperimentMapper;
 import com.inventar.backend.mapper.LogMapper;
 import com.inventar.backend.repo.ComponentRepo;
 import com.inventar.backend.repo.ExperimentRepo;
@@ -32,9 +31,10 @@ public class ExperimentServiceJPA {
     private final LogMapper logMapper;
 
     private final FileServiceJPA fileServiceJPA;
+    private final ExperimentMapper experimentMapper;
 
     @Autowired
-    public ExperimentServiceJPA(ExperimentRepo experimentRepo, ComponentRepo componentRepo, ComponentMapper componentMapper, UserServiceJPA userServiceJPA, LogServiceJPA logServiceJPA, LogMapper logMapper, FileServiceJPA fileServiceJPA) {
+    public ExperimentServiceJPA(ExperimentRepo experimentRepo, ComponentRepo componentRepo, ComponentMapper componentMapper, UserServiceJPA userServiceJPA, LogServiceJPA logServiceJPA, LogMapper logMapper, FileServiceJPA fileServiceJPA, ExperimentMapper experimentMapper) {
         this.experimentRepo = experimentRepo;
         this.componentRepo = componentRepo;
         this.componentMapper = componentMapper;
@@ -42,6 +42,7 @@ public class ExperimentServiceJPA {
         this.logServiceJPA = logServiceJPA;
         this.logMapper = logMapper;
         this.fileServiceJPA = fileServiceJPA;
+        this.experimentMapper = experimentMapper;
     }
 
     @Transactional
@@ -172,6 +173,10 @@ public class ExperimentServiceJPA {
         }
     }
 
+    public ExperimentPublicShowDTO getPublicShowDTO(Experiment experiment) {
+        return experimentMapper.mapExperimentToPublicShowDTO(experiment);
+    }
+
     private void linkComponentsWithExperiment(Experiment experiment, List<Component> componentList, User user) {
         if (componentList != null) {
             for (Component component : componentList) {
@@ -224,11 +229,15 @@ public class ExperimentServiceJPA {
         return experiment;
     }
 
-    public List<Experiment> findAll() {
-        return experimentRepo.findAll();
+    public List<ExperimentDTO> findAll() {
+        return experimentRepo.findAll().stream().map(experimentMapper::mapExperimentToDTO).toList();
     }
 
     public Experiment findById(Long id) {
         return experimentRepo.findById(id).orElse(null);
+    }
+
+    public List<ExperimentDTO> findAllPublic() {
+        return experimentRepo.findAll().stream().filter(Experiment::isItPublic).map(experimentMapper::mapExperimentToDTO).toList();
     }
 }
