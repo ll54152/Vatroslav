@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {useNavigate, Link} from "react-router-dom";
 
 export default function Locations() {
     const [locations, setLocations] = useState([]);
@@ -14,7 +14,7 @@ export default function Locations() {
             const token = localStorage.getItem("jwt");
 
             const res = await fetch("/vatroslav/api/location/getAll", {
-                headers: { Authorization: token },
+                headers: {Authorization: token},
             });
 
             const data = await res.json();
@@ -72,7 +72,8 @@ export default function Locations() {
         <div className="min-h-screen flex flex-col items-center justify-center">
             <div className="w-full max-w-8xl px-4 text-left">
 
-                <header className="fixed top-0 left-0 w-full bg-pink-500 text-white py-4 text-center text-2xl font-bold z-50">
+                <header
+                    className="fixed top-0 left-0 w-full bg-pink-500 text-white py-4 text-center text-2xl font-bold z-50">
                     Lokacije
                 </header>
 
@@ -93,12 +94,13 @@ export default function Locations() {
                         className="bg-pink-200 p-4 mb-3 rounded shadow cursor-pointer hover:bg-pink-300"
                         onClick={() => navigate(`/location/view/${loc.id}`)}
                     >
+
                         <div className="font-semibold">
-                            <HighlightedText text={loc.address} highlight={search} />
+                            <HighlightedText text={loc.room} highlight={search}/>
                         </div>
 
                         <div className="text-sm text-gray-700">
-                            <HighlightedText text={loc.room} highlight={search} />
+                            <HighlightedText text={loc.address} highlight={search}/>
                         </div>
                     </div>
                 ))}
