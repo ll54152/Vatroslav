@@ -116,6 +116,7 @@ public class ExperimentServiceJPA {
         experiment.setSubject(experimentEditDTO.getSubject());
         experiment.setDescription(experimentEditDTO.getDescription());
         experiment.setKeywords(experimentEditDTO.getKeywords().stream().sorted().toList());
+        experiment.setItPublic(experimentEditDTO.isItPublic());
 
         if (experimentEditDTO.getZpf() == null) {
             experiment.setZpf(null);
@@ -161,6 +162,7 @@ public class ExperimentServiceJPA {
             experimentShowDTO.setDescription(experiment.getDescription());
             experimentShowDTO.setKeywords(experiment.getKeywords().stream().sorted().toList());
             experimentShowDTO.setMaterials(experiment.getMaterials());
+            experimentShowDTO.setItPublic(experiment.isItPublic());
 
             experimentShowDTO.setComponentDTOList(componentMapper.mapComponentsToDTOs(experiment.getComponentList()));
             experimentShowDTO.setLogShowDTOList(logMapper.mapLogsToShowDTOs(experiment.getLogList()));
@@ -211,7 +213,8 @@ public class ExperimentServiceJPA {
                 experimentAddDTO.getSubject(),
                 experimentAddDTO.getDescription(),
                 experimentAddDTO.getKeywords().stream().sorted().toList(),
-                experimentAddDTO.getMaterials()
+                experimentAddDTO.getMaterials(),
+                experimentAddDTO.isItPublic()
         );
 
         if (componentList != null && !componentList.isEmpty()) {

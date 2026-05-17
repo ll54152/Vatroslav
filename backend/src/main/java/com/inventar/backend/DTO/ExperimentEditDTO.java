@@ -11,11 +11,12 @@ public class ExperimentEditDTO {
     private String description;
     private List<String> keywords;
     private String materials;
+    private boolean isItPublic;
     private List<Long> componentIds;
     private List<FileDTO> fileDTOList;
     private List<Long> existingFileIds;
 
-    public ExperimentEditDTO(String name, String zpf, String subject, String field, String description, List<String> keywords, String materials, List<Long> componentIds, List<FileDTO> fileDTOList, List<Long> existingFileIds) {
+    public ExperimentEditDTO(String name, String zpf, String subject, String field, String description, List<String> keywords, String materials, boolean isItPublic, List<Long> componentIds, List<FileDTO> fileDTOList, List<Long> existingFileIds) {
         this.name = name;
         this.zpf = zpf;
         this.subject = subject;
@@ -23,6 +24,7 @@ public class ExperimentEditDTO {
         this.description = description;
         this.keywords = keywords;
         this.materials = materials;
+        this.isItPublic = isItPublic;
         this.componentIds = componentIds;
         this.fileDTOList = fileDTOList;
         this.existingFileIds = existingFileIds;
@@ -106,5 +108,13 @@ public class ExperimentEditDTO {
 
     public void setExistingFileIds(List<Long> existingFileIds) {
         this.existingFileIds = existingFileIds;
+    }
+
+    public boolean isItPublic() {
+        return isItPublic;
+    }
+
+    public void setItPublic(boolean itPublic) {
+        isItPublic = itPublic;
     }
 }

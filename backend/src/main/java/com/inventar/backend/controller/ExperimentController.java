@@ -61,7 +61,7 @@ public class ExperimentController {
     @GetMapping("/getAll")
     public ResponseEntity<List<ExperimentDTO>> getAllExperiments() {
         List<ExperimentDTO> experimentDTOList = experimentServiceJPA.findAll().stream()
-                .map(experiment -> new ExperimentDTO(experiment.getId(), experiment.getName(), experiment.getZpf(), experiment.getDescription(), experiment.getKeywords()))
+                .map(experiment -> new ExperimentDTO(experiment.getId(), experiment.getName(), experiment.getZpf(), experiment.getDescription(), experiment.getKeywords(), experiment.isItPublic()))
                 .toList();
         return new ResponseEntity<>(experimentDTOList, HttpStatus.OK);
     }

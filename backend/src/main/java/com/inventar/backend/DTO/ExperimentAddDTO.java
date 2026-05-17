@@ -11,13 +11,14 @@ public class ExperimentAddDTO {
     private String description;
     private List<String> keywords;
     private String materials;
+    private boolean isItPublic;
     private List<Long> componentIds;
     private List<FileDTO> fileDTOList;
 
     public ExperimentAddDTO() {
     }
 
-    public ExperimentAddDTO(String name, String zpf, String subject, String field, String description, List<String> keywords, String materials, List<Long> componentIds, List<FileDTO> fileDTOList) {
+    public ExperimentAddDTO(String name, String zpf, String subject, String field, String description, List<String> keywords, String materials, boolean isItPublic, List<Long> componentIds, List<FileDTO> fileDTOList) {
         this.name = name;
         this.zpf = zpf;
         this.subject = subject;
@@ -25,6 +26,7 @@ public class ExperimentAddDTO {
         this.description = description;
         this.keywords = keywords;
         this.materials = materials;
+        this.isItPublic = isItPublic;
         this.componentIds = componentIds;
         this.fileDTOList = fileDTOList;
     }
@@ -99,5 +101,13 @@ public class ExperimentAddDTO {
 
     public void setComponentIds(List<Long> componentIds) {
         this.componentIds = componentIds;
+    }
+
+    public boolean isItPublic() {
+        return isItPublic;
+    }
+
+    public void setItPublic(boolean itPublic) {
+        isItPublic = itPublic;
     }
 }

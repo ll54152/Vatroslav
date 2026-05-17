@@ -33,6 +33,8 @@ public class Experiment {
     @Column(columnDefinition = "TEXT")
     private String materials;
 
+    private boolean isItPublic;
+
     @OneToMany(mappedBy = "experiment")
     private List<File> fileList;
 
@@ -42,7 +44,7 @@ public class Experiment {
     @OneToMany(mappedBy = "experiment")
     private List<Log> logList;
 
-    public Experiment(String name, String zpf, String field, String subject, String description, List<String> keywords, String materials) {
+    public Experiment(String name, String zpf, String field, String subject, String description, List<String> keywords, String materials, boolean isItPublic) {
         this.name = name;
         this.zpf = zpf;
         this.field = field;
@@ -50,9 +52,10 @@ public class Experiment {
         this.description = description;
         this.setKeywords(keywords);
         this.materials = materials;
+        this.isItPublic = isItPublic;
     }
 
-    public Experiment(String name, String zpf, String field, String subject, String description, List<String> keywords, String materials, List<Component> componentList, List<Log> logList) {
+    public Experiment(String name, String zpf, String field, String subject, String description, List<String> keywords, String materials, boolean isItPublic, List<Component> componentList, List<Log> logList) {
         this.name = name;
         this.zpf = zpf;
         this.field = field;
@@ -62,10 +65,11 @@ public class Experiment {
         this.materials = materials;
         this.componentList = componentList;
         this.logList = logList;
+        this.isItPublic = isItPublic;
     }
 
 
-    public Experiment(String name, String zpf, String field, String subject, String description, List<String> keywords, String materials, List<Log> logList) {
+    public Experiment(String name, String zpf, String field, String subject, String description, List<String> keywords, String materials, boolean isItPublic, List<Log> logList) {
         this.name = name;
         this.zpf = zpf;
         this.field = field;
@@ -74,6 +78,7 @@ public class Experiment {
         this.setKeywords(keywords);
         this.materials = materials;
         this.logList = logList;
+        this.isItPublic = isItPublic;
     }
 
     public Experiment() {
@@ -172,5 +177,13 @@ public class Experiment {
         } else {
             this.keywords = null;
         }
+    }
+
+    public boolean isItPublic() {
+        return isItPublic;
+    }
+
+    public void setItPublic(boolean itPublic) {
+        isItPublic = itPublic;
     }
 }

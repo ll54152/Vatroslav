@@ -9,13 +9,15 @@ public class ExperimentDTO {
     private String zpf;
     private String description;
     private List<String> keywords;
+    private boolean isItPublic;
 
-    public ExperimentDTO(Long id, String name, String zpf, String description, List<String> keywords) {
+    public ExperimentDTO(Long id, String name, String zpf, String description, List<String> keywords, boolean isItPublic) {
         this.id = id;
         this.name = name;
         this.zpf = zpf;
         this.description = description;
         this.keywords = keywords;
+        this.isItPublic = isItPublic;
     }
 
     public ExperimentDTO() {
@@ -59,5 +61,13 @@ public class ExperimentDTO {
 
     public void setKeywords(List<String> keywords) {
         this.keywords = keywords.stream().sorted().toList();
+    }
+
+    public boolean isItPublic() {
+        return isItPublic;
+    }
+
+    public void setItPublic(boolean itPublic) {
+        isItPublic = itPublic;
     }
 }
