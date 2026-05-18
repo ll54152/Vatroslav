@@ -123,7 +123,7 @@ export default function Experiments() {
 
                             <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-start w-full">
                                 <Link
-                                    to={`/experiment/view/${exp.id}`}
+                                    to={`/experiments/public/view/${exp.id}`}
                                     className="text-blue-600 text-lg font-semibold"
                                 >
                                     <HighlightedText text={exp.name} highlight={searchTerm}/>

@@ -61,29 +61,19 @@ export default function Toolbar() {
         };
 
         init();
-    }, []);
+    }, [location.pathname]);
 
     const handleLogout = () => {
         localStorage.removeItem('jwt');
         navigate('/login');
     };
 
-    const noToolbarPaths = [
-        '/login',
-        '/signup',
-        '/forgot-password',
-        '/reset-password',
-        '/home',
-        '/',
-    ];
 
-    if (!isAuthenticated || noToolbarPaths.includes(location.pathname)) {
-        return null;
-    }
+    if (isAuthenticated === null) return null;
 
     const isActive = (path) => location.pathname === path;
 
-    const navLinks = [
+    const navLinksAuth = [
         {path: '/mainpage', label: 'Glavna stranica'},
         {path: '/experiments', label: 'Eksperimenti'},
         {path: '/components', label: 'Komponente'},
@@ -91,6 +81,13 @@ export default function Toolbar() {
         {path: '/logs', label: 'Logovi'},
         {path: '/users', label: 'Korisnici'},
     ];
+
+    const navLinksUnauth = [
+        {path: '/login', label: 'Prijava'},
+        {path: '/experiments/public', label: 'Eksperimenti'},
+    ];
+
+    const navLinks = isAuthenticated ? navLinksAuth : navLinksUnauth;
 
     return (
         <nav className="sticky top-0 z-50">
@@ -114,14 +111,15 @@ export default function Toolbar() {
                             {link.label}
                         </Link>
                     ))}
-
-                    <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-2 rounded-md bg-red-50 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100 hover:text-red-700"
-                    >
-                        <LogOut size={16}/>
-                        Odjava
-                    </button>
+                    {isAuthenticated && (
+                        <button
+                            onClick={handleLogout}
+                            className="flex items-center gap-2 rounded-md bg-red-50 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100 hover:text-red-700"
+                        >
+                            <LogOut size={16}/>
+                            Odjava
+                        </button>
+                    )}
                 </div>
 
                 <button
@@ -150,13 +148,15 @@ export default function Toolbar() {
                             </Link>
                         ))}
 
-                        <button
-                            onClick={handleLogout}
-                            className="mt-3 flex items-center gap-2 rounded-md bg-red-50 px-3 py-3 text-sm font-medium text-red-600 hover:bg-red-100"
-                        >
-                            <LogOut size={16}/>
-                            Odjava
-                        </button>
+                        {isAuthenticated && (
+                            <button
+                                onClick={handleLogout}
+                                className="mt-3 flex items-center gap-2 rounded-md bg-red-50 px-3 py-3 text-sm font-medium text-red-600 hover:bg-red-100"
+                            >
+                                <LogOut size={16}/>
+                                Odjava
+                            </button>
+                        )}
                     </div>
                 </div>
             )}

@@ -36,7 +36,7 @@ function App() {
                 <Route path="/mainpage" element={<MainPage/>}/>
                 <Route path="/experiments" element={<Experiments/>}/>
                 <Route path="/experiments/public" element={<ExperimentsPublic/>}/>
-                <Route path="/experiments/public/:id" element={<ExperimentPublicView/>}/>
+                <Route path="/experiments/public/view/:id" element={<ExperimentPublicView/>}/>
                 <Route path="/experiment/view/:id" element={<ExperimentView/>}/>
                 <Route path="/experiment/view-log/:id" element={<ExperimentViewLog/>}/>
                 <Route path="/experiment/edit/:id" element={<ExperimentEdit/>}/>
