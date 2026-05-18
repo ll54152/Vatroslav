@@ -96,12 +96,10 @@ export default function Toolbar() {
         <nav className="sticky top-0 z-50">
             <Card className="mx-auto flex h-16 items-center justify-between px-4 md:px-6">
 
-                {/* Logo / Title */}
                 <div className="text-lg font-semibold text-pink-600">
                     Vatroslav
                 </div>
 
-                {/* Desktop Navigation */}
                 <div className="hidden md:flex items-center gap-6">
                     {navLinks.map((link) => (
                         <Link
@@ -126,7 +124,6 @@ export default function Toolbar() {
                     </button>
                 </div>
 
-                {/* Mobile Menu Button */}
                 <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                     className="md:hidden rounded-md p-2 text-gray-700 hover:bg-gray-100"
@@ -135,7 +132,6 @@ export default function Toolbar() {
                 </button>
             </Card>
 
-            {/* Mobile Navigation */}
             {isMenuOpen && (
                 <div className="border-t border-gray-200 bg-white md:hidden">
                     <div className="flex flex-col px-4 py-3">
