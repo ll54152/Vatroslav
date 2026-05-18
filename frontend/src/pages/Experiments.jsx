@@ -196,6 +196,7 @@ export default function Experiments() {
                 )}
 
                 {!loading && !error && filteredExperiments.map(exp => {
+                    const isPublic = exp?.isItPublic ?? exp?.itPublic ?? false;
                     const isExpanded = expandedIds.includes(exp.id);
                     const isAdmin = role === "ROLE_ADMIN";
 
@@ -203,12 +204,19 @@ export default function Experiments() {
                         <div key={exp.id} className="flex flex-col bg-pink-200 p-5 mb-4 rounded-lg shadow-lg">
 
                             <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-start w-full">
-                                <Link
-                                    to={`/experiment/view/${exp.id}`}
-                                    className="text-blue-600 text-lg font-semibold"
-                                >
-                                    <HighlightedText text={exp.name} highlight={searchTerm}/>
-                                </Link>
+                                <div className="flex items-center gap-3">
+                                    <Link
+                                        to={`/experiment/view/${exp.id}`}
+                                        className="text-blue-600 text-lg font-semibold"
+                                    >
+                                        <HighlightedText text={exp.name} highlight={searchTerm}/>
+                                    </Link>
+
+                                    <span
+                                        className={`text-xs px-2 py-0.5 rounded-full font-medium ${isPublic ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700'}`}>
+                                        {isPublic ? 'Javno' : 'Privatno'}
+                                    </span>
+                                </div>
 
                                 <div className="flex flex-wrap gap-2 sm:flex-nowrap">
                                     <button

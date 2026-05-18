@@ -24,6 +24,7 @@ function ExperimentEdit() {
     const [field, setField] = useState("");
 
     const [materials, setMaterials] = useState("");
+    const [isItPublic, setIsItPublic] = useState(false);
 
     const [experiments, setExperiments] = useState([]);
 
@@ -93,6 +94,8 @@ function ExperimentEdit() {
             setMaterials(data.materials);
 
             setSelectedComponents(data.componentDTOList || []);
+
+            setIsItPublic(data?.isItPublic ?? data?.itPublic ?? false);
 
             setExistingImages(data.images || []);
             setKeepImages((data.images || []).map(img => img.id));
@@ -278,6 +281,7 @@ function ExperimentEdit() {
             subject: subject,
             field: field,
             description,
+            isItPublic: isItPublic,
             keywords: keywords ? keywords.split(";").map(k => k.trim()).filter(k => k !== "") : [],
             materials: materials,
             componentIds: selectedComponents.map(comp => comp.id),
@@ -674,6 +678,18 @@ function ExperimentEdit() {
                             <CardTitle>Pribor i potrošni materijal</CardTitle>
                             <Textarea placeholder="Unesite pribor i potrošni materijal" value={materials}
                                       onChange={(e) => setMaterials(e.target.value)}/>
+                        </Card>
+
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>Vidljivost</CardTitle>
+                            <input
+                                id="isItPublic_edit"
+                                type="checkbox"
+                                checked={isItPublic}
+                                onChange={(e) => setIsItPublic(e.target.checked)}
+                            />
+                            <label htmlFor="isItPublic_edit" className="text-sm">Javno (Eksperiment vidljiv ne
+                                prijavljenim korisnicima)</label>
                         </Card>
                     </div>
                 </form>

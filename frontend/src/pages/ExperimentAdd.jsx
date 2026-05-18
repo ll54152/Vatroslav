@@ -20,6 +20,7 @@ function ExperimentAdd() {
     const [field, setField] = useState();
     const [description, setDescription] = useState();
     const [materials, setMaterials] = useState();
+    const [isItPublic, setIsItPublic] = useState(false);
     const [subject, setSubject] = useState();
     const [otherImages, setOtherImages] = useState([]);
     const [documents, setDocuments] = useState([]);
@@ -65,6 +66,7 @@ function ExperimentAdd() {
             subject: subject,
             description: description,
             materials: materials,
+            isItPublic: isItPublic,
             keywords: keywords
                 ? keywords
                     .split(";")
@@ -303,6 +305,18 @@ function ExperimentAdd() {
                                 value={materials}
                                 onChange={(e) => setMaterials(e.target.value)}
                             />
+                        </Card>
+
+                        <Card className="w-full flex flex-col space-y-2.5 p-2">
+                            <CardTitle>Vidljivost</CardTitle>
+                            <input
+                                id="isItPublic"
+                                type="checkbox"
+                                checked={isItPublic}
+                                onChange={(e) => setIsItPublic(e.target.checked)}
+                            />
+                            <label htmlFor="isItPublic" className="text-sm">Javno (Eksperiment vidljiv ne prijavljenim
+                                korisnicima)</label>
                         </Card>
                     </div>
 

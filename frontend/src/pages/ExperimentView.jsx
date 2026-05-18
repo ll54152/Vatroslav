@@ -203,6 +203,8 @@ function ExperimentView() {
     if (error) return <p className="text-red-500">{error}</p>;
     if (!experiment) return <div className="p-6">Nema podataka</div>;
 
+    const isPublic = experiment?.isItPublic ?? experiment?.itPublic ?? false;
+
     const EmptyValue = ({text = "N/A"}) => (
         <span className="text-gray-400 italic">{text}</span>
     );
@@ -362,6 +364,8 @@ function ExperimentView() {
                                         <div key={i}>• {k}</div>
                                     ))
                                 ) : <EmptyValue text="Nema ključnih riječi"/>}
+                            </div>
+                            <div><b>Vidljivost: </b> {isPublic ? 'Javno' : 'Privatno'}
                             </div>
                         </CardContent>
                     </Card>
