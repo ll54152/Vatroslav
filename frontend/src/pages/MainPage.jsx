@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Link, Navigate} from "react-router-dom";
+import {Link, Navigate, useNavigate} from "react-router-dom";
 import {Card, CardContent} from "@/components/ui/card";
 import {
     Menubar,
@@ -12,6 +12,7 @@ import {Button} from "@/components/ui/button.jsx";
 export default function MainPage() {
     const [isAuthenticated, setIsAuthenticated] = React.useState(null);
     const [role, setRole] = React.useState(null);
+    const navigate = useNavigate();
 
     const isTokenValid = () => {
         const token = localStorage.getItem("jwt");
@@ -130,8 +131,8 @@ export default function MainPage() {
                         variant="destructive"
                         className="px-8 py-2 text-lg"
                         onClick={() => {
-                            localStorage.removeItem("jwt");
-                            window.location.href = "/login";
+                            localStorage.removeItem('jwt');
+                            navigate('/login');
                         }}
                     >
                         Odjava
