@@ -2,11 +2,13 @@ package com.inventar.backend.DTO;
 
 public class UserShowDTO {
 
+    private Long id;
     private String email;
     private String firstName;
     private String lastName;
 
-    public UserShowDTO(String email, String firstName, String lastName) {
+    public UserShowDTO(Long id, String email, String firstName, String lastName) {
+        this.id = id;
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -37,5 +39,13 @@ public class UserShowDTO {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

@@ -1,6 +1,5 @@
 package com.inventar.backend.service;
 
-import com.inventar.backend.DTO.UserShowDTO;
 import com.inventar.backend.DTO.UserUpdateDTO;
 import com.inventar.backend.domain.User;
 import com.inventar.backend.domain.PasswordResetToken;
@@ -174,17 +173,5 @@ public class UserServiceJPA {
     public User getAuthenticatedUser() {
         String email = authenticationServiceJPA.getEmailFromToken(httpServletRequest.getHeader("Authorization"));
         return userRepo.findByEmail(email).orElse(null);
-    }
-
-    public UserShowDTO mapUserToDTO(User user) {
-        if (user == null) {
-            return null;
-        } else {
-            UserShowDTO userShowDTO = new UserShowDTO();
-            userShowDTO.setEmail(user.getEmail());
-            userShowDTO.setFirstName(user.getFirstName());
-            userShowDTO.setLastName(user.getLastName());
-            return userShowDTO;
-        }
     }
 }

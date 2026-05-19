@@ -8,6 +8,7 @@ import com.inventar.backend.domain.Component;
 import com.inventar.backend.domain.Experiment;
 import com.inventar.backend.domain.Location;
 import com.inventar.backend.domain.User;
+import com.inventar.backend.mapper.ComponentMapper;
 import com.inventar.backend.mapper.ExperimentMapper;
 import com.inventar.backend.mapper.LocationMapper;
 import com.inventar.backend.mapper.LogMapper;
@@ -39,9 +40,10 @@ public class ComponentServiceJPA {
     private final LogMapper logMapper;
 
     private final FileServiceJPA fileServiceJPA;
+    private final ComponentMapper componentMapper;
 
     @Autowired
-    public ComponentServiceJPA(ComponentRepo componentRepo, ExperimentRepo experimentRepo, ExperimentMapper experimentMapper, UserServiceJPA userServiceJPA, LocationMapper locationMapper, LocationRepo locationRepo, LogServiceJPA logServiceJPA, LogMapper logMapper, FileServiceJPA fileServiceJPA) {
+    public ComponentServiceJPA(ComponentRepo componentRepo, ExperimentRepo experimentRepo, ExperimentMapper experimentMapper, UserServiceJPA userServiceJPA, LocationMapper locationMapper, LocationRepo locationRepo, LogServiceJPA logServiceJPA, LogMapper logMapper, FileServiceJPA fileServiceJPA, ComponentMapper componentMapper) {
         this.componentRepo = componentRepo;
         this.experimentRepo = experimentRepo;
         this.experimentMapper = experimentMapper;
@@ -51,6 +53,7 @@ public class ComponentServiceJPA {
         this.logServiceJPA = logServiceJPA;
         this.logMapper = logMapper;
         this.fileServiceJPA = fileServiceJPA;
+        this.componentMapper = componentMapper;
     }
 
     @Transactional
@@ -289,8 +292,8 @@ public class ComponentServiceJPA {
         return componentRepo.findById(id).orElse(null);
     }
 
-    public List<Component> findAll() {
-        return componentRepo.findAll();
+    public List<ComponentDTO> findAll() {
+        return componentRepo.findAll().stream().map(componentMapper::mapComponentToDTO).toList();
     }
 
     public void quickSave(Component component) {

@@ -130,12 +130,12 @@ function ExperimentView() {
                 })
             );
 
-            const urlMap = urls.reduce((acc, cur) => {
-                if (cur) acc[cur.id] = cur.url;
-                return acc;
-            }, {...galleryImageUrls});
-
-            setGalleryImageUrls(urlMap);
+            const newEntries = urls.filter(Boolean);
+            if (newEntries.length > 0) {
+                const urlMap = {...galleryImageUrls};
+                newEntries.forEach(cur => (urlMap[cur.id] = cur.url));
+                setGalleryImageUrls(urlMap);
+            }
         };
 
         if (galleryImages.length > 0) loadGalleryImages();
@@ -202,6 +202,8 @@ function ExperimentView() {
     if (loading) return <div className="p-6">Učitavanje...</div>;
     if (error) return <p className="text-red-500">{error}</p>;
     if (!experiment) return <div className="p-6">Nema podataka</div>;
+
+    const isPublic = experiment?.isItPublic ?? experiment?.itPublic ?? false;
 
     const EmptyValue = ({text = "N/A"}) => (
         <span className="text-gray-400 italic">{text}</span>
@@ -362,6 +364,8 @@ function ExperimentView() {
                                         <div key={i}>• {k}</div>
                                     ))
                                 ) : <EmptyValue text="Nema ključnih riječi"/>}
+                            </div>
+                            <div><b>Vidljivost: </b> {isPublic ? 'Javno' : 'Privatno'}
                             </div>
                         </CardContent>
                     </Card>

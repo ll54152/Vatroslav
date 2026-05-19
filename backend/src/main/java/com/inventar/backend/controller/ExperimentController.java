@@ -4,6 +4,7 @@ import com.inventar.backend.DTO.ExperimentAddDTO;
 import com.inventar.backend.DTO.ExperimentDTO;
 import com.inventar.backend.DTO.ExperimentEditDTO;
 import com.inventar.backend.DTO.ExperimentShowDTO;
+import com.inventar.backend.DTO.ExperimentPublicShowDTO;
 import com.inventar.backend.domain.Experiment;
 import com.inventar.backend.service.ExperimentServiceJPA;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,10 +61,12 @@ public class ExperimentController {
 
     @GetMapping("/getAll")
     public ResponseEntity<List<ExperimentDTO>> getAllExperiments() {
-        List<ExperimentDTO> experimentDTOList = experimentServiceJPA.findAll().stream()
-                .map(experiment -> new ExperimentDTO(experiment.getId(), experiment.getName(), experiment.getZpf(), experiment.getDescription(), experiment.getKeywords()))
-                .toList();
-        return new ResponseEntity<>(experimentDTOList, HttpStatus.OK);
+        return new ResponseEntity<>(experimentServiceJPA.findAll(), HttpStatus.OK);
+    }
+
+    @GetMapping("/getAllPublic")
+    public ResponseEntity<List<ExperimentDTO>> getAllPublic() {
+        return new ResponseEntity<>(experimentServiceJPA.findAllPublic(), HttpStatus.OK);
     }
 
     @GetMapping("/get/{id}")
@@ -73,6 +76,16 @@ public class ExperimentController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
             return new ResponseEntity<>(experimentServiceJPA.getShowDTO(experiment), HttpStatus.OK);
+        }
+    }
+
+    @GetMapping("/getPublic/{id}")
+    public ResponseEntity<ExperimentPublicShowDTO> getPublicExperiment(@PathVariable Long id) {
+        Experiment experiment = experimentServiceJPA.findById(id);
+        if (experiment == null || !experiment.isItPublic()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(experimentServiceJPA.getPublicShowDTO(experiment), HttpStatus.OK);
         }
     }
 

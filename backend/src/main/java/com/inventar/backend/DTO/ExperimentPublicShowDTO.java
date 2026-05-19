@@ -2,8 +2,9 @@ package com.inventar.backend.DTO;
 
 import java.util.List;
 
-public class ExperimentEditDTO {
+public class ExperimentPublicShowDTO {
 
+    private Long id;
     private String name;
     private String zpf;
     private String subject;
@@ -12,11 +13,10 @@ public class ExperimentEditDTO {
     private List<String> keywords;
     private String materials;
     private boolean isItPublic;
-    private List<Long> componentIds;
-    private List<FileDTO> fileDTOList;
-    private List<Long> existingFileIds;
+    private List<ComponentDTO> componentDTOList;
 
-    public ExperimentEditDTO(String name, String zpf, String subject, String field, String description, List<String> keywords, String materials, boolean isItPublic, List<Long> componentIds, List<FileDTO> fileDTOList, List<Long> existingFileIds) {
+    public ExperimentPublicShowDTO(Long id, String name, String zpf, String subject, String field, String description, List<String> keywords, String materials, boolean isItPublic, List<ComponentDTO> componentDTOList) {
+        this.id = id;
         this.name = name;
         this.zpf = zpf;
         this.subject = subject;
@@ -25,9 +25,18 @@ public class ExperimentEditDTO {
         this.keywords = keywords;
         this.materials = materials;
         this.isItPublic = isItPublic;
-        this.componentIds = componentIds;
-        this.fileDTOList = fileDTOList;
-        this.existingFileIds = existingFileIds;
+        this.componentDTOList = componentDTOList;
+    }
+
+    public ExperimentPublicShowDTO() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -86,35 +95,19 @@ public class ExperimentEditDTO {
         this.materials = materials;
     }
 
-    public List<Long> getComponentIds() {
-        return componentIds;
-    }
-
-    public void setComponentIds(List<Long> componentIds) {
-        this.componentIds = componentIds;
-    }
-
-    public List<FileDTO> getFileDTOList() {
-        return fileDTOList;
-    }
-
-    public void setFileDTOList(List<FileDTO> fileDTOList) {
-        this.fileDTOList = fileDTOList;
-    }
-
-    public List<Long> getExistingFileIds() {
-        return existingFileIds;
-    }
-
-    public void setExistingFileIds(List<Long> existingFileIds) {
-        this.existingFileIds = existingFileIds;
-    }
-
     public boolean isItPublic() {
         return isItPublic;
     }
 
     public void setItPublic(boolean itPublic) {
         isItPublic = itPublic;
+    }
+
+    public List<ComponentDTO> getComponentDTOList() {
+        return componentDTOList;
+    }
+
+    public void setComponentDTOList(List<ComponentDTO> componentDTOList) {
+        this.componentDTOList = componentDTOList;
     }
 }

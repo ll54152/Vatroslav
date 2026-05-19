@@ -5,6 +5,8 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import MainPage from './pages/MainPage';
 import Experiments from './pages/Experiments.jsx';
+import ExperimentsPublic from './pages/ExperimentsPublic.jsx';
+import ExperimentPublicView from './pages/ExperimentPublicView.jsx';
 import ExperimentView from './pages/ExperimentView.jsx';
 import ComponentView from './pages/ComponentView';
 import ExperimentEdit from "./pages/ExperimentEdit";
@@ -20,33 +22,39 @@ import Locations from "./pages/Locations.jsx";
 import LocationView from "./pages/LocationView.jsx";
 import Logs from "./pages/Logs.jsx";
 import Users from "./pages/Users.jsx";
+import Toolbar from './components/Toolbar';
 
 function App() {
     return (
-        <Routes>
-            <Route index element={<Home/>}/>
-            <Route path="/home" element={<Home/>}/>
-            <Route path="/login" element={<Login/>}/>
-            <Route path="/signup" element={<Signup/>}/>
-            <Route path="/mainpage" element={<MainPage/>}/>
-            <Route path="/experiments" element={<Experiments/>}/>
-            <Route path="/experiment/view/:id" element={<ExperimentView/>}/>
-            <Route path="/experiment/view-log/:id" element={<ExperimentViewLog/>}/>
-            <Route path="/experiment/edit/:id" element={<ExperimentEdit/>}/>
-            <Route path="/experiment/add" element={<ExperimentAdd/>}/>
-            <Route path="/component/view/:id" element={<ComponentView/>}/>
-            <Route path="/component/view-log/:id" element={<ComponentViewLog/>}/>
-            <Route path="/component/edit/:id" element={<ComponentEdit/>}/>
-            <Route path="/component/add" element={<ComponentAdd/>}/>
-            <Route path="/components" element={<Components/>}/>
-            <Route path="/locations" element={<Locations/>}/>
-            <Route path="/location/view/:id" element={<LocationView/>}/>
-            <Route path="/logs" element={<Logs/>}/>
-            <Route path="/users" element={<Users/>}/>
-            <Route path="/forgot-password" element={<ForgotPassword/>}/>
-            <Route path="/reset-password" element={<ResetPassword/>}/>
-            <Route path="/account" element={<AccountManagement/>}/>
-        </Routes>
+        <>
+            <Toolbar/>
+            <Routes>
+                <Route index element={<Home/>}/>
+                <Route path="/home" element={<Home/>}/>
+                <Route path="/login" element={<Login/>}/>
+                <Route path="/signup" element={<Signup/>}/>
+                <Route path="/mainpage" element={<MainPage/>}/>
+                <Route path="/experiments" element={<Experiments/>}/>
+                <Route path="/experiments/public" element={<ExperimentsPublic/>}/>
+                <Route path="/experiments/public/view/:id" element={<ExperimentPublicView/>}/>
+                <Route path="/experiment/view/:id" element={<ExperimentView/>}/>
+                <Route path="/experiment/view-log/:id" element={<ExperimentViewLog/>}/>
+                <Route path="/experiment/edit/:id" element={<ExperimentEdit/>}/>
+                <Route path="/experiment/add" element={<ExperimentAdd/>}/>
+                <Route path="/component/view/:id" element={<ComponentView/>}/>
+                <Route path="/component/view-log/:id" element={<ComponentViewLog/>}/>
+                <Route path="/component/edit/:id" element={<ComponentEdit/>}/>
+                <Route path="/component/add" element={<ComponentAdd/>}/>
+                <Route path="/components" element={<Components/>}/>
+                <Route path="/locations" element={<Locations/>}/>
+                <Route path="/location/view/:id" element={<LocationView/>}/>
+                <Route path="/logs" element={<Logs/>}/>
+                <Route path="/users" element={<Users/>}/>
+                <Route path="/forgot-password" element={<ForgotPassword/>}/>
+                <Route path="/reset-password" element={<ResetPassword/>}/>
+                <Route path="/account" element={<AccountManagement/>}/>
+            </Routes>
+        </>
     );
 }
 

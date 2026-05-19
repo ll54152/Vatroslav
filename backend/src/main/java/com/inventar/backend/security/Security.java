@@ -37,6 +37,9 @@ public class Security {
             "/auth/verify",
             "/user/forgot-password",
             "/user/reset-password",
+            "/experiment/getAllPublic",
+            "/experiment/getPublic/*",
+            "/files/publicImage/*"
     };
 
     @Bean

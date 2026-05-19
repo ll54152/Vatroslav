@@ -29,7 +29,7 @@ public class FileController {
     }
 
     @GetMapping("/download/{id}")
-    public ResponseEntity<InputStreamResource> download(@PathVariable Long id) {
+    public ResponseEntity<InputStreamResource> downloadFile(@PathVariable Long id) {
         File file = fileServiceJPA.findById(id);
 
         if (file == null) {
@@ -45,8 +45,25 @@ public class FileController {
         }
     }
 
+    @GetMapping("/publicImage/{id}")
+    public ResponseEntity<byte[]> getPublicImage(@PathVariable Long id) {
+        File file = fileServiceJPA.findById(id);
+
+        if (file == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (file.getFileCategory().equals("profileImage") || file.getFileCategory().equals("otherImage") || file.getExperiment().isItPublic()) {
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, "image/*")
+                    .body(file.getFileByte());
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @GetMapping("/image/{id}")
-    public ResponseEntity<byte[]> image(@PathVariable Long id) {
+    public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
         File file = fileServiceJPA.findById(id);
 
         if (file == null) {

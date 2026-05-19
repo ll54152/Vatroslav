@@ -56,4 +56,19 @@ public class ComponentMapper {
             return componentShowDTOList;
         }
     }
+
+    public ComponentDTO mapComponentToDTO(com.inventar.backend.domain.Component component) {
+        if (component == null) {
+            return null;
+        } else {
+            ComponentDTO componentDTO = new ComponentDTO();
+            componentDTO.setId(component.getId());
+            componentDTO.setName(component.getName());
+            componentDTO.setZpf(component.getZpf());
+            componentDTO.setDescription(component.getDescription());
+            componentDTO.setKeywords(component.getKeywords().stream().sorted().toList());
+
+            return componentDTO;
+        }
+    }
 }

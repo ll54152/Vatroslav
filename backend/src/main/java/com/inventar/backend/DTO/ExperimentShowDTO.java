@@ -12,6 +12,7 @@ public class ExperimentShowDTO {
     private String description;
     private List<String> keywords;
     private String materials;
+    private boolean isItPublic;
     private List<ComponentDTO> componentDTOList;
     private List<LogShowDTO> logShowDTOList;
     private List<FileShowDTO> fileShowDTOList;
@@ -19,7 +20,7 @@ public class ExperimentShowDTO {
     public ExperimentShowDTO() {
     }
 
-    public ExperimentShowDTO(Long id, String name, String zpf, String subject, String field, String description, List<String> keywords, String materials, List<ComponentDTO> componentDTOList, List<LogShowDTO> logShowDTOList, List<FileShowDTO> fileShowDTOList) {
+    public ExperimentShowDTO(Long id, String name, String zpf, String subject, String field, String description, List<String> keywords, String materials, boolean isItPublic, List<ComponentDTO> componentDTOList, List<LogShowDTO> logShowDTOList, List<FileShowDTO> fileShowDTOList) {
         this.id = id;
         this.name = name;
         this.zpf = zpf;
@@ -28,6 +29,7 @@ public class ExperimentShowDTO {
         this.description = description;
         this.keywords = keywords;
         this.materials = materials;
+        this.isItPublic = isItPublic;
         this.componentDTOList = componentDTOList;
         this.logShowDTOList = logShowDTOList;
         this.fileShowDTOList = fileShowDTOList;
@@ -119,5 +121,13 @@ public class ExperimentShowDTO {
 
     public void setKeywords(List<String> keywords) {
         this.keywords = keywords.stream().sorted().toList();
+    }
+
+    public boolean isItPublic() {
+        return isItPublic;
+    }
+
+    public void setItPublic(boolean itPublic) {
+        isItPublic = itPublic;
     }
 }

@@ -78,7 +78,7 @@ public class UserController {
 
         String email = authentication.getName();
         User user = userServiceJPA.findByEmail(email);
-        UserShowDTO userShowDTO = new UserShowDTO(user.getEmail(), user.getFirstName(), user.getLastName());
+        UserShowDTO userShowDTO = new UserShowDTO(user.getId(), user.getEmail(), user.getFirstName(), user.getLastName());
 
         return ResponseEntity.ok(userShowDTO);
     }

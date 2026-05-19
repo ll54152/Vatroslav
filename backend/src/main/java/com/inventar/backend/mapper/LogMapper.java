@@ -5,7 +5,6 @@ import com.inventar.backend.DTO.ExperimentDTO;
 import com.inventar.backend.DTO.LogShowAllDTO;
 import com.inventar.backend.DTO.LogShowDTO;
 import com.inventar.backend.domain.Log;
-import com.inventar.backend.service.UserServiceJPA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,11 +14,11 @@ import java.util.List;
 @Component
 public class LogMapper {
 
-    private final UserServiceJPA userServiceJPA;
+    private final UserMapper userMapper;
 
     @Autowired
-    public LogMapper(UserServiceJPA userServiceJPA) {
-        this.userServiceJPA = userServiceJPA;
+    public LogMapper(UserMapper userMapper) {
+        this.userMapper = userMapper;
     }
 
     public List<LogShowDTO> mapLogsToShowDTOs(List<Log> logList) {
@@ -34,7 +33,7 @@ public class LogMapper {
                 logShowDTO.setNote(log.getNote());
                 logShowDTO.setTimestamp(log.getTimestamp());
                 logShowDTO.setDeletable(log.isDeletable());
-                logShowDTO.setUserShowDTO(userServiceJPA.mapUserToDTO(log.getUser()));
+                logShowDTO.setUserShowDTO(userMapper.mapUserToShowDTO(log.getUser()));
 
                 logShowDTOList.add(logShowDTO);
             }
@@ -54,7 +53,7 @@ public class LogMapper {
                 logShowAllDTO.setNote(log.getNote());
                 logShowAllDTO.setTimestamp(log.getTimestamp());
                 logShowAllDTO.setDeletable(log.isDeletable());
-                logShowAllDTO.setUserShowDTO(userServiceJPA.mapUserToDTO(log.getUser()));
+                logShowAllDTO.setUserShowDTO(userMapper.mapUserToShowDTO(log.getUser()));
 
                 if (log.getComponent() != null) {
                     ComponentDTO componentDTO = new ComponentDTO();

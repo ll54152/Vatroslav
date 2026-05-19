@@ -1,12 +1,11 @@
 package com.inventar.backend.service;
 
-import com.inventar.backend.DTO.ExperimentAddDTO;
-import com.inventar.backend.DTO.ExperimentShowDTO;
-import com.inventar.backend.DTO.ExperimentEditDTO;
+import com.inventar.backend.DTO.*;
 import com.inventar.backend.domain.Component;
 import com.inventar.backend.domain.Experiment;
 import com.inventar.backend.domain.User;
 import com.inventar.backend.mapper.ComponentMapper;
+import com.inventar.backend.mapper.ExperimentMapper;
 import com.inventar.backend.mapper.LogMapper;
 import com.inventar.backend.repo.ComponentRepo;
 import com.inventar.backend.repo.ExperimentRepo;
@@ -32,9 +31,10 @@ public class ExperimentServiceJPA {
     private final LogMapper logMapper;
 
     private final FileServiceJPA fileServiceJPA;
+    private final ExperimentMapper experimentMapper;
 
     @Autowired
-    public ExperimentServiceJPA(ExperimentRepo experimentRepo, ComponentRepo componentRepo, ComponentMapper componentMapper, UserServiceJPA userServiceJPA, LogServiceJPA logServiceJPA, LogMapper logMapper, FileServiceJPA fileServiceJPA) {
+    public ExperimentServiceJPA(ExperimentRepo experimentRepo, ComponentRepo componentRepo, ComponentMapper componentMapper, UserServiceJPA userServiceJPA, LogServiceJPA logServiceJPA, LogMapper logMapper, FileServiceJPA fileServiceJPA, ExperimentMapper experimentMapper) {
         this.experimentRepo = experimentRepo;
         this.componentRepo = componentRepo;
         this.componentMapper = componentMapper;
@@ -42,6 +42,7 @@ public class ExperimentServiceJPA {
         this.logServiceJPA = logServiceJPA;
         this.logMapper = logMapper;
         this.fileServiceJPA = fileServiceJPA;
+        this.experimentMapper = experimentMapper;
     }
 
     @Transactional
@@ -116,6 +117,7 @@ public class ExperimentServiceJPA {
         experiment.setSubject(experimentEditDTO.getSubject());
         experiment.setDescription(experimentEditDTO.getDescription());
         experiment.setKeywords(experimentEditDTO.getKeywords().stream().sorted().toList());
+        experiment.setItPublic(experimentEditDTO.isItPublic());
 
         if (experimentEditDTO.getZpf() == null) {
             experiment.setZpf(null);
@@ -161,6 +163,7 @@ public class ExperimentServiceJPA {
             experimentShowDTO.setDescription(experiment.getDescription());
             experimentShowDTO.setKeywords(experiment.getKeywords().stream().sorted().toList());
             experimentShowDTO.setMaterials(experiment.getMaterials());
+            experimentShowDTO.setItPublic(experiment.isItPublic());
 
             experimentShowDTO.setComponentDTOList(componentMapper.mapComponentsToDTOs(experiment.getComponentList()));
             experimentShowDTO.setLogShowDTOList(logMapper.mapLogsToShowDTOs(experiment.getLogList()));
@@ -168,6 +171,10 @@ public class ExperimentServiceJPA {
 
             return experimentShowDTO;
         }
+    }
+
+    public ExperimentPublicShowDTO getPublicShowDTO(Experiment experiment) {
+        return experimentMapper.mapExperimentToPublicShowDTO(experiment);
     }
 
     private void linkComponentsWithExperiment(Experiment experiment, List<Component> componentList, User user) {
@@ -211,7 +218,8 @@ public class ExperimentServiceJPA {
                 experimentAddDTO.getSubject(),
                 experimentAddDTO.getDescription(),
                 experimentAddDTO.getKeywords().stream().sorted().toList(),
-                experimentAddDTO.getMaterials()
+                experimentAddDTO.getMaterials(),
+                experimentAddDTO.isItPublic()
         );
 
         if (componentList != null && !componentList.isEmpty()) {
@@ -221,11 +229,15 @@ public class ExperimentServiceJPA {
         return experiment;
     }
 
-    public List<Experiment> findAll() {
-        return experimentRepo.findAll();
+    public List<ExperimentDTO> findAll() {
+        return experimentRepo.findAll().stream().map(experimentMapper::mapExperimentToDTO).toList();
     }
 
     public Experiment findById(Long id) {
         return experimentRepo.findById(id).orElse(null);
+    }
+
+    public List<ExperimentDTO> findAllPublic() {
+        return experimentRepo.findAll().stream().filter(Experiment::isItPublic).map(experimentMapper::mapExperimentToDTO).toList();
     }
 }

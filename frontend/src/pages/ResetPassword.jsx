@@ -43,39 +43,66 @@ export default function ResetPassword() {
     if (!token) return <p>Invalid reset link.</p>;
 
     return (
-        <Card className="w-[350px]">
-            <CardHeader>
-                <CardTitle>Reset Lozinke</CardTitle>
-                <CardDescription>Unesite novu lozinku.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <form onSubmit={handleSubmit}>
-                    <div className="grid w-full items-center gap-4">
-                        <div className="flex flex-col space-y-1.5">
-                            <Label htmlFor="newPassword">Nova lozinka</Label>
-                            <Input
-                                id="newPassword"
-                                type="password"
-                                value={newPassword}
-                                onChange={(e) => setNewPassword(e.target.value)}
-                            />
+        <div className="flex h-[calc(100dvh-64px)] items-center justify-center overflow-hidden">
+            <Card className="w-full max-w-md">
+                <CardHeader>
+                    <CardTitle>Reset Lozinke</CardTitle>
+                    <CardDescription>
+                        Unesite novu lozinku.
+                    </CardDescription>
+                </CardHeader>
+
+                <CardContent>
+                    <form onSubmit={handleSubmit}>
+                        <div className="grid w-full items-center gap-4">
+                            <div className="flex flex-col space-y-1.5">
+                                <Label htmlFor="newPassword">
+                                    Nova lozinka
+                                </Label>
+
+                                <Input
+                                    id="newPassword"
+                                    type="password"
+                                    value={newPassword}
+                                    onChange={(e) =>
+                                        setNewPassword(e.target.value)
+                                    }
+                                />
+                            </div>
+
+                            <div className="flex flex-col space-y-1.5">
+                                <Label htmlFor="confirmPassword">
+                                    Potvrdite lozinku
+                                </Label>
+
+                                <Input
+                                    id="confirmPassword"
+                                    type="password"
+                                    value={confirmPassword}
+                                    onChange={(e) =>
+                                        setConfirmPassword(e.target.value)
+                                    }
+                                />
+                            </div>
                         </div>
-                        <div className="flex flex-col space-y-1.5">
-                            <Label htmlFor="confirmPassword">Potvrdi lozinku</Label>
-                            <Input
-                                id="confirmPassword"
-                                type="password"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                            />
-                        </div>
-                    </div>
-                    <CardFooter className="flex justify-between mt-4">
-                        <Button type="submit" className="bg-pink-500 text-white">Reset</Button>
-                    </CardFooter>
-                </form>
-                {message && <p className="mt-4 text-sm">{message}</p>}
-            </CardContent>
-        </Card>
+
+                        <CardFooter className="mt-6 flex justify-center px-0">
+                            <Button
+                                type="submit"
+                                className="bg-pink-500 text-white hover:bg-pink-600"
+                            >
+                                Reset
+                            </Button>
+                        </CardFooter>
+                    </form>
+
+                    {message && (
+                        <p className="mt-4 text-center text-sm">
+                            {message}
+                        </p>
+                    )}
+                </CardContent>
+            </Card>
+        </div>
     );
 }

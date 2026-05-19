@@ -289,7 +289,7 @@ function Logs() {
                                             <div>
                                                 Komponenta:{" "}
                                                 <Link
-                                                    to={`/component/${log.componentDTO.id}`}
+                                                    to={`/component/view/${log.componentDTO.id}`}
                                                     className="text-blue-500 hover:underline"
                                                 >
                                                     {log.componentDTO.name} - {" "} {log.componentDTO.zpf}
@@ -301,7 +301,7 @@ function Logs() {
                                             <div>
                                                 Eksperiment:{" "}
                                                 <Link
-                                                    to={`/experiment/${log.experimentDTO.id}`}
+                                                    to={`/experiment/view/${log.experimentDTO.id}`}
                                                     className="text-blue-500 hover:underline"
                                                 >
                                                     {log.experimentDTO.name} - {" "} {log.experimentDTO.zpf}

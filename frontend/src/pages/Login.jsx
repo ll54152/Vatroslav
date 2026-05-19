@@ -94,50 +94,69 @@ function Login() {
 
     if (!isAuthenticated) {
         return (
-            <Card className="w-full max-w-md mx-auto mt-10 p-4">
-                <CardHeader>
-                    <CardTitle>Prijava</CardTitle>
-                    <CardDescription>Prijava u bazu podataka.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <form onSubmit={handleSubmit}>
-                        <div className="grid items-center gap-4">
-                            <div className="flex flex-col space-y-1.5">
-                                <Label htmlFor="email">Email</Label>
-                                <Input
-                                    id="email"
-                                    placeholder="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
+            <div className="flex h-[calc(100dvh-64px)] items-center justify-center overflow-hidden">
+                <Card className="w-full max-w-md">
+                    <CardHeader>
+                        <CardTitle>Prijava</CardTitle>
+                        <CardDescription>
+                            Prijava u bazu podataka.
+                        </CardDescription>
+                    </CardHeader>
+
+                    <CardContent>
+                        <form onSubmit={handleSubmit}>
+                            <div className="space-y-4">
+                                <div>
+                                    <Label htmlFor="email">Email</Label>
+                                    <Input
+                                        id="email"
+                                        placeholder="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                    />
+                                </div>
+
+                                <div>
+                                    <Label htmlFor="password">Lozinka</Label>
+                                    <Input
+                                        id="password"
+                                        type="password"
+                                        placeholder="lozinka"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                    />
+                                </div>
                             </div>
-                            <div className="flex flex-col space-y-1.5">
-                                <Label htmlFor="password">Lozinka</Label>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    placeholder="lozinka"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        <CardFooter className="flex flex-col items-center gap-2">
-                            <div className="flex gap-2">
-                                <Button type="submit" className="m-5 bg-pink-500 text-white">Prijavi se</Button>
-                                <Link to="/home">
-                                    <Button className="m-5 bg-pink-500 text-white">Nazad</Button>
+
+                            <CardFooter className="mt-6 flex flex-col items-center justify-center gap-4">
+                                <div className="flex gap-4">
+                                    <Button
+                                        type="submit"
+                                        className="bg-pink-500 text-white hover:bg-pink-600"
+                                    >
+                                        Prijavi se
+                                    </Button>
+
+                                    <Link to="/home">
+                                        <Button className="bg-pink-500 text-white hover:bg-pink-600">
+                                            Nazad
+                                        </Button>
+                                    </Link>
+                                </div>
+
+                                <Link to="/forgot-password">
+                                    <Button
+                                        variant="link"
+                                        className="text-pink-500"
+                                    >
+                                        Zaboravili ste lozinku?
+                                    </Button>
                                 </Link>
-                            </div>
-                            <Link to="/forgot-password">
-                                <Button variant="link" className="m-10 bg-pink-500 text-white">
-                                    Zaboravili ste lozinku?
-                                </Button>
-                            </Link>
-                        </CardFooter>
-                    </form>
-                </CardContent>
-            </Card>
+                            </CardFooter>
+                        </form>
+                    </CardContent>
+                </Card>
+            </div>
         );
     }
 

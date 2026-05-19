@@ -122,12 +122,14 @@ function ComponentView() {
                 })
             );
 
-            const urlMap = urls.reduce((acc, cur) => {
-                if (cur) acc[cur.id] = cur.url;
-                return acc;
-            }, {...galleryImageUrls});
-
-            setGalleryImageUrls(urlMap);
+            const newEntries = urls.filter(Boolean);
+            if (newEntries.length > 0) {
+                const urlMap = {...galleryImageUrls};
+                newEntries.forEach(cur => {
+                    urlMap[cur.id] = cur.url;
+                });
+                setGalleryImageUrls(urlMap);
+            }
         };
 
         if (galleryImages.length > 0) loadGalleryImages();
@@ -352,7 +354,7 @@ function ComponentView() {
                                     ? `${component.locationDTO.address}, ${component.locationDTO.room}`
                                     : <EmptyValue text="Nema lokacije"/>}
                             </div>
-                            <div><b>Količina:</b> {component.quantity}</div>
+                            <div><b>Količina: </b>{component.quantity}</div>
                             <div><b>Ključne riječi: </b>
                                 {component.keywords?.length ? (
                                     component.keywords.map((k, i) => (
