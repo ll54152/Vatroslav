@@ -94,7 +94,9 @@ export default function Toolbar() {
             <Card className="mx-auto flex h-16 items-center justify-between px-4 md:px-6">
 
                 <div className="text-lg font-semibold text-pink-600">
-                    Vatroslav
+                    <Link className="text-lg font-semibold text-pink-600" to={isAuthenticated ? '/mainpage' : '/home'}>
+                        Vatroslav
+                    </Link>
                 </div>
 
                 <div className="hidden md:flex items-center gap-6">
