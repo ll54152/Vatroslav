@@ -19,7 +19,7 @@ export default function ForgotPassword() {
             });
 
             if (response.ok) {
-                setMessage("If account exists, a reset link has been sent to your email.");
+                setMessage("Ukoliko korisnički račun postoji, poslana Vam je poveznica za reset lozinke.");
             } else {
                 const error = await response.text();
                 setMessage(`Error: ${error}`);
@@ -31,30 +31,48 @@ export default function ForgotPassword() {
     };
 
     return (
-        <Card className="w-[350px]">
-            <CardHeader>
-                <CardTitle>Reset Lozinke</CardTitle>
-                <CardDescription>Unesite email da biste dobili link za reset lozinke.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <form onSubmit={handleSubmit}>
-                    <div className="grid w-full items-center gap-4">
-                        <div className="flex flex-col space-y-1.5">
-                            <Label htmlFor="email">Email</Label>
-                            <Input
-                                id="email"
-                                placeholder="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
+        <div className="flex h-[calc(100dvh-64px)] items-center justify-center overflow-hidden">
+            <Card className="w-full max-w-md">
+                <CardHeader>
+                    <CardTitle>Reset Lozinke</CardTitle>
+
+                    <CardDescription>
+                        Unesite email da biste dobili link za reset lozinke.
+                    </CardDescription>
+                </CardHeader>
+
+                <CardContent>
+                    <form onSubmit={handleSubmit}>
+                        <div className="grid w-full items-center gap-4">
+                            <div className="flex flex-col space-y-1.5">
+                                <Label htmlFor="email">Email</Label>
+
+                                <Input
+                                    id="email"
+                                    placeholder="Upišite vašu email adresu"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <CardFooter className="flex justify-between mt-4">
-                        <Button type="submit" className="m-10 bg-pink-500 text-white">Pošalji</Button>
-                    </CardFooter>
-                </form>
-                {message && <p className="mt-4 text-sm">{message}</p>}
-            </CardContent>
-        </Card>
+
+                        <CardFooter className="mt-6 flex justify-center px-0">
+                            <Button
+                                type="submit"
+                                className="bg-pink-500 text-white hover:bg-pink-600"
+                            >
+                                Pošalji
+                            </Button>
+                        </CardFooter>
+                    </form>
+
+                    {message && (
+                        <p className="mt-4 text-center text-sm">
+                            {message}
+                        </p>
+                    )}
+                </CardContent>
+            </Card>
+        </div>
     );
 }
