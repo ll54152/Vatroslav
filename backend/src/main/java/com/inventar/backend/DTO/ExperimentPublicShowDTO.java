@@ -14,8 +14,9 @@ public class ExperimentPublicShowDTO {
     private String materials;
     private boolean isItPublic;
     private List<ComponentDTO> componentDTOList;
+    private List<FileShowDTO> fileShowDTOList;
 
-    public ExperimentPublicShowDTO(Long id, String name, String zpf, String subject, String field, String description, List<String> keywords, String materials, boolean isItPublic, List<ComponentDTO> componentDTOList) {
+    public ExperimentPublicShowDTO(Long id, String name, String zpf, String subject, String field, String description, List<String> keywords, String materials, boolean isItPublic, List<ComponentDTO> componentDTOList, List<FileShowDTO> fileShowDTOList) {
         this.id = id;
         this.name = name;
         this.zpf = zpf;
@@ -26,6 +27,7 @@ public class ExperimentPublicShowDTO {
         this.materials = materials;
         this.isItPublic = isItPublic;
         this.componentDTOList = componentDTOList;
+        this.fileShowDTOList = fileShowDTOList;
     }
 
     public ExperimentPublicShowDTO() {
@@ -109,5 +111,13 @@ public class ExperimentPublicShowDTO {
 
     public void setComponentDTOList(List<ComponentDTO> componentDTOList) {
         this.componentDTOList = componentDTOList;
+    }
+
+    public List<FileShowDTO> getFileShowDTOList() {
+        return fileShowDTOList;
+    }
+
+    public void setFileShowDTOList(List<FileShowDTO> fileShowDTOList) {
+        this.fileShowDTOList = fileShowDTOList;
     }
 }

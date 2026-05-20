@@ -124,6 +124,8 @@ public class ExperimentMapper {
             experimentPublicShowDTO.setKeywords(experiment.getKeywords().stream().sorted().toList());
             experimentPublicShowDTO.setMaterials(experiment.getMaterials());
 
+            experimentPublicShowDTO.setFileShowDTOList(fileMapper.mapFilesToDTOs(experiment.getFileList().stream().filter(file -> file.getFileCategory().equals("profileImage") || file.getFileCategory().equals("otherImage")).toList()));
+
             experimentPublicShowDTO.setComponentDTOList(componentMapper.mapComponentsToDTOs(experiment.getComponentList()));
 
             return experimentPublicShowDTO;
