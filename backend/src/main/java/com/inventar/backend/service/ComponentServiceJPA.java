@@ -9,9 +9,6 @@ import com.inventar.backend.domain.Experiment;
 import com.inventar.backend.domain.Location;
 import com.inventar.backend.domain.User;
 import com.inventar.backend.mapper.ComponentMapper;
-import com.inventar.backend.mapper.ExperimentMapper;
-import com.inventar.backend.mapper.LocationMapper;
-import com.inventar.backend.mapper.LogMapper;
 import com.inventar.backend.repo.ComponentRepo;
 import com.inventar.backend.repo.ExperimentRepo;
 import com.inventar.backend.repo.LocationRepo;
@@ -27,31 +24,25 @@ import java.util.List;
 public class ComponentServiceJPA {
 
     private final ComponentRepo componentRepo;
+    private final ComponentMapper componentMapper;
 
     private final ExperimentRepo experimentRepo;
-    private final ExperimentMapper experimentMapper;
 
     private final UserServiceJPA userServiceJPA;
 
-    private final LocationMapper locationMapper;
     private final LocationRepo locationRepo;
 
     private final LogServiceJPA logServiceJPA;
-    private final LogMapper logMapper;
 
     private final FileServiceJPA fileServiceJPA;
-    private final ComponentMapper componentMapper;
 
     @Autowired
-    public ComponentServiceJPA(ComponentRepo componentRepo, ExperimentRepo experimentRepo, ExperimentMapper experimentMapper, UserServiceJPA userServiceJPA, LocationMapper locationMapper, LocationRepo locationRepo, LogServiceJPA logServiceJPA, LogMapper logMapper, FileServiceJPA fileServiceJPA, ComponentMapper componentMapper) {
+    public ComponentServiceJPA(ComponentRepo componentRepo, ExperimentRepo experimentRepo, UserServiceJPA userServiceJPA, LocationRepo locationRepo, LogServiceJPA logServiceJPA, FileServiceJPA fileServiceJPA, ComponentMapper componentMapper) {
         this.componentRepo = componentRepo;
         this.experimentRepo = experimentRepo;
-        this.experimentMapper = experimentMapper;
         this.userServiceJPA = userServiceJPA;
-        this.locationMapper = locationMapper;
         this.locationRepo = locationRepo;
         this.logServiceJPA = logServiceJPA;
-        this.logMapper = logMapper;
         this.fileServiceJPA = fileServiceJPA;
         this.componentMapper = componentMapper;
     }
@@ -96,6 +87,10 @@ public class ComponentServiceJPA {
         logServiceJPA.componentUpdated(component, user);
 
         componentRepo.save(component);
+    }
+
+    public ComponentShowDTO getShowDTO(Component component) {
+        return componentMapper.getShowDTO(component);
     }
 
     private void syncExperimentsWithComponent(Component component, List<Experiment> newExperiments, User user) {
@@ -196,30 +191,6 @@ public class ComponentServiceJPA {
         componentRepo.deleteById(id);
     }
 
-    public ComponentShowDTO getShowDTO(Component component) {
-        if (component == null) {
-            return null;
-        } else {
-            ComponentShowDTO componentShowDTO = new ComponentShowDTO();
-            componentShowDTO.setId(component.getId());
-            componentShowDTO.setName(component.getName());
-            componentShowDTO.setZpf(component.getZpf());
-            componentShowDTO.setFer(component.getFer());
-            componentShowDTO.setFerStatus(component.getFerStatus());
-            componentShowDTO.setDeprecatedInventoryMarks(component.getDeprecatedInventoryMarks());
-            componentShowDTO.setDescription(component.getDescription());
-            componentShowDTO.setKeywords(component.getKeywords().stream().sorted().toList());
-            componentShowDTO.setQuantity(component.getQuantity());
-
-            componentShowDTO.setLocationDTO(locationMapper.mapLocationToDTO(component.getLocation()));
-            componentShowDTO.setExperimentDTOList(experimentMapper.mapExperimentsToDTOs(component.getExperimentList()));
-            componentShowDTO.setLogShowDTOList(logMapper.mapLogsToShowDTOs(component.getLogList()));
-            componentShowDTO.setFileShowDTOList(fileServiceJPA.mapFilesToDTOs(component.getFileList()));
-
-            return componentShowDTO;
-        }
-    }
-
     private void linkExperimentsWithComponent(Component component, List<Experiment> experimentList, User user) {
         if (experimentList != null) {
             for (Experiment experiment : experimentList) {
@@ -299,6 +270,4 @@ public class ComponentServiceJPA {
     public void quickSave(Component component) {
         componentRepo.save(component);
     }
-
-
 }

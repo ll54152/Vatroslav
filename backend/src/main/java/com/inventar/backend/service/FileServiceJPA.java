@@ -1,7 +1,6 @@
 package com.inventar.backend.service;
 
 import com.inventar.backend.DTO.FileDTO;
-import com.inventar.backend.DTO.FileShowDTO;
 import com.inventar.backend.domain.Component;
 import com.inventar.backend.domain.Experiment;
 import com.inventar.backend.domain.File;
@@ -16,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -237,26 +235,4 @@ public class FileServiceJPA {
             fileRepo.deleteAll(fileList);
         }
     }
-
-    public List<FileShowDTO> mapFilesToDTOs(List<File> fileList) {
-        if (fileList == null) {
-            return List.of();
-        } else {
-            List<FileShowDTO> fileShowDTOList = new ArrayList<>();
-
-            for (File file : fileList) {
-                FileShowDTO fileShowDTO = new FileShowDTO();
-                fileShowDTO.setId(file.getId());
-                fileShowDTO.setName(file.getName());
-                fileShowDTO.setFileCategory(file.getFileCategory());
-                //fileShowDTO.setFileByte(Base64.getEncoder().encodeToString(file.getFileByte()));
-
-                fileShowDTOList.add(fileShowDTO);
-            }
-
-            return fileShowDTOList;
-        }
-    }
-
-
 }
