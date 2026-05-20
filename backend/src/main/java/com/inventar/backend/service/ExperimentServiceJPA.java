@@ -1,12 +1,14 @@
 package com.inventar.backend.service;
 
-import com.inventar.backend.DTO.*;
+import com.inventar.backend.DTO.ExperimentAddDTO;
+import com.inventar.backend.DTO.ExperimentDTO;
+import com.inventar.backend.DTO.ExperimentEditDTO;
+import com.inventar.backend.DTO.ExperimentPublicShowDTO;
+import com.inventar.backend.DTO.ExperimentShowDTO;
 import com.inventar.backend.domain.Component;
 import com.inventar.backend.domain.Experiment;
 import com.inventar.backend.domain.User;
-import com.inventar.backend.mapper.ComponentMapper;
 import com.inventar.backend.mapper.ExperimentMapper;
-import com.inventar.backend.mapper.LogMapper;
 import com.inventar.backend.repo.ComponentRepo;
 import com.inventar.backend.repo.ExperimentRepo;
 import jakarta.transaction.Transactional;
@@ -23,24 +25,20 @@ public class ExperimentServiceJPA {
     private final ExperimentRepo experimentRepo;
 
     private final ComponentRepo componentRepo;
-    private final ComponentMapper componentMapper;
 
     private final UserServiceJPA userServiceJPA;
 
     private final LogServiceJPA logServiceJPA;
-    private final LogMapper logMapper;
 
     private final FileServiceJPA fileServiceJPA;
     private final ExperimentMapper experimentMapper;
 
     @Autowired
-    public ExperimentServiceJPA(ExperimentRepo experimentRepo, ComponentRepo componentRepo, ComponentMapper componentMapper, UserServiceJPA userServiceJPA, LogServiceJPA logServiceJPA, LogMapper logMapper, FileServiceJPA fileServiceJPA, ExperimentMapper experimentMapper) {
+    public ExperimentServiceJPA(ExperimentRepo experimentRepo, ComponentRepo componentRepo, UserServiceJPA userServiceJPA, LogServiceJPA logServiceJPA, FileServiceJPA fileServiceJPA, ExperimentMapper experimentMapper) {
         this.experimentRepo = experimentRepo;
         this.componentRepo = componentRepo;
-        this.componentMapper = componentMapper;
         this.userServiceJPA = userServiceJPA;
         this.logServiceJPA = logServiceJPA;
-        this.logMapper = logMapper;
         this.fileServiceJPA = fileServiceJPA;
         this.experimentMapper = experimentMapper;
     }
@@ -81,6 +79,10 @@ public class ExperimentServiceJPA {
         logServiceJPA.experimentUpdated(experiment, user);
 
         experimentRepo.save(experiment);
+    }
+
+    public ExperimentShowDTO getShowDTO(Experiment experiment) {
+        return experimentMapper.getShowDTO(experiment);
     }
 
     private void syncComponentsWithExperiment(Experiment experiment, List<Component> newComponents, User user) {
@@ -150,28 +152,6 @@ public class ExperimentServiceJPA {
         experimentRepo.deleteById(id);
     }
 
-    public ExperimentShowDTO getShowDTO(Experiment experiment) {
-        if (experiment == null) {
-            return null;
-        } else {
-            ExperimentShowDTO experimentShowDTO = new ExperimentShowDTO();
-            experimentShowDTO.setId(experiment.getId());
-            experimentShowDTO.setName(experiment.getName());
-            experimentShowDTO.setZpf(experiment.getZpf());
-            experimentShowDTO.setField(experiment.getField());
-            experimentShowDTO.setSubject(experiment.getSubject());
-            experimentShowDTO.setDescription(experiment.getDescription());
-            experimentShowDTO.setKeywords(experiment.getKeywords().stream().sorted().toList());
-            experimentShowDTO.setMaterials(experiment.getMaterials());
-            experimentShowDTO.setItPublic(experiment.isItPublic());
-
-            experimentShowDTO.setComponentDTOList(componentMapper.mapComponentsToDTOs(experiment.getComponentList()));
-            experimentShowDTO.setLogShowDTOList(logMapper.mapLogsToShowDTOs(experiment.getLogList()));
-            experimentShowDTO.setFileShowDTOList(fileServiceJPA.mapFilesToDTOs(experiment.getFileList()));
-
-            return experimentShowDTO;
-        }
-    }
 
     public ExperimentPublicShowDTO getPublicShowDTO(Experiment experiment) {
         return experimentMapper.mapExperimentToPublicShowDTO(experiment);

@@ -14,10 +14,37 @@ import java.util.List;
 public class ExperimentMapper {
 
     private final ComponentMapper componentMapper;
+    private final LogMapper logMapper;
+    private final FileMapper fileMapper;
 
     @Autowired
-    public ExperimentMapper(ComponentMapper componentMapper) {
+    public ExperimentMapper(ComponentMapper componentMapper, LogMapper logMapper, FileMapper fileMapper) {
         this.componentMapper = componentMapper;
+        this.logMapper = logMapper;
+        this.fileMapper = fileMapper;
+    }
+
+    public ExperimentShowDTO getShowDTO(Experiment experiment) {
+        if (experiment == null) {
+            return null;
+        } else {
+            ExperimentShowDTO experimentShowDTO = new ExperimentShowDTO();
+            experimentShowDTO.setId(experiment.getId());
+            experimentShowDTO.setName(experiment.getName());
+            experimentShowDTO.setZpf(experiment.getZpf());
+            experimentShowDTO.setField(experiment.getField());
+            experimentShowDTO.setSubject(experiment.getSubject());
+            experimentShowDTO.setDescription(experiment.getDescription());
+            experimentShowDTO.setKeywords(experiment.getKeywords().stream().sorted().toList());
+            experimentShowDTO.setMaterials(experiment.getMaterials());
+            experimentShowDTO.setItPublic(experiment.isItPublic());
+
+            experimentShowDTO.setComponentDTOList(componentMapper.mapComponentsToDTOs(experiment.getComponentList()));
+            experimentShowDTO.setLogShowDTOList(logMapper.mapLogsToShowDTOs(experiment.getLogList()));
+            experimentShowDTO.setFileShowDTOList(fileMapper.mapFilesToDTOs(experiment.getFileList()));
+
+            return experimentShowDTO;
+        }
     }
 
     public ExperimentDTO mapExperimentToDTO(Experiment experiment) {
