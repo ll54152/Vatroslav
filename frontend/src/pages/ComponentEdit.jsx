@@ -539,7 +539,9 @@ function ComponentEdit() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="CATALOGED">Na inventaru</SelectItem>
-                                    <SelectItem value="UNCATALOGED">Deinvetarizirano</SelectItem>
+                                    <SelectItem value="NOT_CATALOGED">Nije na inventaru</SelectItem>
+                                    <SelectItem value="UNCATALOGED">Deinvetarizirano (Nekad bilo u
+                                        inventaru)</SelectItem>
                                     <SelectItem value="UNKNOWN">Nepoznato</SelectItem>
                                 </SelectContent>
                             </Select>

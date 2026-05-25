@@ -379,9 +379,10 @@ function ComponentView() {
                                 <b>Status FER inventarne oznake: </b>
                                 {component.ferStatus ? (
                                     component.ferStatus === "CATALOGED" ? "Na inventaru" :
-                                        component.ferStatus === "UNCATALOGED" ? "Deinvetarizirano" :
-                                            component.ferStatus === "UNKNOWN" ? "Nepoznato" :
-                                                component.code
+                                        component.ferStatus === "NOT_CATALOGED" ? "Nije na inventaru" :
+                                            component.ferStatus === "UNCATALOGED" ? "Deinvetarizirano (Nekad bilo u inventaru)" :
+                                                component.ferStatus === "UNKNOWN" ? "Nepoznato" :
+                                                    component.code
                                 ) : (
                                     <EmptyValue text="Nema statusa FER inventarne oznake"/>
                                 )}
