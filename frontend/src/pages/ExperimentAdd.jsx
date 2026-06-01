@@ -107,13 +107,20 @@ function ExperimentAdd() {
                 alert("Novi eksperiment dodan");
                 navigate(`/experiment/view/${newExperimentId}`);
             } else {
-                const text = await response.text();
-                alert(`Greška: ${text}`);
+                try {
+                    const errorData = await response.json();
+                    const errorMsg = errorData.message || "Došlo je do greške";
+                    const errorDetails = errorData.details ? ` - ${errorData.details}` : "";
+                    alert(`Greška: ${errorMsg}${errorDetails}`);
+                } catch (jsonErr) {
+                    const text = await response.text();
+                    alert(`Greška: ${text}`);
+                }
             }
 
         } catch (error) {
             console.error(error);
-            alert("Došlo je do greške.");
+            alert("Došlo je do greške pri slanju podataka: " + error.message);
         }
     };
 

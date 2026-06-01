@@ -337,7 +337,8 @@ function ComponentView() {
                 )}
 
                 <h1 className="text-3xl font-bold mt-4">{component.name}</h1>
-                <p className="text-gray-500">{component.zpf}</p>
+                <p className="text-gray-500">{component.zpf || <EmptyValue text="Nema ZPF inventarne oznake"/>}</p>
+
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

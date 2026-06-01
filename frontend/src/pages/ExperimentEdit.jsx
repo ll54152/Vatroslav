@@ -300,20 +300,32 @@ function ExperimentEdit() {
         newOtherImages.forEach(f => formData.append("otherImages", f));
         newDocuments.forEach(f => formData.append("files", f));
 
-        const res = await fetch(`/vatroslav/api/experiment/edit/${id}`, {
-            method: "PUT",
-            headers: {
-                Authorization: `${token}`,
-            },
-            body: formData,
-        });
+        try {
+            const res = await fetch(`/vatroslav/api/experiment/edit/${id}`, {
+                method: "PUT",
+                headers: {
+                    Authorization: `${token}`,
+                },
+                body: formData,
+            });
 
-        if (res.ok) {
-            alert("Eksperiment ažuriran");
-            navigate(`/experiment/view/${id}`);
-
-        } else {
-            alert(await res.text());
+            if (res.ok) {
+                alert("Eksperiment ažuriran");
+                navigate(`/experiment/view/${id}`);
+            } else {
+                try {
+                    const errorData = await res.json();
+                    const errorMsg = errorData.message || "Greška pri ažuriranju eksperimenta";
+                    const errorDetails = errorData.details ? ` - ${errorData.details}` : "";
+                    alert(`Greška: ${errorMsg}${errorDetails}`);
+                } catch (jsonErr) {
+                    const errorMessage = await res.text();
+                    alert(`Greška: ${errorMessage}`);
+                }
+            }
+        } catch (error) {
+            console.error("Error updating experiment:", error);
+            alert("Došlo je do greške pri slanju podataka: " + error.message);
         }
     };
 

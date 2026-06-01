@@ -3,6 +3,7 @@ package com.inventar.backend.controller;
 import com.inventar.backend.DTO.LogAddDTO;
 import com.inventar.backend.DTO.LogShowAllDTO;
 import com.inventar.backend.DTO.LogShowDTO;
+import com.inventar.backend.DTO.ErrorResponseDTO;
 import com.inventar.backend.service.LogServiceJPA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,18 +30,42 @@ public class LogController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteLog(@PathVariable Long id) {
+    public ResponseEntity<Object> deleteLog(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), "Nevažeći ID", "ID loga mora biti pozitivan broj"),
+                    HttpStatus.BAD_REQUEST);
+        }
+
         if (logServiceJPA.deleteById(id)) {
-            return new ResponseEntity<>("Log obrisan uspešno", HttpStatus.OK);
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.OK.value(), "Uspješno obrisano", "Log obrisan uspješno"),
+                    HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("Greška prilikom brisanja loga", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.NOT_FOUND.value(), "Log nije pronađen", "Log sa ID: " + id + " ne postoji ili nije moguće obrisati"),
+                    HttpStatus.NOT_FOUND);
         }
     }
 
     @PostMapping("/add")
-    public ResponseEntity<String> addLog(@RequestBody LogAddDTO logAddDTO) {
-        logServiceJPA.save(logAddDTO);
-        return new ResponseEntity<>("Log dodat uspešno", HttpStatus.CREATED);
+    public ResponseEntity<Object> addLog(@RequestBody LogAddDTO logAddDTO) {
+        if (logAddDTO == null || logAddDTO.getNote() == null || logAddDTO.getNote().isEmpty()) {
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), "Nevažeći zahtjev", "Napomena je obavezna"),
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            logServiceJPA.save(logAddDTO);
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.CREATED.value(), "Uspješno kreirano", "Log je uspješno dodat"),
+                    HttpStatus.CREATED);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), "Greška pri dodavanju loga", ex.getMessage()),
+                    HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/getAll")
@@ -50,12 +75,20 @@ public class LogController {
     }
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<LogShowDTO> getLog(@PathVariable Long id) {
+    public ResponseEntity<Object> getLog(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), "Nevažeći ID", "ID loga mora biti pozitivan broj"),
+                    HttpStatus.BAD_REQUEST);
+        }
+
         LogShowDTO log = logServiceJPA.findById(id);
         if (log != null) {
             return new ResponseEntity<>(log, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.NOT_FOUND.value(), "Log nije pronađen", "Log sa ID: " + id + " ne postoji"),
+                    HttpStatus.NOT_FOUND);
         }
     }
 }

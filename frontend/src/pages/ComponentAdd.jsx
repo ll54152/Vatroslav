@@ -172,8 +172,15 @@ function ComponentAdd() {
                 alert("Nova komponenta je dodana");
                 navigate(`/component/view/${newComponentId}`);
             } else {
-                const errorMessage = await response.text();
-                alert(`Greška: ${errorMessage}`);
+                try {
+                    const errorData = await response.json();
+                    const errorMsg = errorData.message || "Došlo je do greške";
+                    const errorDetails = errorData.details ? ` - ${errorData.details}` : "";
+                    alert(`Greška: ${errorMsg}${errorDetails}`);
+                } catch (jsonErr) {
+                    const errorMessage = await response.text();
+                    alert(`Greška: ${errorMessage}`);
+                }
             }
         } catch (error) {
             console.error("Error saving component:", error);
@@ -200,29 +207,27 @@ function ComponentAdd() {
                 body: JSON.stringify(newLocation),
             });
 
-            const textResponse = await response.text();
-            console.log("Response text:", textResponse);
-
-            let data;
-            try {
-                data = JSON.parse(textResponse);
-                console.log("Parsed response data:", data);
-            } catch (jsonError) {
-                console.error("Failed to parse response as JSON:", jsonError);
-            }
-
             if (response.ok) {
+                const data = await response.json();
                 alert("Nova lokacija je dodana");
                 setLocations([...locations, data]);
                 setNewLocationAddress("");
                 setNewLocationRoom("");
                 setShowAddLocation(false);
             } else {
-                alert(`Greška: ${textResponse}`);
+                try {
+                    const errorData = await response.json();
+                    const errorMsg = errorData.message || "Greška pri dodavanju lokacije";
+                    const errorDetails = errorData.details ? ` - ${errorData.details}` : "";
+                    alert(`Greška: ${errorMsg}${errorDetails}`);
+                } catch (jsonErr) {
+                    const errorMessage = await response.text();
+                    alert(`Greška: ${errorMessage}`);
+                }
             }
         } catch (error) {
             console.error("Error adding location:", error);
-            alert("Došlo je do greške prilikom dodavanja lokacije.");
+            alert("Došlo je do greške prilikom dodavanja lokacije: " + error.message);
         }
     };
 

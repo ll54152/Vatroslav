@@ -1,5 +1,6 @@
 package com.inventar.backend.controller;
 
+import com.inventar.backend.DTO.ErrorResponseDTO;
 import com.inventar.backend.service.AuthenticationServiceJPA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,13 +22,21 @@ public class AuthenticationController {
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<Void> verifyToken(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<Object> verifyToken(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || authHeader.isEmpty()) {
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), "Nevažeći zahtjev", "Authorization header je obavezan"),
+                    HttpStatus.BAD_REQUEST);
+        }
+
         boolean isValid = authenticationServiceJPA.verifyToken(authHeader);
 
         if (isValid) {
             return ResponseEntity.ok().build();
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.UNAUTHORIZED.value(), "Nevalidan token", "Priloženi token je istekao ili nije validan"),
+                    HttpStatus.UNAUTHORIZED);
         }
     }
 }

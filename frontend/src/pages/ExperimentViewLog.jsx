@@ -178,7 +178,7 @@ function ExperimentViewLog() {
 
                 <h1 className="text-3xl font-bold mt-4">{experiment.name}</h1>
                 <p className="text-gray-500">
-                    {experiment.zpf}
+                    {experiment.zpf || <EmptyValue text="Nema ZPF oznake"/>}
                 </p>
             </div>
 

@@ -10,7 +10,7 @@ public class ComponentEditDTO {
     private String fer;
     private FerStatus ferStatus;
     private List<String> deprecatedInventoryMarks;
-    private int quantity;
+    private Integer quantity;
     private Long locationID;
     private String description;
     private List<String> keywords;
@@ -19,7 +19,7 @@ public class ComponentEditDTO {
     private List<FileDTO> fileDTOList;
     private List<Long> existingFileIds;
 
-    public ComponentEditDTO(String name, String zpf, String fer, FerStatus ferStatus, List<String> deprecatedInventoryMarks, int quantity, Long locationID, String description, List<String> keywords, String log, List<Long> experimentIds, List<FileDTO> fileDTOList, List<Long> existingFileIds) {
+    public ComponentEditDTO(String name, String zpf, String fer, FerStatus ferStatus, List<String> deprecatedInventoryMarks, Integer quantity, Long locationID, String description, List<String> keywords, String log, List<Long> experimentIds, List<FileDTO> fileDTOList, List<Long> existingFileIds) {
         this.name = name;
         this.zpf = zpf;
         this.fer = fer;
@@ -75,11 +75,11 @@ public class ComponentEditDTO {
         this.deprecatedInventoryMarks = deprecatedInventoryMarks;
     }
 
-    public int getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 

@@ -3,8 +3,7 @@ package com.inventar.backend.controller;
 import com.inventar.backend.DTO.ExperimentAddDTO;
 import com.inventar.backend.DTO.ExperimentDTO;
 import com.inventar.backend.DTO.ExperimentEditDTO;
-import com.inventar.backend.DTO.ExperimentShowDTO;
-import com.inventar.backend.DTO.ExperimentPublicShowDTO;
+import com.inventar.backend.DTO.ErrorResponseDTO;
 import com.inventar.backend.domain.Experiment;
 import com.inventar.backend.service.ExperimentServiceJPA;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,20 +69,36 @@ public class ExperimentController {
     }
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<ExperimentShowDTO> getExperiment(@PathVariable Long id) {
+    public ResponseEntity<Object> getExperiment(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), "Nevažeći ID", "ID eksperimenta mora biti pozitivan broj"),
+                    HttpStatus.BAD_REQUEST);
+        }
+
         Experiment experiment = experimentServiceJPA.findById(id);
         if (experiment == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.NOT_FOUND.value(), "Eksperiment nije pronađen", "Eksperiment sa ID: " + id + " ne postoji"),
+                    HttpStatus.NOT_FOUND);
         } else {
             return new ResponseEntity<>(experimentServiceJPA.getShowDTO(experiment), HttpStatus.OK);
         }
     }
 
     @GetMapping("/getPublic/{id}")
-    public ResponseEntity<ExperimentPublicShowDTO> getPublicExperiment(@PathVariable Long id) {
+    public ResponseEntity<Object> getPublicExperiment(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), "Nevažeći ID", "ID eksperimenta mora biti pozitivan broj"),
+                    HttpStatus.BAD_REQUEST);
+        }
+
         Experiment experiment = experimentServiceJPA.findById(id);
         if (experiment == null || !experiment.isItPublic()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.NOT_FOUND.value(), "Eksperiment nije pronađen", "Eksperiment sa ID: " + id + " ne postoji ili nije javno dostupan"),
+                    HttpStatus.NOT_FOUND);
         } else {
             return new ResponseEntity<>(experimentServiceJPA.getPublicShowDTO(experiment), HttpStatus.OK);
         }
@@ -91,13 +106,23 @@ public class ExperimentController {
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteExperiment(@PathVariable Long id) {
+    public ResponseEntity<Object> deleteExperiment(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), "Nevažeći ID", "ID eksperimenta mora biti pozitivan broj"),
+                    HttpStatus.BAD_REQUEST);
+        }
+
         Experiment experiment = experimentServiceJPA.findById(id);
         if (experiment != null) {
             experimentServiceJPA.deleteById(id);
-            return new ResponseEntity<>("Eksperiment obrisan uspješno", HttpStatus.OK);
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.OK.value(), "Uspješno obrisano", "Eksperiment obrisan uspješno"),
+                    HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("Eksperiment nije pronađen", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.NOT_FOUND.value(), "Eksperiment nije pronađen", "Eksperiment sa ID: " + id + " ne postoji"),
+                    HttpStatus.NOT_FOUND);
         }
     }
 }

@@ -2,6 +2,7 @@ package com.inventar.backend.controller;
 
 import com.inventar.backend.DTO.UserShowDTO;
 import com.inventar.backend.DTO.UserUpdateDTO;
+import com.inventar.backend.DTO.ErrorResponseDTO;
 import com.inventar.backend.domain.User;
 import com.inventar.backend.service.UserServiceJPA;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,45 +32,79 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody User user) {
+    public ResponseEntity<Object> loginUser(@RequestBody User user) {
+        if (user == null || user.getEmail() == null || user.getPassword() == null) {
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), "Nevažeći zahtjev", "Email i lozinka su obavezni"),
+                    HttpStatus.BAD_REQUEST);
+        }
+
         User oldUser = userServiceJPA.findByEmail(user.getEmail());
         if (oldUser == null) {
-            return new ResponseEntity<>("Pogrešni podatci", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.UNAUTHORIZED.value(), "Neispravni podaci", "Email ili lozinka su pogrešni"),
+                    HttpStatus.UNAUTHORIZED);
         } else {
             user.setRole(oldUser.getRole());
             String token = userServiceJPA.verifyLogin(user);
             if (token != null) {
                 return new ResponseEntity<>("Bearer" + token, HttpStatus.OK);
             }
-            return new ResponseEntity<>("Pogrešni podatci", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.UNAUTHORIZED.value(), "Neispravni podaci", "Email ili lozinka su pogrešni"),
+                    HttpStatus.UNAUTHORIZED);
         }
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody User user) {
+    public ResponseEntity<Object> registerUser(@RequestBody User user) {
+        if (user == null || user.getEmail() == null || user.getPassword() == null) {
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), "Nevažeći zahtjev", "Email i lozinka su obavezni"),
+                    HttpStatus.BAD_REQUEST);
+        }
+
         User oldUser = userServiceJPA.findByEmail(user.getEmail());
         if (oldUser != null) {
-            return new ResponseEntity<>("Korisnik već postoji!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), "Korisnik već postoji", "Korisnik s ovim emailom je već registriran"),
+                    HttpStatus.BAD_REQUEST);
         }
 
         if (userServiceJPA.register(user)) {
-            return new ResponseEntity<>("Korisnik ažuriran uspješno!", HttpStatus.CREATED);
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.CREATED.value(), "Uspješno registovan", "Korisnik je uspješno registriran"),
+                    HttpStatus.CREATED);
         } else {
-            return new ResponseEntity<>("Neuspjelo ažuriranje korisnika!", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Greška pri registraciji", "Došlo je do greške pri registraciji korisnika"),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("/updateUser")
-    public ResponseEntity<String> updateUser(@RequestBody UserUpdateDTO userUpdateDTO) {
+    public ResponseEntity<Object> updateUser(@RequestBody UserUpdateDTO userUpdateDTO) {
+        if (userUpdateDTO == null || userUpdateDTO.getOldPassword() == null) {
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), "Nevažeći zahtjev", "Stara lozinka je obavezna"),
+                    HttpStatus.BAD_REQUEST);
+        }
+
         if (!userServiceJPA.doesUserExists()) {
-            return new ResponseEntity<>("Korisnik ne postoji!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.NOT_FOUND.value(), "Korisnik nije pronađen", "Korisnik ne postoji"),
+                    HttpStatus.NOT_FOUND);
         }
 
         if (userServiceJPA.updateUser(userUpdateDTO)) {
-            return new ResponseEntity<>("Korisnik ažuriran uspješno!", HttpStatus.OK);
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.OK.value(), "Uspješno ažurirano", "Podaci korisnika su uspješno ažurirani"),
+                    HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("Greška prilikom ažuriranja korisnika!", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), "Greška pri ažuriranju", "Stara lozinka je pogrešna ili došlo je do greške"),
+                    HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -112,16 +147,26 @@ public class UserController {
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(
+    public ResponseEntity<Object> resetPassword(
             @RequestParam String token,
             @RequestParam String newPassword) {
+
+        if (token == null || token.isEmpty() || newPassword == null || newPassword.isEmpty()) {
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), "Nevažeći zahtjev", "Token i nova lozinka su obavezni"),
+                    HttpStatus.BAD_REQUEST);
+        }
 
         boolean success = userServiceJPA.resetPassword(token, newPassword);
 
         if (success) {
-            return ResponseEntity.ok("Password updated successfully.");
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.OK.value(), "Uspješno", "Lozinka je uspješno ažurirana"),
+                    HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("Invalid or expired token.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), "Nevažeći ili istekao token", "Token je istekao ili je nevažeći"),
+                    HttpStatus.BAD_REQUEST);
         }
     }
 }

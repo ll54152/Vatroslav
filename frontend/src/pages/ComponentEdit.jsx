@@ -318,20 +318,32 @@ function ComponentEdit() {
         newOtherImages.forEach(f => formData.append("otherImages", f));
         newDocuments.forEach(f => formData.append("files", f));
 
-        const res = await fetch(`/vatroslav/api/component/edit/${id}`, {
-            method: "PUT",
-            headers: {
-                Authorization: `${token}`,
-            },
-            body: formData,
-        });
+        try {
+            const res = await fetch(`/vatroslav/api/component/edit/${id}`, {
+                method: "PUT",
+                headers: {
+                    Authorization: `${token}`,
+                },
+                body: formData,
+            });
 
-        if (res.ok) {
-            alert("Komponenta ažurirana");
-            navigate(`/component/view/${id}`);
-
-        } else {
-            alert(await res.text());
+            if (res.ok) {
+                alert("Komponenta ažurirana");
+                navigate(`/component/view/${id}`);
+            } else {
+                try {
+                    const errorData = await res.json();
+                    const errorMsg = errorData.message || "Greška pri ažuriranju komponente";
+                    const errorDetails = errorData.details ? ` - ${errorData.details}` : "";
+                    alert(`Greška: ${errorMsg}${errorDetails}`);
+                } catch (jsonErr) {
+                    const errorMessage = await res.text();
+                    alert(`Greška: ${errorMessage}`);
+                }
+            }
+        } catch (error) {
+            console.error("Error updating component:", error);
+            alert("Došlo je do greške pri slanju podataka: " + error.message);
         }
     };
 
@@ -417,11 +429,19 @@ function ComponentEdit() {
                     setLocation("");
                 }
             } else {
-                const err = await response.text();
-                alert(`Greška: ${err}`);
+                try {
+                    const errorData = await response.json();
+                    const errorMsg = errorData.message || "Greška pri brisanju lokacije";
+                    const errorDetails = errorData.details ? ` - ${errorData.details}` : "";
+                    alert(`Greška: ${errorMsg}${errorDetails}`);
+                } catch (jsonErr) {
+                    const err = await response.text();
+                    alert(`Greška: ${err}`);
+                }
             }
         } catch (e) {
             console.error(e);
+            alert("Došlo je do greške pri brisanju lokacije: " + e.message);
         }
     };
 
@@ -451,29 +471,27 @@ function ComponentEdit() {
                 body: JSON.stringify(newLocation),
             });
 
-            const textResponse = await response.text();
-            console.log("Response text:", textResponse);
-
-            let data;
-            try {
-                data = JSON.parse(textResponse);
-                console.log("Parsed response data:", data);
-            } catch (jsonError) {
-                console.error("Failed to parse response as JSON:", jsonError);
-            }
-
             if (response.ok) {
+                const data = await response.json();
                 alert("Nova lokacija je dodana");
                 setLocations([...locations, data]);
                 setNewLocationAddress("");
                 setNewLocationRoom("");
                 setShowAddLocation(false);
             } else {
-                alert(`Greška: ${textResponse}`);
+                try {
+                    const errorData = await response.json();
+                    const errorMsg = errorData.message || "Greška pri dodavanju lokacije";
+                    const errorDetails = errorData.details ? ` - ${errorData.details}` : "";
+                    alert(`Greška: ${errorMsg}${errorDetails}`);
+                } catch (jsonErr) {
+                    const errorMessage = await response.text();
+                    alert(`Greška: ${errorMessage}`);
+                }
             }
         } catch (error) {
             console.error("Error adding location:", error);
-            alert("Došlo je do greške prilikom dodavanja lokacije.");
+            alert("Došlo je do greške prilikom dodavanja lokacije: " + error.message);
         }
     };
 

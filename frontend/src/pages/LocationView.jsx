@@ -9,21 +9,57 @@ export default function LocationView() {
     const [components, setComponents] = useState([]);
     const [expandedIds, setExpandedIds] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const load = async () => {
-            const token = localStorage.getItem("jwt");
+            setLoading(true);
+            setError(null);
 
-            const locRes = await fetch(`/vatroslav/api/location/get/${id}`, {
-                headers: {Authorization: token},
-            });
+            try {
+                const token = localStorage.getItem("jwt");
 
-            const compRes = await fetch(`/vatroslav/api/component/getByLocationID/${id}`, {
-                headers: {Authorization: token},
-            });
+                const locRes = await fetch(`/vatroslav/api/location/get/${id}`, {
+                    headers: {Authorization: token},
+                });
 
-            setLocation(await locRes.json());
-            setComponents(await compRes.json());
+                if (!locRes.ok) {
+                    const errorData = await locRes.json();
+                    setError({
+                        status: locRes.status,
+                        message: errorData.message || "Nije moguće učitati lokaciju",
+                        details: errorData.details
+                    });
+                    setLocation(null);
+                    setLoading(false);
+                    return;
+                }
+
+                const locationData = await locRes.json();
+                setLocation(locationData);
+
+                const compRes = await fetch(`/vatroslav/api/component/getByLocationID/${id}`, {
+                    headers: {Authorization: token},
+                });
+
+                if (compRes.ok) {
+                    const componentsData = await compRes.json();
+                    setComponents(Array.isArray(componentsData) ? componentsData : []);
+                } else {
+                    console.warn("Nije moguće učitati komponente:", compRes.status);
+                    setComponents([]);
+                }
+            } catch (err) {
+                setError({
+                    status: "error",
+                    message: "Greška pri komunikaciji sa serverom",
+                    details: err.message
+                });
+                setLocation(null);
+            } finally {
+                setLoading(false);
+            }
         };
 
         load();
@@ -96,7 +132,46 @@ export default function LocationView() {
         c.keywords?.some(k => k.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
-    if (!location) return <div className="p-6">Učitavanje...</div>;
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="text-xl text-gray-600">Učitavanje lokacije...</div>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen flex items-center justify-center p-4">
+                <div className="bg-red-50 border-l-4 border-red-500 p-6 max-w-md w-full rounded">
+                    <h2 className="text-xl font-bold text-red-800 mb-2">
+                        {error.message}
+                    </h2>
+                    {error.details && (
+                        <p className="text-red-700 text-sm mb-4">{error.details}</p>
+                    )}
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                    >
+                        Nazad
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    if (!location) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="text-xl text-gray-600">Lokacija nije pronađena</div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen flex flex-col">
