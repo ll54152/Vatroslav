@@ -142,4 +142,22 @@ dist-ssr
 # Project exclude paths
 /backend/target/
 
-backend/src/main/resources/application.properties
+# Environment and Secrets
+.env
+.env.local
+.env*.local
+.env.production.local
+.env.development.local
+.env.test.local
+*.pem
+*.key
+*.keystore
+*.jks
+*.p12
+
+# IDE Secrets
+.idea/sonarlint/
+.idea/codeStyles/
+
+# Logs and temp files
+*.log*
