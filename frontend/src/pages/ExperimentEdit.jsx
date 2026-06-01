@@ -696,14 +696,22 @@ function ExperimentEdit() {
 
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
                             <CardTitle>Vidljivost</CardTitle>
-                            <input
-                                id="isItPublic_edit"
-                                type="checkbox"
-                                checked={isItPublic}
-                                onChange={(e) => setIsItPublic(e.target.checked)}
-                            />
-                            <label htmlFor="isItPublic_edit" className="text-sm">Javno (Eksperiment vidljiv ne
-                                prijavljenim korisnicima)</label>
+                            <Select
+                                value={String(isItPublic)}
+                                onValueChange={(value) => setIsItPublic(value === "true")}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Odaberite vidljivost eksperimenta"/>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="true">
+                                        Javno (Eksperiment vidljiv ne prijavljenim korisnicima)
+                                    </SelectItem>
+                                    <SelectItem value="false">
+                                        Privatno
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
                         </Card>
                     </div>
                 </form>

@@ -6,6 +6,7 @@ import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Button} from "@/components/ui/button";
 import {Textarea} from "@/components/ui/textarea.jsx";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.jsx";
 
 function ExperimentAdd() {
     const [components, setComponents] = useState([]);
@@ -316,14 +317,22 @@ function ExperimentAdd() {
 
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
                             <CardTitle>Vidljivost</CardTitle>
-                            <input
-                                id="isItPublic"
-                                type="checkbox"
-                                checked={isItPublic}
-                                onChange={(e) => setIsItPublic(e.target.checked)}
-                            />
-                            <label htmlFor="isItPublic" className="text-sm">Javno (Eksperiment vidljiv ne prijavljenim
-                                korisnicima)</label>
+                            <Select
+                                value={String(isItPublic)}
+                                onValueChange={(value) => setIsItPublic(value === "true")}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Odaberite vidljivost eksperimenta"/>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="true">
+                                        Javno (Eksperiment vidljiv ne prijavljenim korisnicima)
+                                    </SelectItem>
+                                    <SelectItem value="false">
+                                        Privatno
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
                         </Card>
                     </div>
 
