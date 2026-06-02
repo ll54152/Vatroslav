@@ -5,19 +5,23 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import {useNavigate} from "react-router-dom";
-import React, {useState, useEffect} from "react";
+import {Link, useNavigate} from "react-router-dom";
+import React, {useState, useEffect, useRef} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {Textarea} from "@/components/ui/textarea";
+import {ScrollArea} from "@/components/ui/scroll-area.jsx";
+
+const DEBOUNCE_DELAY = 300;
+
 
 function ComponentAdd() {
     const [componentName, setComponentName] = useState();
     const [internalCode, setInternalCode] = useState();
     const [location, setLocation] = useState();
     const [experiments, setExperiments] = useState([]);
-    const [experimentSearchQuery, setExperimentSearchQuery] = useState();
+    const [experimentSearchQuery, setExperimentSearchQuery] = useState("");
     const [experimentSearchResults, setExperimentSearchResults] = useState([]);
     const [selectedExperiments, setSelectedExperiments] = useState([]);
     const [keywords, setKeywords] = useState();
@@ -37,6 +41,9 @@ function ComponentAdd() {
     const [validationMessage, setValidationMessage] = useState();
     const navigate = useNavigate();
     const [optionalNumbers, setOptionalNumbers] = useState("");
+
+    const [isSearching, setIsSearching] = useState(false);
+    const searchDebounceTimer = useRef(null);
 
 
     useEffect(() => {
@@ -111,6 +118,40 @@ function ComponentAdd() {
             console.error(e);
         }
     };
+
+    useEffect(() => {
+        if (searchDebounceTimer.current) {
+            clearTimeout(searchDebounceTimer.current);
+        }
+
+        if (!experimentSearchQuery.trim()) {
+            setExperimentSearchResults([]);
+            setIsSearching(false);
+            return;
+        }
+
+        setIsSearching(true);
+
+        searchDebounceTimer.current = setTimeout(() => {
+            const query = experimentSearchQuery.toLowerCase();
+            const filtered = experiments
+                .filter((comp) =>
+                    comp.name.toLowerCase().includes(query) ||
+                    comp.zpf?.toLowerCase().includes(query) ||
+                    comp.description?.toLowerCase().includes(query)
+                )
+
+            setExperimentSearchResults(filtered);
+            setIsSearching(false);
+
+        }, DEBOUNCE_DELAY);
+
+        return () => {
+            if (searchDebounceTimer.current) {
+                clearTimeout(searchDebounceTimer.current);
+            }
+        };
+    }, [experimentSearchQuery, experiments]);
 
     const handleSaveComponent = async () => {
         const token = localStorage.getItem("jwt");
@@ -327,54 +368,110 @@ function ComponentAdd() {
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
                             <CardTitle>Eksperimenti</CardTitle>
                             <Input
-                                placeholder="Pretražite eksperimente"
+                                placeholder="Pretražite eksperimente po imenu, ZPF oznaci ili opisu"
+
                                 value={experimentSearchQuery}
                                 onChange={(e) => {
-                                    const query = e.target.value.toLowerCase();
-                                    setExperimentSearchQuery(query);
-                                    if (!query) {
-                                        setExperimentSearchResults([]);
-                                        return;
-                                    }
-                                    const filtered = experiments.filter((exp) =>
-                                        exp.name.toLowerCase().includes(query)
-                                    );
-                                    setExperimentSearchResults(filtered);
+                                    setExperimentSearchQuery(e.target.value);
                                 }}
                             />
-                            {experimentSearchResults.map((exp) => (
-                                <div key={exp.id} className="w-full flex flex-col space-y-1.5">
-                                    <span>{exp.name}</span>
-                                    <Button
-                                        type="button"
-                                        onClick={() => {
-                                            if (!selectedExperiments.some(e => e.id === exp.id)) {
-                                                setSelectedExperiments([...selectedExperiments, exp]);
-                                            }
-                                        }}
-                                        className="bg-blue-500 text-white hover:bg-blue-600"
-                                    >
-                                        Dodaj
-                                    </Button>
+
+                            {experimentSearchResults.length === 0 ? (
+                                    <p className="text-xs text-gray-500 italic">Nema pretraženih eksperimenata</p>
+                                ) :
+                                <ScrollArea className="h-64 border rounded p-2">
+                                    {experimentSearchResults.map((exp) => (
+                                        <div key={exp.id}
+                                             className="w-full flex flex-col space-y-1.5 mb-3 pb-2 border-b last:border-b-0">
+                                            <Link
+                                                to={`/experiment/view/${exp.id}`}
+                                                className="text-blue-500 hover:underline"
+                                            >
+                                                {exp.name}
+                                            </Link>
+                                            {exp.zpf && <span className="text-xs text-gray-600">ZPF: {exp.zpf}</span>}
+                                            {exp.description && <span
+                                                className="text-xs text-gray-600 line-clamp-2">{exp.description}</span>}
+                                            <Button
+                                                type="button"
+                                                onClick={() => {
+                                                    console.log(`[DEBUG] Dodaj button clicked for experiment:`, exp);
+                                                    if (!selectedExperiments.some(e => e.id === exp.id)) {
+                                                        console.log(`[DEBUG] Adding component to selectedExperiments:`, exp.id, exp.name);
+                                                        setSelectedExperiments([...selectedExperiments, exp]);
+                                                    } else {
+                                                        console.log(`[DEBUG] Experiment already selected:`, exp.id);
+                                                        alert("Eksperiment je već odabran");
+                                                    }
+                                                }}
+                                                className="bg-blue-500 text-white hover:bg-blue-600 text-xs py-1"
+                                            >
+                                                Dodaj
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </ScrollArea>
+                            }
+
+                            {isSearching && (
+                                <div className="text-sm text-gray-500 italic">
+                                    Pretraga u tijeku...
                                 </div>
-                            ))}
+                            )}
+
+                            {experimentSearchQuery && experimentSearchResults.length === 0 && !isSearching && (
+                                <div className="text-sm text-gray-500">
+                                    Nema pronađenih eksperimenata
+                                </div>
+                            )}
+
+                            {experimentSearchResults.length > 0 && (
+                                <div className="text-xs text-gray-600 mb-2">
+                                    Pronađeno {experimentSearchResults.length} rezultata
+                                </div>
+                            )}
+
+                            <br/>
+                            <hr></hr>
+                            <br/>
+
 
                             <div className="mt-2">
-                                <h4 className="text-sm font-medium">Odabrani eksperimenti:</h4>
-                                {selectedExperiments.map((exp, index) => (
-                                    <div key={exp.id} className="flex justify-between items-center border-b py-1">
-                                        <span>{exp.name}</span>
-                                        <Button
-                                            type="button"
-                                            onClick={() =>
-                                                setSelectedExperiments(selectedExperiments.filter((_, i) => i !== index))
-                                            }
-                                            className="bg-red-500 text-white hover:bg-red-600"
-                                        >
-                                            Ukloni
-                                        </Button>
-                                    </div>
-                                ))}
+                                <h4 className="text-sm font-medium">Odabrani eksperimenti
+                                    ({selectedExperiments.length}):</h4>
+                                {selectedExperiments.length === 0 ? (
+                                    <p className="text-xs text-gray-500 italic">Nema odabranih eksperimenata</p>
+                                ) : (
+                                    <ScrollArea className="h-40 border rounded p-2">
+                                        {selectedExperiments.map((exp, index) => (
+                                            <div key={exp.id}
+                                                 className="flex justify-between items-center border-b py-2 px-1 last:border-b-0">
+                                                <div className="flex-1">
+                                                    <span className="text-sm">
+                                                        <Link
+                                                            to={`/experiment/view/${exp.id}`}
+                                                            className="text-blue-500 hover:underline"
+                                                        >
+                                            {exp.name}
+                                        </Link>
+                                                    </span>
+                                                    {exp.zpf && <span
+                                                        className="text-xs text-gray-600 block">ZPF: {exp.zpf}</span>}
+                                                </div>
+                                                <Button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        console.log(`[DEBUG] Removing component:`, exp.id);
+                                                        setSelectedExperiments(selectedExperiments.filter((_, i) => i !== index))
+                                                    }}
+                                                    className="bg-red-500 text-white hover:bg-red-600 text-xs py-1 ml-2"
+                                                >
+                                                    Ukloni
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </ScrollArea>
+                                )}
                             </div>
                         </Card>
 

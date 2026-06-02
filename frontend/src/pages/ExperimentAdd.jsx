@@ -1,12 +1,13 @@
-import React, {useState, useEffect} from "react";
-import {useNavigate} from "react-router-dom";
+import React, {useState, useEffect, useRef} from "react";
+import {Link, useNavigate} from "react-router-dom";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {Input} from "@/components/ui/input";
-import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 import {Textarea} from "@/components/ui/textarea.jsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.jsx";
+
+const DEBOUNCE_DELAY = 300;
 
 function ExperimentAdd() {
     const [components, setComponents] = useState([]);
@@ -15,7 +16,6 @@ function ExperimentAdd() {
     const [keywords, setKeywords] = useState("");
     const [validationMessage, setValidationMessage] = useState("");
     const [internalCode, setInternalCode] = useState("");
-    const [optionalNumbers, setOptionalNumbers] = useState("");
 
     const [experimentName, setExperimentName] = useState();
     const [field, setField] = useState();
@@ -26,9 +26,11 @@ function ExperimentAdd() {
     const [otherImages, setOtherImages] = useState([]);
     const [documents, setDocuments] = useState([]);
 
-    const [componentSearchQuery, setComponentSearchQuery] = useState();
+    const [componentSearchQuery, setComponentSearchQuery] = useState("");
     const [componentSearchResults, setComponentSearchResults] = useState([]);
     const [selectedComponents, setSelectedComponents] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const searchDebounceTimer = useRef(null);
 
 
     useEffect(() => {
@@ -54,6 +56,40 @@ function ExperimentAdd() {
 
         fetchComponents();
     }, []);
+
+    useEffect(() => {
+        if (searchDebounceTimer.current) {
+            clearTimeout(searchDebounceTimer.current);
+        }
+
+        if (!componentSearchQuery.trim()) {
+            setComponentSearchResults([]);
+            setIsSearching(false);
+            return;
+        }
+
+        setIsSearching(true);
+
+        searchDebounceTimer.current = setTimeout(() => {
+            const query = componentSearchQuery.toLowerCase();
+            const filtered = components
+                .filter((comp) =>
+                    comp.name.toLowerCase().includes(query) ||
+                    comp.zpf?.toLowerCase().includes(query) ||
+                    comp.description?.toLowerCase().includes(query)
+                )
+
+            setComponentSearchResults(filtered);
+            setIsSearching(false);
+
+        }, DEBOUNCE_DELAY);
+
+        return () => {
+            if (searchDebounceTimer.current) {
+                clearTimeout(searchDebounceTimer.current);
+            }
+        };
+    }, [componentSearchQuery, components]);
 
     const handleSubmit = async () => {
         const token = localStorage.getItem("jwt");
@@ -198,54 +234,109 @@ function ExperimentAdd() {
                         <Card className="w-full flex flex-col space-y-2.5 p-2">
                             <CardTitle>Komponente</CardTitle>
                             <Input
-                                placeholder="Pretraži komponente"
+                                placeholder="Pretražite komponente po imenu, ZPF inventarnoj oznaci ili opisu"
+
                                 value={componentSearchQuery}
                                 onChange={(e) => {
-                                    const query = e.target.value.toLowerCase();
-                                    setComponentSearchQuery(query);
-                                    if (!query) {
-                                        setComponentSearchResults([]);
-                                        return;
-                                    }
-                                    const filtered = components.filter((comp) =>
-                                        comp.name.toLowerCase().includes(query)
-                                    );
-                                    setComponentSearchResults(filtered);
+                                    setComponentSearchQuery(e.target.value);
                                 }}
                             />
-                            {componentSearchResults.map((comp) => (
-                                <div key={comp.id} className="w-full flex flex-col space-y-1.5">
-                                    <span>{comp.name}</span>
-                                    <Button
-                                        type="button"
-                                        onClick={() => {
-                                            if (!selectedComponents.some(c => c.id === comp.id)) {
-                                                setSelectedComponents([...selectedComponents, comp]);
-                                            }
-                                        }}
-                                        className="bg-blue-500 text-white hover:bg-blue-600"
-                                    >
-                                        Dodaj
-                                    </Button>
+
+                            {isSearching && (
+                                <div className="text-sm text-gray-500 italic">
+                                    Pretraga u tijeku...
                                 </div>
-                            ))}
+                            )}
+
+                            {componentSearchQuery && componentSearchResults.length === 0 && !isSearching && (
+                                <div className="text-sm text-gray-500">
+                                    Nema pronađenih komponenti
+                                </div>
+                            )}
+
+                            {componentSearchResults.length > 0 && (
+                                <div className="text-xs text-gray-600 mb-2">
+                                    Pronađeno {componentSearchResults.length} rezultata
+                                </div>
+                            )}
+
+                            <br/>
+                            <hr></hr>
+                            <br/>
+
+                            {componentSearchResults.length === 0 ? (
+                                    <p className="text-xs text-gray-500 italic">Nema pretraženih komponenti</p>
+                                ) :
+                                <ScrollArea className="h-64 border rounded p-2">
+                                    {componentSearchResults.map((comp) => (
+                                        <div key={comp.id}
+                                             className="w-full flex flex-col space-y-1.5 mb-3 pb-2 border-b last:border-b-0">
+                                            <Link
+                                                to={`/component/view/${comp.id}`}
+                                                className="text-blue-500 hover:underline"
+                                            >
+                                                {comp.name}
+                                            </Link>
+                                            {comp.zpf && <span className="text-xs text-gray-600">ZPF: {comp.zpf}</span>}
+                                            {comp.description && <span
+                                                className="text-xs text-gray-600 line-clamp-2">{comp.description}</span>}
+                                            <Button
+                                                type="button"
+                                                onClick={() => {
+                                                    console.log(`[DEBUG] Dodaj button clicked for component:`, comp);
+                                                    if (!selectedComponents.some(c => c.id === comp.id)) {
+                                                        console.log(`[DEBUG] Adding component to selectedComponents:`, comp.id, comp.name);
+                                                        setSelectedComponents(prev => [...prev, comp]);
+                                                    } else {
+                                                        console.log(`[DEBUG] Component already selected:`, comp.id);
+                                                        alert("Komponenta je već odabrana");
+                                                    }
+                                                }}
+                                                className="bg-blue-500 text-white hover:bg-blue-600 text-xs py-1"
+                                            >
+                                                Dodaj
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </ScrollArea>
+                            }
 
                             <div className="mt-2">
-                                <h4 className="text-sm font-medium">Odabrane komponente:</h4>
-                                {selectedComponents.map((comp, index) => (
-                                    <div key={comp.id} className="flex justify-between items-center border-b py-1">
-                                        <span>{comp.name}</span>
-                                        <Button
-                                            type="button"
-                                            onClick={() =>
-                                                setSelectedComponents(selectedComponents.filter((_, i) => i !== index))
-                                            }
-                                            className="bg-red-500 text-white hover:bg-red-600"
-                                        >
-                                            Ukloni
-                                        </Button>
-                                    </div>
-                                ))}
+                                <h4 className="text-sm font-medium">Odabrane komponente
+                                    ({selectedComponents.length}):</h4>
+                                {selectedComponents.length === 0 ? (
+                                    <p className="text-xs text-gray-500 italic">Nema odabranih komponenti</p>
+                                ) : (
+                                    <ScrollArea className="h-40 border rounded p-2">
+                                        {selectedComponents.map((comp, index) => (
+                                            <div key={comp.id}
+                                                 className="flex justify-between items-center border-b py-2 px-1 last:border-b-0">
+                                                <div className="flex-1">
+                                                    <span className="text-sm">
+                                                        <Link
+                                                            to={`/component/view/${comp.id}`}
+                                                            className="text-blue-500 hover:underline"
+                                                        >
+                                            {comp.name}
+                                        </Link>
+                                                    </span>
+                                                    {comp.zpf && <span
+                                                        className="text-xs text-gray-600 block">ZPF: {comp.zpf}</span>}
+                                                </div>
+                                                <Button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        console.log(`[DEBUG] Removing component:`, comp.id);
+                                                        setSelectedComponents(selectedComponents.filter((_, i) => i !== index));
+                                                    }}
+                                                    className="bg-red-500 text-white hover:bg-red-600 text-xs py-1 ml-2"
+                                                >
+                                                    Ukloni
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </ScrollArea>
+                                )}
                             </div>
                         </Card>
 

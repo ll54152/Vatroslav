@@ -97,7 +97,7 @@ public class ComponentServiceJPA {
             throw new IllegalArgumentException("Lokacija je obavezna");
         }
 
-        if (componentAddDTO.getFerStatus() == null || componentAddDTO.getFer().trim().isEmpty()) {
+        if (componentAddDTO.getFerStatus() == null) {
             throw new IllegalArgumentException("Fer status je obavezan");
         }
 
