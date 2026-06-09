@@ -275,6 +275,10 @@ function ComponentView() {
     }
 
     const handleDeleteComponent = async (id) => {
+        if (!window.confirm("Jeste li sigurni da želite obrisati komponentu?")) {
+            return;
+        }
+
         const token = localStorage.getItem("jwt");
         try {
             const response = await fetch(`/vatroslav/api/component/delete/${id}`, {
@@ -283,7 +287,7 @@ function ComponentView() {
             });
 
             if (response.ok) {
-                alert("Lokacija izbrisana");
+                alert("Komponenta uspješno izbrisana");
                 navigate("/components");
             } else {
                 console.error("Neuspjelo brisanje komponente");

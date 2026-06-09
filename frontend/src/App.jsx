@@ -19,6 +19,8 @@ import ComponentViewLog from "./pages/ComponentViewLog.jsx";
 import ExperimentViewLog from "./pages/ExperimentViewLog.jsx";
 import ComponentEdit from "./pages/ComponentEdit.jsx";
 import Locations from "./pages/Locations.jsx";
+import LocationAdd from "./pages/LocationAdd.jsx";
+import LocationEdit from "./pages/LocationEdit.jsx";
 import LocationView from "./pages/LocationView.jsx";
 import Logs from "./pages/Logs.jsx";
 import Users from "./pages/Users.jsx";
@@ -47,6 +49,8 @@ function App() {
                 <Route path="/component/add" element={<ComponentAdd/>}/>
                 <Route path="/components" element={<Components/>}/>
                 <Route path="/locations" element={<Locations/>}/>
+                <Route path="/location/add" element={<LocationAdd/>}/>
+                <Route path="/location/edit/:id" element={<LocationEdit/>}/>
                 <Route path="/location/view/:id" element={<LocationView/>}/>
                 <Route path="/logs" element={<Logs/>}/>
                 <Route path="/users" element={<Users/>}/>

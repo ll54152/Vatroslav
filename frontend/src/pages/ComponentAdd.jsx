@@ -210,7 +210,7 @@ function ComponentAdd() {
 
             if (response.ok) {
                 const newComponentId = await response.json();
-                alert("Nova komponenta je dodana");
+                alert("Nova komponenta uspješno dodana");
                 navigate(`/component/view/${newComponentId}`);
             } else {
                 try {
@@ -250,7 +250,7 @@ function ComponentAdd() {
 
             if (response.ok) {
                 const data = await response.json();
-                alert("Nova lokacija je dodana");
+                alert("Nova lokacija uspješno dodana");
                 setLocations([...locations, data]);
                 setNewLocationAddress("");
                 setNewLocationRoom("");
@@ -513,9 +513,14 @@ function ComponentAdd() {
                                                         setLocationSearchQuery("");
                                                     }}
                                                 >
+                                                    <div className="flex-1">
                                                     <span
                                                         className="text-sm truncate"><strong>Address:</strong> {loc.address}</span>
-                                                    <span className="text-sm truncate"><strong>Room:</strong> {loc.room}</span>
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <span
+                                                            className="text-sm truncate"><strong>Room:</strong> {loc.room}</span>
+                                                    </div>
                                                 </div>
                                                 <Button
                                                     type="button"

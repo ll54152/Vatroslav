@@ -97,6 +97,10 @@ export default function Experiments() {
     };
 
     const handleDeleteExperiment = async (id) => {
+        if (!window.confirm("Jeste li sigurni da želite obrisati eksperiment?")) {
+            return;
+        }
+
         const token = localStorage.getItem("jwt");
         try {
             const response = await fetch(`/vatroslav/api/experiment/delete/${id}`, {

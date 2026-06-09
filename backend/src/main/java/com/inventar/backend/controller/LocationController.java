@@ -7,6 +7,7 @@ import com.inventar.backend.service.LocationServiceJPA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -67,6 +68,7 @@ public class LocationController {
         }
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteLocation(@PathVariable Long id) {
         if (id == null || id <= 0) {
@@ -88,6 +90,7 @@ public class LocationController {
         }
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateLocation(@PathVariable Long id, @RequestBody Location location) {
         if (id == null || id <= 0) {

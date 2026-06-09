@@ -348,7 +348,7 @@ function ExperimentEdit() {
             });
 
             if (res.ok) {
-                alert("Eksperiment ažuriran");
+                alert("Eksperiment uspješno ažuriran");
                 navigate(`/experiment/view/${id}`);
             } else {
                 try {

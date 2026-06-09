@@ -141,7 +141,7 @@ function ExperimentAdd() {
 
             if (response.ok) {
                 const newExperimentId = await response.json();
-                alert("Novi eksperiment dodan");
+                alert("Novi eksperiment uspješno dodan");
                 navigate(`/experiment/view/${newExperimentId}`);
             } else {
                 try {

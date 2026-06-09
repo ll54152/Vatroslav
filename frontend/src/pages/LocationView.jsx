@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {useParams, useNavigate, Link} from "react-router-dom";
+import {jwtDecode} from "jwt-decode";
 
 export default function LocationView() {
     const {id} = useParams();
@@ -11,11 +12,27 @@ export default function LocationView() {
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [role, setRole] = useState(null);
+
+    const getUserRole = () => {
+        const token = localStorage.getItem("jwt");
+
+        if (!token) return null;
+
+        try {
+            const decoded = jwtDecode(token);
+            return decoded.role;
+        } catch {
+            return null;
+        }
+    };
 
     useEffect(() => {
         const load = async () => {
             setLoading(true);
             setError(null);
+
+            setRole(getUserRole());
 
             try {
                 const token = localStorage.getItem("jwt");
@@ -132,6 +149,36 @@ export default function LocationView() {
         c.keywords?.some(k => k.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
+    const handleDeleteLocation = async () => {
+        if (!window.confirm("Jeste li sigurni da želite obrisati lokaciju?")) {
+            return;
+        }
+
+        const token = localStorage.getItem("jwt");
+
+        try {
+            const response = await fetch(
+                `/vatroslav/api/location/delete/${id}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: token,
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Greška prilikom brisanja lokacije");
+            }
+
+            alert("Lokacija obrisana uspješno");
+
+            navigate("/locations");
+        } catch (err) {
+            alert(err.message);
+        }
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -182,6 +229,25 @@ export default function LocationView() {
                             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">
                                 {location.address} — {location.room}
                             </h1>
+
+                            {role === "ROLE_ADMIN" && (
+                                <div className="flex gap-2">
+                                    <Link to={`/location/edit/${id}`}>
+                                        <button
+                                            className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded"
+                                        >
+                                            Edit
+                                        </button>
+                                    </Link>
+
+                                    <button
+                                        onClick={handleDeleteLocation}
+                                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            )}
                         </div>
                         <input
                             type="text"

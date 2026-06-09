@@ -368,7 +368,7 @@ function ComponentEdit() {
             });
 
             if (res.ok) {
-                alert("Komponenta ažurirana");
+                alert("Komponenta uspješno ažurirana");
                 navigate(`/component/view/${id}`);
             } else {
                 try {
@@ -452,7 +452,7 @@ function ComponentEdit() {
     const handleDeleteLocation = async (locationId) => {
         const token = localStorage.getItem("jwt");
 
-        if (!window.confirm("Jesi siguran da želiš obrisati lokaciju?")) return;
+        if (!window.confirm("Jeste li sigurni da želite obrisati lokaciju?")) return;
 
         try {
             const response = await fetch(`/vatroslav/api/location/delete/${locationId}`, {
@@ -513,7 +513,7 @@ function ComponentEdit() {
 
             if (response.ok) {
                 const data = await response.json();
-                alert("Nova lokacija je dodana");
+                alert("Nova lokacija uspješno dodana");
                 setLocations([...locations, data]);
                 setNewLocationAddress("");
                 setNewLocationRoom("");

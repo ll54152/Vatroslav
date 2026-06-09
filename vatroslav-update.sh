@@ -8,6 +8,7 @@ git pull
 echo "Building frontend..."
 cd ~/Vatroslav/frontend
 npm ci
+npm audit fix
 npm run build
 sudo cp -r dist/* /var/www/html/vatroslav
 
