@@ -12,7 +12,7 @@ public class ComponentShowDTO {
     private String fer;
     private FerStatus ferStatus;
     private List<String> deprecatedInventoryMarks;
-    private int quantity;
+    private Integer quantity;
     private LocationDTO locationDTO;
     private String description;
     private List<String> keywords;
@@ -23,7 +23,7 @@ public class ComponentShowDTO {
     public ComponentShowDTO() {
     }
 
-    public ComponentShowDTO(Long id, String name, String zpf, String fer, FerStatus ferStatus, List<String> deprecatedInventoryMarks, int quantity, LocationDTO locationDTO, String description, List<String> keywords, List<ExperimentDTO> experimentDTOList, List<LogShowDTO> logShowDTOList, List<FileShowDTO> fileShowDTOList) {
+    public ComponentShowDTO(Long id, String name, String zpf, String fer, FerStatus ferStatus, List<String> deprecatedInventoryMarks, Integer quantity, LocationDTO locationDTO, String description, List<String> keywords, List<ExperimentDTO> experimentDTOList, List<LogShowDTO> logShowDTOList, List<FileShowDTO> fileShowDTOList) {
         this.id = id;
         this.name = name;
         this.zpf = zpf;
@@ -75,7 +75,7 @@ public class ComponentShowDTO {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 

@@ -281,6 +281,10 @@ function ExperimentView() {
     }
 
     const handleDeleteExperiment = async (id) => {
+        if (!window.confirm("Jeste li sigurni da želite obrisati eksperiment?")) {
+            return;
+        }
+
         const token = localStorage.getItem("jwt");
         try {
             const response = await fetch(`/vatroslav/api/experiment/delete/${id}`, {
@@ -289,7 +293,7 @@ function ExperimentView() {
             });
 
             if (response.ok) {
-                alert("Eksperiment izbrisan");
+                alert("Eksperiment uspješno izbrisan");
                 navigate("/experiments");
             } else {
                 console.error("Neuspjelo brisanje eksperimenta");
@@ -342,7 +346,8 @@ function ExperimentView() {
                 )}
 
                 <h1 className="text-3xl font-bold mt-4">{experiment.name}</h1>
-                <p className="text-gray-500">{experiment.zpf}</p>
+                <p className="text-gray-500">{experiment.zpf || <EmptyValue text="Nema ZPF oznake"/>}</p>
+
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

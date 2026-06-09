@@ -275,6 +275,10 @@ function ComponentView() {
     }
 
     const handleDeleteComponent = async (id) => {
+        if (!window.confirm("Jeste li sigurni da želite obrisati komponentu?")) {
+            return;
+        }
+
         const token = localStorage.getItem("jwt");
         try {
             const response = await fetch(`/vatroslav/api/component/delete/${id}`, {
@@ -283,7 +287,7 @@ function ComponentView() {
             });
 
             if (response.ok) {
-                alert("Lokacija izbrisana");
+                alert("Komponenta uspješno izbrisana");
                 navigate("/components");
             } else {
                 console.error("Neuspjelo brisanje komponente");
@@ -337,7 +341,8 @@ function ComponentView() {
                 )}
 
                 <h1 className="text-3xl font-bold mt-4">{component.name}</h1>
-                <p className="text-gray-500">{component.zpf}</p>
+                <p className="text-gray-500">{component.zpf || <EmptyValue text="Nema ZPF inventarne oznake"/>}</p>
+
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

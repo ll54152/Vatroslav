@@ -3,7 +3,7 @@ package com.inventar.backend.controller;
 import com.inventar.backend.DTO.ComponentAddDTO;
 import com.inventar.backend.DTO.ComponentDTO;
 import com.inventar.backend.DTO.ComponentEditDTO;
-import com.inventar.backend.DTO.ComponentShowDTO;
+import com.inventar.backend.DTO.ErrorResponseDTO;
 import com.inventar.backend.domain.Component;
 import com.inventar.backend.service.ComponentServiceJPA;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,22 +61,38 @@ public class ComponentController {
     }
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<ComponentShowDTO> getComponent(@PathVariable Long id) {
+    public ResponseEntity<Object> getComponent(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), "Nevažeći ID", "ID komponente mora biti pozitivan broj"),
+                    HttpStatus.BAD_REQUEST);
+        }
+
         Component component = componentServiceJPA.findById(id);
         if (component == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.NOT_FOUND.value(), "Komponenta nije pronađena", "Komponenta sa ID: " + id + " ne postoji"),
+                    HttpStatus.NOT_FOUND);
         } else {
             return new ResponseEntity<>(componentServiceJPA.getShowDTO(component), HttpStatus.OK);
         }
     }
 
     @GetMapping("/getByLocationID/{id}")
-    public ResponseEntity<List<ComponentDTO>> getComponentByLocationID(@PathVariable Long id) {
-        List<ComponentDTO> componentDTOList = componentServiceJPA.getComponentByLocationID(id);
-        if (componentDTOList == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
+    public ResponseEntity<Object> getComponentByLocationID(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), "Nevažeći ID", "ID lokacije mora biti pozitivan broj"),
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            List<ComponentDTO> componentDTOList = componentServiceJPA.getComponentByLocationID(id);
             return new ResponseEntity<>(componentDTOList, HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(
+                    new ErrorResponseDTO(HttpStatus.NOT_FOUND.value(), "Lokacija nije pronađena", ex.getMessage()),
+                    HttpStatus.NOT_FOUND);
         }
     }
 

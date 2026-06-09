@@ -8,6 +8,7 @@ import com.inventar.backend.DTO.ExperimentShowDTO;
 import com.inventar.backend.domain.Component;
 import com.inventar.backend.domain.Experiment;
 import com.inventar.backend.domain.User;
+import com.inventar.backend.exception.ResourceNotFoundException;
 import com.inventar.backend.mapper.ExperimentMapper;
 import com.inventar.backend.repo.ComponentRepo;
 import com.inventar.backend.repo.ExperimentRepo;
@@ -45,6 +46,14 @@ public class ExperimentServiceJPA {
 
     @Transactional
     public Long save(ExperimentAddDTO experimentAddDTO, MultipartFile[] files, MultipartFile profileImage, MultipartFile[] otherImages) {
+        if (experimentAddDTO == null) {
+            throw new IllegalArgumentException("Podaci eksperimenta ne smiju biti prazni");
+        }
+
+        if (experimentAddDTO.getName() == null || experimentAddDTO.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Naziv eksperimenta je obavezan");
+        }
+
         User user = userServiceJPA.getAuthenticatedUser();
 
         List<Component> componentList = componentRepo.findAllById(experimentAddDTO.getComponentIds());
@@ -64,9 +73,21 @@ public class ExperimentServiceJPA {
 
     @Transactional
     public void edit(Long id, ExperimentEditDTO experimentEditDTO, MultipartFile[] files, MultipartFile profileImage, MultipartFile[] otherImages) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("Nevažeći ID eksperimenta");
+        }
+
+        if (experimentEditDTO == null) {
+            throw new IllegalArgumentException("Podaci eksperimenta ne smiju biti prazni");
+        }
+
+        if (experimentEditDTO.getName() == null || experimentEditDTO.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Naziv eksperimenta je obavezan");
+        }
+
         User user = userServiceJPA.getAuthenticatedUser();
 
-        Experiment experiment = experimentRepo.findById(id).orElseThrow(() -> new RuntimeException("Experiment not found"));
+        Experiment experiment = experimentRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Experiment", "id", id));
 
         List<Component> newComponents = componentRepo.findAllById(experimentEditDTO.getComponentIds());
 
@@ -128,7 +149,7 @@ public class ExperimentServiceJPA {
         } else {
             if (experiment.getZpf() == null || !experiment.getZpf().equals(experimentEditDTO.getZpf())) {
                 if (componentRepo.findByZpf(experimentEditDTO.getZpf()).isPresent()) {
-                    throw new RuntimeException("Experiment with same ZPF exists");
+                    throw new IllegalArgumentException("Experiment with same ZPF already exists");
                 }
                 experiment.setZpf(experimentEditDTO.getZpf());
             }
@@ -137,7 +158,11 @@ public class ExperimentServiceJPA {
 
     @Transactional
     public void deleteById(Long id) {
-        Experiment experiment = experimentRepo.findById(id).orElseThrow(() -> new RuntimeException("Experiment not found"));
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("Nevažeći ID eksperimenta");
+        }
+
+        Experiment experiment = experimentRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Experiment", "id", id));
 
         User user = userServiceJPA.getAuthenticatedUser();
 
@@ -188,7 +213,7 @@ public class ExperimentServiceJPA {
 
     private Experiment mapDTOtoEntity(ExperimentAddDTO experimentAddDTO, List<Component> componentList) {
         if (experimentRepo.findByZpf(experimentAddDTO.getZpf()).isPresent()) {
-            throw new RuntimeException("Experiment with same ZPF already exists");
+            throw new IllegalArgumentException("Experiment with same ZPF already exists");
         }
 
         Experiment experiment = new Experiment(

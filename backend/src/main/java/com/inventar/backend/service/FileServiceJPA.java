@@ -5,6 +5,7 @@ import com.inventar.backend.domain.Component;
 import com.inventar.backend.domain.Experiment;
 import com.inventar.backend.domain.File;
 import com.inventar.backend.domain.User;
+import com.inventar.backend.exception.ResourceNotFoundException;
 import com.inventar.backend.repo.ComponentRepo;
 import com.inventar.backend.repo.ExperimentRepo;
 import com.inventar.backend.repo.FileRepo;
@@ -47,7 +48,7 @@ public class FileServiceJPA {
         try {
             bytes = file.getBytes();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException("Greška pri čitanju datoteke: " + e.getMessage());
         }
 
         return bytes;
@@ -55,6 +56,10 @@ public class FileServiceJPA {
 
     @Transactional
     public File uploadExperimentFile(FileDTO fileDTO) {
+        if (fileDTO == null || fileDTO.getEntityId() == null) {
+            throw new IllegalArgumentException("ID eksperimenta je obavezan");
+        }
+
         byte[] bytes = uploadFile(fileDTO.getData());
 
         File file = new File(
@@ -65,12 +70,16 @@ public class FileServiceJPA {
                 userServiceJPA.getAuthenticatedUser()
         );
 
-        file.setExperiment(experimentRepo.findById(fileDTO.getEntityId()).orElseThrow(() -> new RuntimeException("Experiment not found")));
+        file.setExperiment(experimentRepo.findById(fileDTO.getEntityId()).orElseThrow(() -> new ResourceNotFoundException("Experiment", "id", fileDTO.getEntityId())));
         return fileRepo.save(file);
     }
 
     @Transactional
     public File uploadComponentFile(FileDTO fileDTO) {
+        if (fileDTO == null || fileDTO.getEntityId() == null) {
+            throw new IllegalArgumentException("ID komponente je obavezan");
+        }
+
         byte[] bytes = uploadFile(fileDTO.getData());
 
         File file = new File(
@@ -81,7 +90,7 @@ public class FileServiceJPA {
                 userServiceJPA.getAuthenticatedUser()
         );
 
-        file.setComponent(componentRepo.findById(fileDTO.getEntityId()).orElseThrow(() -> new RuntimeException("Location not found")));
+        file.setComponent(componentRepo.findById(fileDTO.getEntityId()).orElseThrow(() -> new ResourceNotFoundException("Component", "id", fileDTO.getEntityId())));
 
         return fileRepo.save(file);
     }
@@ -223,10 +232,7 @@ public class FileServiceJPA {
 
     @Transactional
     public void deleteById(Long fileId) {
-        File file = fileRepo.findById(fileId).orElse(null);
-        if (file != null) {
-            fileRepo.delete(file);
-        }
+        fileRepo.findById(fileId).ifPresent(fileRepo::delete);
     }
 
     @Transactional

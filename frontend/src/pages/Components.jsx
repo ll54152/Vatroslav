@@ -107,6 +107,10 @@ export default function Components() {
     };
 
     const handleDeleteComponent = async (id) => {
+        if (!window.confirm("Jeste li sigurni da želite obrisati komponentu?")) {
+            return;
+        }
+
         const token = localStorage.getItem("jwt");
         try {
             const response = await fetch(`/vatroslav/api/component/delete/${id}`, {

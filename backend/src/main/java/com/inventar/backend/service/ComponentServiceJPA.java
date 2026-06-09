@@ -8,6 +8,7 @@ import com.inventar.backend.domain.Component;
 import com.inventar.backend.domain.Experiment;
 import com.inventar.backend.domain.Location;
 import com.inventar.backend.domain.User;
+import com.inventar.backend.exception.ResourceNotFoundException;
 import com.inventar.backend.mapper.ComponentMapper;
 import com.inventar.backend.mapper.ExperimentMapper;
 import com.inventar.backend.mapper.FileMapper;
@@ -62,9 +63,11 @@ public class ComponentServiceJPA {
 
     @Transactional
     public Long save(ComponentAddDTO componentAddDTO, MultipartFile[] files, MultipartFile profileImage, MultipartFile[] otherImages) {
+        validateBasicComponentAddDTOFields(componentAddDTO);
+
         User user = userServiceJPA.getAuthenticatedUser();
 
-        Location location = locationRepo.findById(componentAddDTO.getLocationID()).orElseThrow(() -> new RuntimeException("Location not found"));
+        Location location = locationRepo.findById(componentAddDTO.getLocationID()).orElseThrow(() -> new ResourceNotFoundException("Location", "id", componentAddDTO.getLocationID()));
 
         List<Experiment> experimentList = experimentRepo.findAllById(componentAddDTO.getExperimentIds());
 
@@ -81,13 +84,41 @@ public class ComponentServiceJPA {
         return component.getId();
     }
 
+    private static void validateBasicComponentAddDTOFields(ComponentAddDTO componentAddDTO) {
+        if (componentAddDTO == null) {
+            throw new IllegalArgumentException("Podaci komponente ne smiju biti prazni");
+        }
+
+        if (componentAddDTO.getName() == null || componentAddDTO.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Naziv komponente je obavezan");
+        }
+
+        if (componentAddDTO.getLocationID() == null) {
+            throw new IllegalArgumentException("Lokacija je obavezna");
+        }
+
+        if (componentAddDTO.getFerStatus() == null) {
+            throw new IllegalArgumentException("Fer status je obavezan");
+        }
+
+        if (componentAddDTO.getQuantity() == null) {
+            throw new IllegalArgumentException("Količina je obavezna");
+        }
+
+        if (componentAddDTO.getZpf() == null || componentAddDTO.getZpf().trim().isEmpty()) {
+            throw new IllegalArgumentException("ZPF inventarna oznaka je obavezan");
+        }
+    }
+
     @Transactional
     public void edit(Long id, ComponentEditDTO componentEditDTO, MultipartFile[] files, MultipartFile profileImage, MultipartFile[] otherImages) {
+        validateBasicComponentEditDTOFields(id, componentEditDTO);
+
         User user = userServiceJPA.getAuthenticatedUser();
 
-        Component component = componentRepo.findById(id).orElseThrow(() -> new RuntimeException("Component not found"));
+        Component component = componentRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Component", "id", id));
 
-        Location location = locationRepo.findById(componentEditDTO.getLocationID()).orElseThrow(() -> new RuntimeException("Location not found"));
+        Location location = locationRepo.findById(componentEditDTO.getLocationID()).orElseThrow(() -> new ResourceNotFoundException("Location", "id", componentEditDTO.getLocationID()));
 
         List<Experiment> newExperiments = experimentRepo.findAllById(componentEditDTO.getExperimentIds());
 
@@ -100,6 +131,36 @@ public class ComponentServiceJPA {
         logServiceJPA.componentUpdated(component, user);
 
         componentRepo.save(component);
+    }
+
+    private static void validateBasicComponentEditDTOFields(Long id, ComponentEditDTO componentEditDTO) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("Nevažeći ID komponente");
+        }
+
+        if (componentEditDTO == null) {
+            throw new IllegalArgumentException("Podaci komponente ne smiju biti prazni");
+        }
+
+        if (componentEditDTO.getLocationID() == null) {
+            throw new IllegalArgumentException("Lokacija je obavezna");
+        }
+
+        if (componentEditDTO.getName() == null || componentEditDTO.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Naziv komponente je obavezan");
+        }
+
+        if (componentEditDTO.getFerStatus() == null) {
+            throw new IllegalArgumentException("Fer status je obavezan");
+        }
+
+        if (componentEditDTO.getQuantity() == null) {
+            throw new IllegalArgumentException("Količina je obavezna");
+        }
+
+        if (componentEditDTO.getZpf() == null || componentEditDTO.getZpf().trim().isEmpty()) {
+            throw new IllegalArgumentException("ZPF inventarna oznaka je obavezna");
+        }
     }
 
     public ComponentShowDTO getShowDTO(Component component) {
@@ -153,7 +214,11 @@ public class ComponentServiceJPA {
     }
 
     public List<ComponentDTO> getComponentByLocationID(Long id) {
-        Location location = locationRepo.findById(id).orElseThrow(() -> new RuntimeException("Location not found"));
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("Nevažeći ID lokacije");
+        }
+
+        Location location = locationRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Location", "id", id));
 
         if (location.getComponentList() == null) {
             return new ArrayList<>();
@@ -187,7 +252,7 @@ public class ComponentServiceJPA {
         } else {
             if (component.getZpf() == null || !component.getZpf().equals(componentEditDTO.getZpf())) {
                 if (componentRepo.findByZpf(componentEditDTO.getZpf()).isPresent()) {
-                    throw new RuntimeException("Component with same ZPF exists");
+                    throw new IllegalArgumentException("Component with same ZPF already exists");
                 }
                 component.setZpf(componentEditDTO.getZpf());
             }
@@ -200,7 +265,7 @@ public class ComponentServiceJPA {
         } else {
             if (component.getFer() == null || !component.getFer().equals(componentEditDTO.getFer())) {
                 if (componentRepo.findByFer(componentEditDTO.getFer()).isPresent()) {
-                    throw new RuntimeException("Component with same FER exists");
+                    throw new IllegalArgumentException("Component with same FER already exists");
                 }
                 component.setFer(componentEditDTO.getFer());
             }
@@ -209,7 +274,11 @@ public class ComponentServiceJPA {
 
     @Transactional
     public void deleteById(Long id) {
-        Component component = componentRepo.findById(id).orElseThrow(() -> new RuntimeException("Component not found"));
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("Nevažeći ID komponente");
+        }
+
+        Component component = componentRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Component", "id", id));
 
         User user = userServiceJPA.getAuthenticatedUser();
 
@@ -255,7 +324,7 @@ public class ComponentServiceJPA {
 
     private Component mapDTOtoEntity(ComponentAddDTO componentAddDTO, Location location, List<Experiment> experimentList) {
         if (componentRepo.findByZpf(componentAddDTO.getZpf()).isPresent()) {
-            throw new RuntimeException("Component with same ZPF already exists");
+            throw new IllegalArgumentException("Component with same ZPF already exists");
         }
 
         Component component = new Component(
