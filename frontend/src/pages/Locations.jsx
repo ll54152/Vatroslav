@@ -158,11 +158,11 @@ export default function Locations() {
                     >
                         <div className="flex justify-between items-start">
                             <div>
-                                <div className="font-semibold">
+                                <div className="font-semibold text-start">
                                     <HighlightedText text={loc.room} highlight={search}/>
                                 </div>
 
-                                <div className="text-sm text-gray-700">
+                                <div className="text-sm text-gray-700 text-start">
                                     <HighlightedText text={loc.address} highlight={search}/>
                                 </div>
                             </div>
