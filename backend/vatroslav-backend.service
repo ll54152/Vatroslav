@@ -4,13 +4,14 @@ After=network.target
 
 [Service]
 #Change username
-User=luka
+User=linux_username
 
 #Location of Spring Boot application (backend)
-WorkingDirectory=/home/luka/Vatroslav/backend
+WorkingDirectory=
 
 #Location of Java executable and Spring Boot application JAR file
-ExecStart=/home/luka/.sdkman/candidates/java/current/bin/java -jar target/backend-0.0.1-SNAPSHOT.jar
+#Java executable path can be found by running `which java` in the terminal
+ExecStart=java_executablepath -jar location_of_jar_file
 
 #Graceful shutdown settings
 SuccessExitStatus=143
