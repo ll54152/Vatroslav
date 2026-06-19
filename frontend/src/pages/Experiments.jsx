@@ -171,14 +171,12 @@ export default function Experiments() {
                             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">
                                 Eksperimenti
                             </h1>
-                            {role === "ROLE_ADMIN" && (
-                                <Link to="/experiment/add">
-                                    <button
-                                        className="px-3 sm:px-4 md:px-6 py-2 bg-pink-500 hover:bg-pink-600 text-white font-semibold text-sm sm:text-base rounded-lg transition duration-200 shadow-md hover:shadow-lg w-full sm:w-auto">
-                                        Dodajte eksperiment
-                                    </button>
-                                </Link>
-                            )}
+                            <Link to="/experiment/add">
+                                <button
+                                    className="px-3 sm:px-4 md:px-6 py-2 bg-pink-500 hover:bg-pink-600 text-white font-semibold text-sm sm:text-base rounded-lg transition duration-200 shadow-md hover:shadow-lg w-full sm:w-auto">
+                                    Dodajte eksperiment
+                                </button>
+                            </Link>
                         </div>
                         <input
                             type="text"
