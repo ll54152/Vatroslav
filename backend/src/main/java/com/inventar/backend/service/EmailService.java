@@ -24,9 +24,10 @@ public class EmailService {
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
-        message.setSubject("Password Reset Request");
-        message.setText("Click the link to reset your password:\n" + resetLink +
-                "\n\nThis link expires in 15 minutes.");
+        message.setSubject("Obnova Vatroslav lozinke");
+        message.setText("Ukoliko ste zatražili obnovu Vatroslav lozinke, molimo pritisnite na sljedeću poveznicu:\n" + resetLink +
+                "\n\n Ako ovaj zahtjev niste zatražili, molimo zanemarite ovu poruku." +
+                "\n Fakultet elektrotehnike i računarstva - Sveučilišta u Zagrebu");
 
         mailSender.send(message);
     }
