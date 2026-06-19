@@ -46,7 +46,7 @@ export default function ResetPassword() {
         <div className="flex h-[calc(100dvh-64px)] items-center justify-center overflow-hidden">
             <Card className="w-full max-w-md">
                 <CardHeader>
-                    <CardTitle>Reset Lozinke</CardTitle>
+                    <CardTitle>Obnova lozinke</CardTitle>
                     <CardDescription>
                         Unesite novu lozinku.
                     </CardDescription>

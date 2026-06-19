@@ -19,7 +19,7 @@ export default function ForgotPassword() {
             });
 
             if (response.ok) {
-                setMessage("Ukoliko korisnički račun postoji, poslana Vam je poveznica za reset lozinke.");
+                setMessage("Ukoliko korisnički račun postoji, poslana Vam je poveznica za obnovu lozinke.");
             } else {
                 const error = await response.text();
                 setMessage(`Error: ${error}`);
@@ -34,10 +34,10 @@ export default function ForgotPassword() {
         <div className="flex h-[calc(100dvh-64px)] items-center justify-center overflow-hidden">
             <Card className="w-full max-w-md">
                 <CardHeader>
-                    <CardTitle>Reset Lozinke</CardTitle>
+                    <CardTitle>Obnova lozinke</CardTitle>
 
                     <CardDescription>
-                        Unesite email da biste dobili link za reset lozinke.
+                        Unesite email adresu na koju će Vam biti poslana poveznica za obnovu lozinke.
                     </CardDescription>
                 </CardHeader>
 

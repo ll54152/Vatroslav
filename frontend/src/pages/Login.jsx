@@ -79,8 +79,8 @@ function Login() {
                 console.log("Login successful, Token:", token);
                 navigate("/mainpage");
             } else {
-                const error = await response.text();
-                alert(`Error: ${error}`);
+                const error = await response.json();
+                alert(`Error: ${error.details}`);
             }
         } catch (error) {
             console.error("Error during login:", error);

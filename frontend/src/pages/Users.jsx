@@ -176,8 +176,8 @@ function Users() {
             );
 
             if (response.ok) {
-                const msg = await response.text();
-                alert(`Uspjeh: ${msg}`);
+                const msg = await response.json();
+                alert(`Uspjeh: ${msg.details}`);
             } else {
                 const err = await response.text();
                 alert(`Greška: ${err}`);
@@ -228,8 +228,8 @@ function Users() {
             );
 
             if (response.ok) {
-                const data = await response.text();
-                alert(`Uspjeh: ${data}`);
+                const data = await response.json();
+                alert(`Uspjeh: ${data.details}`);
 
                 setSignupForm({
                     ime: "",
