@@ -19,6 +19,9 @@ function ExperimentViewLog() {
     const [logs, setLogs] = useState([]);
     const [error, setError] = useState(null);
     const [logToDelete, setLogToDelete] = useState(null);
+    const [profileImageUrl, setProfileImageUrl] = useState(null);
+
+    const profileImageFile = experiment?.fileShowDTOList?.find(f => f.fileCategory === "profileImage");
 
     const isTokenValid = () => {
         const token = localStorage.getItem("jwt");
@@ -81,6 +84,24 @@ function ExperimentViewLog() {
         fetchExperiment();
     }, [id, navigate]);
 
+    useEffect(() => {
+        const loadProfileImage = async () => {
+            if (!profileImageFile) return;
+
+            const token = localStorage.getItem("jwt");
+            const res = await fetch(`/vatroslav/api/files/image/${profileImageFile.id}`, {
+                headers: {Authorization: `${token}`},
+            });
+
+            if (!res.ok) return;
+
+            const blob = await res.blob();
+            setProfileImageUrl(URL.createObjectURL(blob));
+        };
+
+        loadProfileImage();
+    }, [profileImageFile]);
+
     if (loading) return <div className="p-6">Učitavanje...</div>;
     if (error) return <p className="text-red-500">{error}</p>;
     if (!experiment) return <div className="p-6">Nema podataka</div>;
@@ -89,7 +110,6 @@ function ExperimentViewLog() {
         <span className="text-gray-400 italic">{text}</span>
     );
 
-    const profileImage = experiment.fileShowDTOList?.find(f => f.fileCategory === "profileImage");
 
     const fetchLogsAgain = async () => {
         const token = localStorage.getItem("jwt");
@@ -164,12 +184,17 @@ function ExperimentViewLog() {
         <div className="min-h-screen p-6">
 
             <div className="flex flex-col items-center mb-10">
-
-                {profileImage ? (
-                    <img
-                        src={`data:image/jpeg;base64,${profileImage.fileByte}`}
-                        onClick={() => openImage(profileImage)}
-                    />
+                {profileImageFile ? (
+                    profileImageUrl ? (
+                        <img
+                            src={profileImageUrl}
+                            className="w-full max-w-md sm:max-w-2xl h-auto rounded-2xl object-contain cursor-pointer"
+                        />
+                    ) : (
+                        <div className="w-56 h-56 bg-gray-200 rounded-3xl flex items-center justify-center">
+                            <span className="text-gray-400 italic">Učitavanje...</span>
+                        </div>
+                    )
                 ) : (
                     <div className="w-56 h-56 bg-gray-200 rounded-3xl flex items-center justify-center">
                         <EmptyValue text="Nema profilne fotografije"/>
@@ -236,14 +261,7 @@ function ExperimentViewLog() {
                                                 Izbriši
                                             </button>
                                         </>
-                                    ) : (
-                                        <>
-                                            <button
-                                                className="absolute right-0 top-1/2 -translate-y-1/2 bg-red-500 text-white px-3 py-2 rounded text-sm opacity-50 cursor-not-allowed">
-                                                Izbriši
-                                            </button>
-                                        </>
-                                    )}
+                                    ) : null}
 
                                 </div>
                             )) : (
