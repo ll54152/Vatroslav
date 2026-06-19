@@ -355,9 +355,17 @@ function ComponentView() {
                         <CardContent className="space-y-2">
                             <div>
                                 <b>Lokacija: </b>
-                                {component.locationDTO
-                                    ? `${component.locationDTO.address}, ${component.locationDTO.room}`
-                                    : <EmptyValue text="Nema lokacije"/>}
+
+                                <div
+                                    key={component.locationDTO.id}
+                                    className="text-blue-500 hover:underline cursor-pointer"
+                                    onClick={() => navigate(`/location/view/${component.locationDTO.id}`)}
+                                >
+                                    {component.locationDTO
+                                        ? `${component.locationDTO.address}, ${component.locationDTO.room}`
+                                        : <EmptyValue text="Nema lokacije"/>}
+                                </div>
+
                             </div>
                             <div><b>Količina: </b>{component.quantity}</div>
                             <div><b>Ključne riječi: </b>
