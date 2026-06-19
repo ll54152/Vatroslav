@@ -185,14 +185,12 @@ export default function Components() {
                             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">
                                 Komponente
                             </h1>
-                            {role === "ROLE_ADMIN" && (
-                                <Link to="/component/add">
-                                    <button
-                                        className="px-3 sm:px-4 md:px-6 py-2 bg-pink-500 hover:bg-pink-600 text-white font-semibold text-sm sm:text-base rounded-lg transition duration-200 shadow-md hover:shadow-lg w-full sm:w-auto">
-                                        Dodajte komponentu
-                                    </button>
-                                </Link>
-                            )}
+                            <Link to="/component/add">
+                                <button
+                                    className="px-3 sm:px-4 md:px-6 py-2 bg-pink-500 hover:bg-pink-600 text-white font-semibold text-sm sm:text-base rounded-lg transition duration-200 shadow-md hover:shadow-lg w-full sm:w-auto">
+                                    Dodajte komponentu
+                                </button>
+                            </Link>
                         </div>
                         <input
                             type="text"
